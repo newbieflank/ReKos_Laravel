@@ -9,7 +9,6 @@ use Illuminate\Notifications\Notifiable;
 class UserDetail extends Model
 {
     use HasFactory, Notifiable;
-    protected $table = "user_detail";
 
     protected $fillable = [
         'user_id',
