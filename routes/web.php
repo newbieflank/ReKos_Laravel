@@ -11,8 +11,6 @@ Route::get('/', function () {
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/login', [AuthController::class, 'auth_login'])->name('login.auth');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
-Route::post('/register', [AuthController::class, 'register'])->name('register.auth');
+Route::post('/register', [AuthController::class, 'auth_register'])->name('register.auth');
 
-Route::get('/detailkos', [KosController::class, 'showDetail']);
-
-
+Route::get('/detailkos', [KosController::class, 'showDetail'])->name('detail');
