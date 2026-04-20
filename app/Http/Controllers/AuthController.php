@@ -33,7 +33,7 @@ class AuthController extends Controller
 
             $request->session()->regenerate();
 
-            return redirect()->route('detail')
+            return redirect()->route('home')
                 ->with('success', 'Selamat datang kembali, ' . Auth::user()->name . '!');
         }
 
@@ -74,5 +74,17 @@ class AuthController extends Controller
 
             return back()->withErrors(['error' => 'Terjadi kesalahan saat pendaftaran.']);
         }
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')
+            ->with('success', 'Anda telah berhasil keluar.');
     }
 }

@@ -10,16 +10,61 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto fw-medium">
-                <li class="nav-item px-2"><a class="nav-link active text-primary" href="#">Home</a></li>
-                <li class="nav-item px-2"><a class="nav-link" href="#">Kost-an</a></li>
-                <li class="nav-item px-2"><a class="nav-link" href="#">Service</a></li>
-                <li class="nav-item px-2"><a class="nav-link" href="#">Contact</a></li>
+                <li class="nav-item px-2">
+                    <a class="nav-link" href="{{ route('home') }}">Home</a>
+                </li>
+                <li class="nav-item px-2">
+                    <a class="nav-link" href="{{ url('/#kostan') }}">Kost-an</a>
+                </li>
+                <li class="nav-item px-2">
+                    <a class="nav-link" href="{{ url('/#service') }}">Service</a>
+                </li>
+                <li class="nav-item px-2">
+                    <a class="nav-link" href="{{ url('/#contact') }}">Contact</a>
+                </li>
             </ul>
 
-            <div class="d-flex gap-2 mt-3 mt-lg-0">
-                <a href="{{ route('login') }}" class="btn btn-outline-primary rounded-pill px-4 fw-medium">Sign In</a>
-                <a href="{{ route('register') }}" class="btn btn-primary px-4 fw-medium text-white">Sign Up</a>
-            </div>
+            <ul class="navbar-nav ms-auto align-items-center">
+                @guest
+                    <li class="nav-item">
+                        <a href="{{ route('login') }}" class="btn btn-outline-primary me-2">Sign In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('register') }}" class="btn btn-primary">Sign Up</a>
+                    </li>
+                @else
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown"
+                            role="button" data-bs-toggle="dropdown">
+                            <img src="{{ auth()->user()->avatar_url }}" class="rounded-circle me-2" width="35"
+                                height="35">
+                            <span>{{ Str::limit(auth()->user()->name, 15, '...') }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ route('login') }}">Riwayat</a></li>
+
+                            @if (auth()->user()->role === 'owner')
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="{{ route('login') }}">Data Kost</a></li>
+                                <li><a class="dropdown-item" href="{{ route('login') }}">Data Kamar</a></li>
+                            @endif
+
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item text-danger">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                @endguest
+            </ul>
         </div>
     </div>
 </nav>
