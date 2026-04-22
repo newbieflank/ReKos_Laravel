@@ -258,6 +258,17 @@
             <p class="text-secondary small">Kelola hunian, fasilitas, dan status penyewa Kost Anda.</p>
         </div>
 
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert"
+                style="background-color: #d1e7dd; color: #0f5132; border-radius: 12px;">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-circle-check fs-5"></i>
+                    <span class="fw-medium">{{ session('success') }}</span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <div class="row mb-4">
             <div class="col-12">
                 <div class="search-filter-bar">
@@ -419,10 +430,10 @@
             </div>
 
             <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                <div class="add-room-card">
+                <a href="{{ route('pemilik.kamar.tambah') }}" class="add-room-card text-decoration-none">
                     <i class="fa-solid fa-plus mb-2" style="font-size: 28px;"></i>
                     <h5 class="fw-bold mb-0">Tambah Kamar</h5>
-                </div>
+                </a>
             </div>
 
         </div>
