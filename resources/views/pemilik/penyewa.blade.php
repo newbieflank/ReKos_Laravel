@@ -147,8 +147,18 @@
         }
 
         .badge-status.pending {
-            background-color: #f1f3f5;
-            color: #6c757d;
+            background-color: #fff3cd;
+            color: #b45309;
+        }
+
+        .badge-status.complete {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-status.cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
         }
 
         .badge-pay {
@@ -250,10 +260,14 @@
 
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
             <div class="filter-tabs">
-                <a href="#" class="filter-tab-link active">Semua</a>
-                <a href="#" class="filter-tab-link">Aktif</a>
-                <a href="#" class="filter-tab-link">Pending</a>
-                <a href="#" class="filter-tab-link">Terminated</a>
+                <a href="{{ route('pemilik.penyewa') }}"
+                    class="filter-tab-link {{ !$statusFilter ? 'active' : '' }}">Semua</a>
+                <a href="{{ route('pemilik.penyewa', ['status' => 'active']) }}"
+                    class="filter-tab-link {{ $statusFilter === 'active' ? 'active' : '' }}">Aktif</a>
+                <a href="{{ route('pemilik.penyewa', ['status' => 'pending']) }}"
+                    class="filter-tab-link {{ $statusFilter === 'pending' ? 'active' : '' }}">Pending</a>
+                <a href="{{ route('pemilik.penyewa', ['status' => 'cancelled']) }}"
+                    class="filter-tab-link {{ $statusFilter === 'cancelled' ? 'active' : '' }}">Terminated</a>
             </div>
             <div class="action-btns d-flex gap-2">
                 <button class="btn btn-outline-custom"><i class="fa-solid fa-filter me-2"></i> Filter</button>
@@ -277,86 +291,51 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @forelse($tenants as $tenant)
                         <tr>
-                            <td class="fw-bold">Yuyun</td>
-                            <td>A101</td>
-                            <td>01-01-24</td>
-                            <td>01-02-24</td>
-                            <td><span class="badge-status active">ACTIVE</span></td>
-                            <td><span class="badge-pay lunas">LUNAS</span></td>
-                            <td>0822xxx</td>
+                            <td class="fw-bold">{{ $tenant->user->name ?? '-' }}</td>
+                            <td>{{ $tenant->room->room_name ?? '-' }}</td>
+                            <td>{{ $tenant->start_date ? $tenant->start_date->format('d-m-y') : '-' }}</td>
+                            <td>{{ $tenant->end_date ? $tenant->end_date->format('d-m-y') : '-' }}</td>
                             <td>
-                                <i class="fa-solid fa-pen table-action-icon edit"></i>
-                                <i class="fa-regular fa-trash-can table-action-icon delete" style="color: #e03131;"></i>
+                                <span class="badge-status {{ $tenant->status }}">
+                                    {{ strtoupper($tenant->status) }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-pay {{ $tenant->total_price > 0 ? 'lunas' : 'belum' }}">
+                                    {{ $tenant->total_price > 0 ? 'LUNAS' : 'BELUM BAYAR' }}
+                                </span>
+                            </td>
+                            <td>{{ $tenant->user->userDetail->phone ?? '-' }}</td>
+                            <td>
+                                <a href="{{ route('pemilik.penyewa.edit', $tenant->id) }}" class="table-action-icon edit" title="Edit">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                <form action="{{ route('pemilik.penyewa.hapus', $tenant->id) }}" method="POST" class="d-inline" onsubmit="event.preventDefault(); confirmDelete(this, 'Yakin ingin menghapus data penyewa ini?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="border-0 bg-transparent p-0">
+                                        <i class="fa-regular fa-trash-can table-action-icon delete" style="color: #e03131;"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
+                        @empty
                         <tr>
-                            <td class="fw-bold">Ahmad Rizky</td>
-                            <td>B205</td>
-                            <td>15-12-23</td>
-                            <td>15-06-24</td>
-                            <td><span class="badge-status active">ACTIVE</span></td>
-                            <td><span class="badge-pay lunas">LUNAS</span></td>
-                            <td>0857xxx</td>
-                            <td>
-                                <i class="fa-solid fa-pen table-action-icon edit"></i>
-                                <i class="fa-regular fa-trash-can table-action-icon delete" style="color: #e03131;"></i>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="fa-solid fa-inbox me-2"></i> Belum ada penyewa terdaftar.
                             </td>
                         </tr>
-                        <tr>
-                            <td class="fw-bold">Siti Aminah</td>
-                            <td>C003</td>
-                            <td>10-01-24</td>
-                            <td>10-04-24</td>
-                            <td><span class="badge-status pending">PENDING</span></td>
-                            <td><span class="badge-pay belum">BELUM BAYAR</span></td>
-                            <td>0812xxx</td>
-                            <td>
-                                <i class="fa-solid fa-pen table-action-icon edit"></i>
-                                <i class="fa-regular fa-trash-can table-action-icon delete" style="color: #e03131;"></i>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">Budi Santoso</td>
-                            <td>A112</td>
-                            <td>05-01-24</td>
-                            <td>05-01-25</td>
-                            <td><span class="badge-status active">ACTIVE</span></td>
-                            <td><span class="badge-pay lunas">LUNAS</span></td>
-                            <td>0899xxx</td>
-                            <td>
-                                <i class="fa-solid fa-pen table-action-icon edit"></i>
-                                <i class="fa-regular fa-trash-can table-action-icon delete" style="color: #e03131;"></i>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">Rina Melati</td>
-                            <td>B102</td>
-                            <td>20-11-23</td>
-                            <td>20-11-24</td>
-                            <td><span class="badge-status active">ACTIVE</span></td>
-                            <td><span class="badge-pay lunas">LUNAS</span></td>
-                            <td>0877xxx</td>
-                            <td>
-                                <i class="fa-solid fa-pen table-action-icon edit"></i>
-                                <i class="fa-regular fa-trash-can table-action-icon delete" style="color: #e03131;"></i>
-                            </td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
 
         <div class="pagination-container">
-            <span class="text-secondary small">Showing 1-5 of 124 tenants</span>
+            <span class="text-secondary small">Showing {{ $tenants->firstItem() }}-{{ $tenants->lastItem() }} of {{ $tenants->total() }} penyewa</span>
             <div class="d-flex gap-1 align-items-center">
-                <a href="#" class="page-link-custom"><i class="fa-solid fa-chevron-left"
-                        style="font-size: 10px;"></i></a>
-                <a href="#" class="page-link-custom active">1</a>
-                <a href="#" class="page-link-custom">2</a>
-                <a href="#" class="page-link-custom">3</a>
-                <a href="#" class="page-link-custom"><i class="fa-solid fa-chevron-right"
-                        style="font-size: 10px;"></i></a>
+                {{ $tenants->links('pagination::simple-bootstrap-4') }}
             </div>
         </div>
     </div>

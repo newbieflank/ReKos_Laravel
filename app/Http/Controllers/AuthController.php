@@ -33,8 +33,15 @@ class AuthController extends Controller
 
             $request->session()->regenerate();
 
+            $user = Auth::user();
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard')->with('success', 'Selamat datang kembali, ' . $user->name . '!');
+            } elseif ($user->role === 'owner') {
+                return redirect()->route('pemilik.dashboard')->with('success', 'Selamat datang kembali, ' . $user->name . '!');
+            }
+
             return redirect()->route('home')
-                ->with('success', 'Selamat datang kembali, ' . Auth::user()->name . '!');
+                ->with('success', 'Selamat datang kembali, ' . $user->name . '!');
         }
 
         return back()->withErrors([

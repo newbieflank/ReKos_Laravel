@@ -11,16 +11,16 @@
     <div class="row g-4 mb-4">
         <div class="col-12 col-md-4">
             <div class="card card-custom p-4 h-100">
-                <p class="text-muted small fw-bold mb-2">PENDAPATAN</p>
-                <h2 class="text-primary fw-bold mb-3">Rp. 1.000.000</h2>
+                <p class="text-muted small fw-bold mb-2">TOTAL PENDAPATAN (1 THN)</p>
+                <h2 class="text-primary fw-bold mb-3">Rp {{ number_format($totalIncome, 0, ',', '.') }}</h2>
                 <i class="fa-solid fa-money-bill-wave card-bg-icon text-primary"></i>
             </div>
         </div>
 
         <div class="col-12 col-md-4">
             <div class="card card-custom p-4 h-100">
-                <p class="text-muted small fw-bold mb-2">PENGELUARAN</p>
-                <h2 class="text-dark fw-bold mb-3">Rp. 1.000.000</h2>
+                <p class="text-muted small fw-bold mb-2">TOTAL PENGELUARAN (1 THN)</p>
+                <h2 class="text-dark fw-bold mb-3">Rp {{ number_format($totalExpense, 0, ',', '.') }}</h2>
                 <i class="fa-solid fa-credit-card card-bg-icon text-secondary"></i>
             </div>
         </div>
@@ -29,15 +29,25 @@
             <div class="card card-custom p-4 h-100 text-white" style="background-color: #4a85f6;">
                 <p class="small fw-bold mb-2 text-white-50">GUEST RATING</p>
                 <div class="d-flex align-items-end gap-2 mb-2">
-                    <h2 class="fw-bold mb-0">3 / 5</h2>
-                    <span class="mb-1 text-white-50">Rate</span>
+                    @if($totalReviews == 0)
+                        <h2 class="fw-bold mb-0">0 / 0</h2>
+                        <span class="mb-1 text-white-50">Rate</span>
+                    @else
+                        <h2 class="fw-bold mb-0">{{ number_format($avgRating, 1) }} / 5</h2>
+                        <span class="mb-1 text-white-50">({{ $totalReviews }} Ulasan)</span>
+                    @endif
                 </div>
                 <div class="text-warning mb-0 fs-5">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-regular fa-star"></i>
-                    <i class="fa-regular fa-star"></i>
+                    @php
+                        $ratingInt = round($avgRating);
+                    @endphp
+                    @for($i = 1; $i <= 5; $i++)
+                        @if($i <= $ratingInt)
+                            <i class="fa-solid fa-star"></i>
+                        @else
+                            <i class="fa-regular fa-star"></i>
+                        @endif
+                    @endfor
                 </div>
                 <i class="fa-solid fa-shield-check card-bg-icon text-white"></i>
             </div>
@@ -53,8 +63,8 @@
                         <p class="text-muted small mb-0">Annual performance overview of revenue and expenses.</p>
                     </div>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-light border btn-sm text-muted">2023</button>
-                        <button type="button" class="btn btn-primary btn-sm">2024</button>
+                        <button type="button" class="btn btn-light border btn-sm text-muted">{{ $currentYear - 1 }}</button>
+                        <button type="button" class="btn btn-primary btn-sm">{{ $currentYear }}</button>
                     </div>
                 </div>
 
@@ -75,12 +85,10 @@
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov',
-                        'Des'
-                    ],
+                    labels: {!! json_encode($months) !!},
                     datasets: [{
                             label: 'Pendapatan',
-                            data: [550, 750, 650, 50, 650, 350, 320, 10, 450, 600, 800, 950],
+                            data: {!! json_encode($chartIncome) !!},
                             backgroundColor: '#0d6efd',
                             borderRadius: 2,
                             barPercentage: 0.8,
@@ -88,7 +96,7 @@
                         },
                         {
                             label: 'Pengeluaran',
-                            data: [540, 850, 400, 250, 550, 450, 650, 750, 300, 400, 550, 600],
+                            data: {!! json_encode($chartExpense) !!},
                             backgroundColor: '#495057',
                             borderRadius: 2,
                             barPercentage: 0.8,
@@ -111,10 +119,6 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 1000,
-                            ticks: {
-                                stepSize: 250
-                            },
                             grid: {
                                 color: '#f3f4f6'
                             }

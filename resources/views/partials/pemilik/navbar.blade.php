@@ -10,29 +10,27 @@
     </div>
 
     <div class="d-flex align-items-center gap-3 gap-md-4">
-        <button class="btn btn-link text-secondary position-relative p-0 border-0">
-            <i class="fa-solid fa-bell fs-5" style="color: #6c757d;"></i>
-            <span
-                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white"
-                style="font-size: 0.65rem;">
-                6
-            </span>
-        </button>
-
+        
         <div class="vr d-none d-md-block" style="height: 24px;"></div>
 
         <div class="dropdown">
             <button class="btn p-0 border-0 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
                 <i class="fa-solid fa-circle-user text-primary" style="font-size: 32px;"></i>
-                <span class="text-dark small fw-medium d-none d-md-block">Bapak/Ibu Kost</span>
+                <span class="text-dark small fw-medium d-none d-md-block">{{ Auth::user()->name ?? 'Bapak/Ibu Kost' }}</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
-                <li><a class="dropdown-item py-2" href="#"><i class="fa-solid fa-user me-2"></i> Profil</a></li>
+                <li><a class="dropdown-item py-2" href="{{ route('profile.edit') }}"><i class="fa-solid fa-user me-2"></i> Profil</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
-                <li><a class="dropdown-item py-2 text-danger" href="#"><i
-                            class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+                <li>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="dropdown-item py-2 text-danger">
+                            <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                        </button>
+                    </form>
+                </li>
             </ul>
         </div>
     </div>
