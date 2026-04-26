@@ -112,7 +112,7 @@
 
     <div class="card card-custom p-3">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold text-dark m-0">Sales Details</h5>
+            <h5 class="fw-bold text-dark m-0">New Users</h5>
             <select class="form-select form-select-sm w-auto text-secondary shadow-none border-light-subtle">
                 <option>October</option>
                 <option>November</option>
@@ -129,7 +129,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             var options = {
                 series: [{
-                    name: 'Sales',
+                    name: 'New Users',
                     data: @json($chartData)
                 }],
                 chart: {
@@ -184,12 +184,9 @@
                     }
                 },
                 yaxis: {
-                    min: 20,
-                    max: 100,
-                    tickAmount: 4,
                     labels: {
                         formatter: function(val) {
-                            return val + "%";
+                            return Math.floor(val);
                         },
                         style: {
                             colors: '#6c757d',

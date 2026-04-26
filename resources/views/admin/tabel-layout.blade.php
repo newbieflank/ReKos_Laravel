@@ -115,11 +115,15 @@
                                         <span class="badge bg-light text-dark border">Belum ada Kos</span>
                                     @endif
                                 @elseif($title == 'Pemilik Kost')
-                                    @if ($currentUser->boardingHouse)
-                                        <small class="text-muted">
-                                            <i class="fa-solid fa-location-dot me-1"></i>
-                                            {{ $currentUser->boardingHouse->address }}
-                                        </small>
+                                    @if ($currentUser->boardingHouses->isNotEmpty())
+                                        @php $kos = $currentUser->boardingHouses->first(); @endphp
+                                        <div class="d-flex justify-content-center align-items-start mt-1 w-100">
+                                            <i class="fa-solid fa-location-dot me-2 text-muted mt-1"></i>
+                                            <small class="text-muted text-wrap text-center"
+                                                style="max-width: 280px; line-height: 1.5; white-space: normal;">
+                                                {{ $kos->alamat }}
+                                            </small>
+                                        </div>
                                     @else
                                         <span class="text-danger small">Kos belum didaftarkan</span>
                                     @endif

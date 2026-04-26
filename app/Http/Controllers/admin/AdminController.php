@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AppReview;
+use App\Models\BoardingHouse;
 use App\Models\RoleRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -34,75 +37,23 @@ class AdminController extends Controller
     public function index()
     {
         $stats = [
-            'pemilik_kos' => '40,689',
-            'pencari_kos' => '10,293',
-            'kos' => '$89,000',
-            'rating' => '2040'
+            'pemilik_kos' => User::where('role', 'owner')->count(),
+            'pencari_kos' => User::where('role', 'tenant')->count(),
+            'kos' => BoardingHouse::count(),
+            'rating' => AppReview::count(),
         ];
 
-        $chartData = [
-            25,
-            28,
-            48,
-            38,
-            51,
-            31,
-            39,
-            52,
-            86,
-            34,
-            52,
-            47,
-            42,
-            54,
-            38,
-            45,
-            61,
-            24,
-            31,
-            27,
-            47,
-            43,
-            72,
-            58,
-            62,
-            53,
-            52,
-            58,
-            42,
-            56,
-            51,
-            57,
-            51,
-            58
-        ];
+        $usersPerMonth = User::select(
+            DB::raw('COUNT(id) as total'),
+            DB::raw("DATE_FORMAT(created_at, '%b') as month"), // %b untuk nama bulan singkat (Jan, Feb)
+            DB::raw("MIN(created_at) as sort_date")
+        )
+            ->groupBy('month')
+            ->orderBy('sort_date', 'asc')
+            ->get();
 
-        $chartCategories = [
-            '5k',
-            '',
-            '10k',
-            '',
-            '15k',
-            '',
-            '20k',
-            '',
-            '25k',
-            '',
-            '30k',
-            '',
-            '35k',
-            '',
-            '40k',
-            '',
-            '45k',
-            '',
-            '50k',
-            '',
-            '55k',
-            '',
-            '60k',
-            ''
-        ];
+        $chartData = $usersPerMonth->pluck('total')->toArray();
+        $chartCategories = $usersPerMonth->pluck('month')->toArray();
 
         return view('admin.dashboard', compact('stats', 'chartData', 'chartCategories'));
     }

@@ -22,7 +22,7 @@ class UserController extends Controller
     public function pemilikKos()
     {
         $users = User::With(['userDetail', 'boardingHouses'])->where('role', 'owner')->get();
-
+        // dd($users);
         $title = "Pemilik Kost";
 
         return view('admin.tabel-layout', compact('users', 'title'));
