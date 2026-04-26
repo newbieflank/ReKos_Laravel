@@ -67,34 +67,27 @@
                     
                     <div class="mb-4">
                         <label class="form-label-custom">NAMA KOST</label>
-                        <input type="text" class="form-control form-control-custom w-100" placeholder="Contoh: Stanza Residence Menteng">
+                        <input type="text" name="boarding_house_name" class="form-control form-control-custom w-100" placeholder="Contoh: Stanza Residence Menteng" required>
                     </div>
                     
                     <div class="mb-4">
                         <label class="form-label-custom">TIPE KOST</label>
                         <div class="d-flex gap-2">
                             <div class="flex-grow-1">
-                                <input type="radio" name="tipe_kost" id="tipePutra" class="toggle-radio">
+                                <input type="radio" name="boarding_house_type" value="male" id="tipePutra" class="toggle-radio">
                                 <label for="tipePutra" class="toggle-label">Putra</label>
                             </div>
                             <div class="flex-grow-1">
-                                <input type="radio" name="tipe_kost" id="tipePutri" class="toggle-radio">
+                                <input type="radio" name="boarding_house_type" value="female" id="tipePutri" class="toggle-radio">
                                 <label for="tipePutri" class="toggle-label">Putri</label>
                             </div>
                             <div class="flex-grow-1">
-                                <input type="radio" name="tipe_kost" id="tipeCampur" class="toggle-radio" checked>
+                                <input type="radio" name="boarding_house_type" value="mixed" id="tipeCampur" class="toggle-radio" checked>
                                 <label for="tipeCampur" class="toggle-label">Campur</label>
                             </div>
                         </div>
                     </div>
 
-                    <div>
-                        <label class="form-label-custom">RANGE HARGA (BULANAN)</label>
-                        <div class="d-flex gap-3">
-                            <input type="text" class="form-control form-control-custom w-50" placeholder="Harga Terendah">
-                            <input type="text" class="form-control form-control-custom w-50" placeholder="Harga Tertinggi">
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -104,16 +97,29 @@
                         <div class="section-icon-box"><i class="fa-solid fa-location-dot"></i></div>
                         <h5 class="fw-bold mb-0">Lokasi Properti</h5>
                     </div>
-                    
-                    <div class="mb-4">
-                        <label class="form-label-custom">KOTA / PROVINSI</label>
-                        <input type="text" class="form-control form-control-custom w-100" placeholder="Jakarta Selatan, DKI Jakarta">
+
+                    <div class="mb-3">
+                        <label class="form-label-custom">PIN LOKASI DI PETA</label>
+                        <p class="text-muted small mb-2">Klik pada peta untuk menentukan lokasi kost Anda di Bondowoso.</p>
+                        <div id="map" style="height: 220px; border-radius: 10px; border: 1px solid #dee2e6;"></div>
                     </div>
-                    
+
+                    <input type="hidden" name="latitude" id="input_lat" value="-7.9107">
+                    <input type="hidden" name="longitude" id="input_lng" value="113.8204">
+
+                    <div class="mb-3">
+                        <label class="form-label-custom">ALAMAT DARI PETA</label>
+                        <textarea id="input_alamat_maps" class="form-control form-control-custom w-100" style="height: 70px;" placeholder="Klik peta untuk mengisi alamat otomatis..." readonly></textarea>
+                    </div>
+
                     <div>
-                        <label class="form-label-custom">ALAMAT LENGKAP</label>
-                        <textarea class="form-control form-control-custom w-100" style="height: 130px;" placeholder="Jl. Kemang Raya No. 12..."></textarea>
+                        <label class="form-label-custom">DETAIL LOKASI <span class="text-muted fw-normal" style="text-transform:none;letter-spacing:0;">(RT/RW, Blok, No. Rumah, dll)</span></label>
+                        <input type="text" id="input_detail" class="form-control form-control-custom w-100" placeholder="Contoh: RT 03/RW 02, Blok B No. 12">
+                        <p class="text-muted small mt-1 mb-0"><i class="fa-solid fa-circle-info me-1"></i>Detail ini akan digabung dengan alamat peta secara otomatis.</p>
                     </div>
+
+                    {{-- Field yang dikirim ke server: gabungan keduanya --}}
+                    <input type="hidden" name="alamat" id="input_alamat">
                 </div>
             </div>
         </div>
@@ -127,11 +133,11 @@
             <div class="row g-4">
                 <div class="col-12 col-md-6">
                     <label class="form-label-custom">DESKRIPSI PROPERTI</label>
-                    <textarea class="form-control form-control-custom w-100" placeholder="Ceritakan keunggulan kost Anda..."></textarea>
+                    <textarea name="description" class="form-control form-control-custom w-100" placeholder="Ceritakan keunggulan kost Anda..." required></textarea>
                 </div>
                 <div class="col-12 col-md-6">
                     <label class="form-label-custom">PERATURAN KOST</label>
-                    <textarea class="form-control form-control-custom w-100" placeholder="Contoh: Dilarang membawa hewan peliharaan, Tamu maksimal jam 10 malam..."></textarea>
+                    <textarea name="house_rule" class="form-control form-control-custom w-100" placeholder="Contoh: Dilarang membawa hewan peliharaan, Tamu maksimal jam 10 malam..." required></textarea>
                 </div>
             </div>
         </div>
@@ -144,75 +150,48 @@
             
             <div class="row row-cols-2 row-cols-sm-3 row-cols-md-5 g-3">
                 <div class="col">
-                    <input type="checkbox" id="f_wifi" class="facility-check" checked>
+                    <input type="checkbox" name="facilities[]" value="Free WiFi" id="f_wifi" class="facility-check">
                     <label for="f_wifi" class="facility-card"><i class="fa-solid fa-wifi"></i><span>Free WiFi</span></label>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="f_laundry" class="facility-check">
+                    <input type="checkbox" name="facilities[]" value="Laundry" id="f_laundry" class="facility-check">
                     <label for="f_laundry" class="facility-card"><i class="fa-solid fa-shirt"></i><span>Laundry</span></label>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="f_parkir" class="facility-check">
+                    <input type="checkbox" name="facilities[]" value="Parkir Luas" id="f_parkir" class="facility-check">
                     <label for="f_parkir" class="facility-card"><i class="fa-solid fa-car"></i><span>Parkir Luas</span></label>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="f_keamanan" class="facility-check" checked>
+                    <input type="checkbox" name="facilities[]" value="Keamanan 24j" id="f_keamanan" class="facility-check">
                     <label for="f_keamanan" class="facility-card"><i class="fa-solid fa-shield-halved"></i><span>Keamanan 24j</span></label>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="f_dapur" class="facility-check">
+                    <input type="checkbox" name="facilities[]" value="Dapur Bersama" id="f_dapur" class="facility-check">
                     <label for="f_dapur" class="facility-card"><i class="fa-solid fa-kitchen-set"></i><span>Dapur Bersama</span></label>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="f_ac" class="facility-check">
+                    <input type="checkbox" name="facilities[]" value="Full AC" id="f_ac" class="facility-check">
                     <label for="f_ac" class="facility-card"><i class="fa-solid fa-snowflake"></i><span>Full AC</span></label>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="f_roomservice" class="facility-check">
+                    <input type="checkbox" name="facilities[]" value="Room Service" id="f_roomservice" class="facility-check">
                     <label for="f_roomservice" class="facility-card"><i class="fa-solid fa-bell-concierge"></i><span>Room Service</span></label>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="f_gym" class="facility-check">
+                    <input type="checkbox" name="facilities[]" value="Gym Area" id="f_gym" class="facility-check">
                     <label for="f_gym" class="facility-card"><i class="fa-solid fa-dumbbell"></i><span>Gym Area</span></label>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="f_kolam" class="facility-check">
+                    <input type="checkbox" name="facilities[]" value="Kolam Renang" id="f_kolam" class="facility-check">
                     <label for="f_kolam" class="facility-card"><i class="fa-solid fa-water-ladder"></i><span>Kolam Renang</span></label>
                 </div>
                 <div class="col">
-                    <input type="checkbox" id="f_lainnya" class="facility-check">
+                    <input type="checkbox" name="facilities[]" value="Lainnya" id="f_lainnya" class="facility-check">
                     <label for="f_lainnya" class="facility-card"><i class="fa-solid fa-ellipsis"></i><span>Lainnya</span></label>
                 </div>
             </div>
         </div>
 
-        <div class="form-section-card">
-            <div class="section-title-wrap mb-4">
-                <div class="section-icon-box"><i class="fa-regular fa-images"></i></div>
-                <h5 class="fw-bold mb-0">Galeri Foto Kost</h5>
-            </div>
-
-            <div class="row g-4 mb-3">
-                <div class="col-12 col-md-8">
-                    <div class="upload-box upload-main">
-                        <div class="bg-white shadow-sm p-3 rounded-circle mb-3 text-primary"><i class="fa-solid fa-cloud-arrow-up fs-4"></i></div>
-                        <h6 class="fw-bold text-dark mb-1">Unggah Foto Utama</h6>
-                        <p class="small text-muted">Seret gambar atau klik untuk memilih</p>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4 d-flex flex-column gap-4">
-                    <div class="upload-box upload-small">
-                        <i class="fa-solid fa-camera mb-2 fs-5"></i>
-                        <span class="small fw-bold">Tambah Detail</span>
-                    </div>
-                    <div class="upload-box upload-small">
-                        <i class="fa-solid fa-camera mb-2 fs-5"></i>
-                        <span class="small fw-bold">Tambah Fasilitas</span>
-                    </div>
-                </div>
-            </div>
-            <p class="text-muted small"><i class="fa-regular fa-circle-info me-1"></i> Rekomendasi ukuran foto minimal 1280x720 pixel dalam format JPG atau PNG.</p>
-        </div>
 
         <div class="d-flex justify-content-end align-items-center gap-3 mt-2">
             <a href="{{ route('pemilik.kost') }}" class="btn-cancel">Batal</a>
@@ -221,4 +200,63 @@
 
     </form>
 </div>
+
+@push('scripts')
+<script>
+    // Inisialisasi peta Leaflet (OpenStreetMap, gratis tanpa API key)
+    const defaultLat = -7.9107;
+    const defaultLng = 113.8204;
+
+    const map = L.map('map').setView([defaultLat, defaultLng], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+
+    function updateAddress(lat, lng) {
+        document.getElementById('input_lat').value = lat.toFixed(6);
+        document.getElementById('input_lng').value = lng.toFixed(6);
+
+        // Reverse geocoding via Nominatim (gratis)
+        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.display_name) {
+                    document.getElementById('input_alamat_maps').value = data.display_name;
+                    combineAddress();
+                }
+            })
+            .catch(() => {
+                document.getElementById('input_alamat_maps').value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+                combineAddress();
+            });
+    }
+
+    function combineAddress() {
+        const fromMap = document.getElementById('input_alamat_maps').value.trim();
+        const detail = document.getElementById('input_detail').value.trim();
+        // Gabungkan: detail dulu, lalu alamat dari peta
+        document.getElementById('input_alamat').value = detail ? `${detail}, ${fromMap}` : fromMap;
+    }
+
+    // Saat user mengetik detail lokasi
+    document.getElementById('input_detail').addEventListener('input', combineAddress);
+
+    // Saat marker digeser
+    marker.on('dragend', function(e) {
+        const pos = e.target.getLatLng();
+        updateAddress(pos.lat, pos.lng);
+    });
+
+    // Saat klik peta
+    map.on('click', function(e) {
+        marker.setLatLng(e.latlng);
+        updateAddress(e.latlng.lat, e.latlng.lng);
+    });
+
+    // Load alamat awal
+    updateAddress(defaultLat, defaultLng);
+</script>
+@endpush
 @endsection

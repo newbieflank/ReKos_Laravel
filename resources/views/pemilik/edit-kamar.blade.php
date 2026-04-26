@@ -1,6 +1,6 @@
 @extends('layouts.pemilik')
 
-@section('title', 'Tambah Kamar - RE-KOST')
+@section('title', 'Edit Kamar - RE-KOST')
 
 @section('content')
     <style>
@@ -291,9 +291,9 @@
     <div class="container-fluid-custom pb-5">
 
         <a href="{{ route('pemilik.kamar', $kost->id) }}" class="page-title mt-2">
-            <i class="fa-solid fa-chevron-left"></i> Tambah Kamar
+            <i class="fa-solid fa-chevron-left"></i> Edit Kamar
         </a>
-        <p class="text-secondary small mt-2">Informasi Kamar mulai dengan mendefinisikan detail dasar kamar Anda. Informasi
+        <p class="text-secondary small mt-2">Ubah Informasi Kamar dan sesuaikan detail dasar kamar Anda.
             ini akan membantu penyewa menemukan pilihan yang tepat.</p>
 
         <div class="stepper-container">
@@ -323,8 +323,9 @@
             </div>
         </div>
 
-        <form id="tambahKamarForm" action="{{ route('pemilik.kamar.simpan', $kost->id) }}" method="POST">
+        <form id="tambahKamarForm" action="{{ route('pemilik.kamar.update', ['id' => $kost->id, 'room_id' => $room->id]) }}" method="POST">
             @csrf
+            @method('PUT')
 
             <div id="step-1">
                 <div class="form-section-card">
@@ -332,14 +333,14 @@
                         <div class="col-12 col-md-6">
                             <label class="form-label-custom">Nama Kamar</label>
                             <input type="text" name="room_name" id="input_room_name" class="form-control form-control-custom w-100"
-                                placeholder="e.g. Kamar Standard" required>
+                                placeholder="e.g. Kamar Standard" value="{{ old('room_name', $room->room_name) }}" required>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label-custom">Tipe Kamar</label>
                             <select name="room_type" id="input_room_type" class="form-select form-control-custom text-muted" required>
                                 <option value="">Pilih Tipe</option>
-                                <option value="Standard">Standard</option>
-                                <option value="Deluxe">Deluxe</option>
+                                <option value="Standard" {{ (old('room_type', $room->room_type) == 'Standard') ? 'selected' : '' }}>Standard</option>
+                                <option value="Deluxe" {{ (old('room_type', $room->room_type) == 'Deluxe') ? 'selected' : '' }}>Deluxe</option>
                             </select>
                         </div>
                     </div>
@@ -348,7 +349,7 @@
                             <label class="form-label-custom">Ukuran Kamar (m)</label>
                             <div class="position-relative">
                                 <input type="text" name="room_size" id="input_room_size" class="form-control form-control-custom w-100" placeholder="e.g. 3x4"
-                                    style="padding-right: 60px;" required>
+                                    style="padding-right: 60px;" value="{{ old('room_size', $room->room_size) }}" required>
                                 <span class="position-absolute text-muted"
                                     style="right: 16px; top: 12px; font-size: 0.85rem;">Meter</span>
                             </div>
@@ -356,7 +357,7 @@
                         <div class="col-12 col-md-4">
                             <label class="form-label-custom">Ketersediaan</label>
                             <div class="form-check form-switch mt-2">
-                                <input class="form-check-input" type="checkbox" role="switch" name="available" id="input_available" checked style="width: 40px; height: 20px; cursor: pointer;">
+                                <input class="form-check-input" type="checkbox" role="switch" name="available" id="input_available" style="width: 40px; height: 20px; cursor: pointer;" {{ old('available', $room->available) ? 'checked' : '' }}>
                                 <label class="form-check-label ms-2 fw-medium text-dark" for="input_available" style="line-height: 20px; cursor: pointer;">Kamar Tersedia</label>
                             </div>
                         </div>
@@ -486,7 +487,7 @@
                                 <label class="form-label-custom">Harga Harian</label>
                                 <div class="price-input-group">
                                     <span class="prefix">Rp</span>
-                                    <input type="number" name="daily_price" id="input_daily_price" class="form-control form-control-custom w-100" placeholder="0">
+                                    <input type="number" name="daily_price" id="input_daily_price" class="form-control form-control-custom w-100" placeholder="0" value="{{ old('daily_price', $room->daily_price) }}">
                                     <span class="suffix">PER HARI</span>
                                 </div>
                             </div>
@@ -494,7 +495,7 @@
                                 <label class="form-label-custom">Harga Mingguan</label>
                                 <div class="price-input-group">
                                     <span class="prefix">Rp</span>
-                                    <input type="number" name="weekly_price" id="input_weekly_price" class="form-control form-control-custom w-100" placeholder="0">
+                                    <input type="number" name="weekly_price" id="input_weekly_price" class="form-control form-control-custom w-100" placeholder="0" value="{{ old('weekly_price', $room->weekly_price) }}">
                                     <span class="suffix">PER MINGGU</span>
                                 </div>
                             </div>
@@ -502,20 +503,8 @@
                                 <label class="form-label-custom">Harga Bulanan</label>
                                 <div class="price-input-group">
                                     <span class="prefix">Rp</span>
-                                    <input type="number" name="monthly_price" id="input_monthly_price" class="form-control form-control-custom w-100" placeholder="0" required>
+                                    <input type="number" name="monthly_price" id="input_monthly_price" class="form-control form-control-custom w-100" placeholder="0" value="{{ old('monthly_price', $room->monthly_price) }}" required>
                                     <span class="suffix">PER BULAN</span>
-                                </div>
-                            </div>
-                            
-                            <hr class="my-4 text-muted">
-
-                            <div class="mb-4">
-                                <label class="form-label-custom text-warning">Estimasi Pengeluaran Bulanan</label>
-                                <p class="small text-muted mb-2">Perkiraan biaya bulanan kamar ini (misal: listrik, kebersihan) untuk dikalkulasikan di grafik keuangan.</p>
-                                <div class="price-input-group" style="border-color: #ffe69c;">
-                                    <span class="prefix" style="background-color: #fff3cd; color: #ffc107;">Rp</span>
-                                    <input type="number" name="monthly_expense" id="input_monthly_expense" class="form-control form-control-custom w-100" placeholder="0" required>
-                                    <span class="suffix" style="background-color: #fff3cd; color: #ffc107;">PER BULAN</span>
                                 </div>
                             </div>
 

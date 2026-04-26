@@ -304,6 +304,8 @@
         </div>
 
         <form id="tambahPenyewaForm" action="{{ route('pemilik.penyewa.simpan') }}" method="POST">
+            <input type="hidden" name="room_id" id="hidden_room_id" value="{{ $selectedRoomId }}">
+            <input type="hidden" name="total_price" id="hidden_total_price" value="0">
             @csrf
 
             <div id="step-1">
@@ -315,8 +317,19 @@
                             <p class="text-secondary small mb-0">Cari pengguna yang sudah memiliki akun dalam sistem</p>
                         </div>
                     </div>
-                    <input type="text" class="form-control form-control-custom w-100"
-                        placeholder="Ketik nama atau email...">
+                    <select name="tenant_id" id="select_tenant" class="form-select form-control-custom w-100" required>
+                        <option value="">-- Pilih Pengguna --</option>
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}"
+                                data-name="{{ $user->name }}"
+                                data-gender="{{ $user->userDetail->gender ?? 'unknown' }}"
+                                data-birth="{{ $user->userDetail->birth_date ?? '' }}"
+                                data-occ="{{ $user->userDetail->occupation ?? '' }}"
+                                data-inst="{{ $user->userDetail->institution ?? '' }}">
+                                {{ $user->name }} ({{ $user->email }})
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="form-section-card">
@@ -324,42 +337,42 @@
                         <div class="section-icon-box"><i class="fa-solid fa-address-card"></i></div>
                         <div>
                             <h6 class="fw-bold text-dark mb-1">Informasi Pribadi</h6>
-                            <p class="text-secondary small mb-0">Data identitas lengkap calon penyewa baru</p>
+                            <p class="text-secondary small mb-0">Data diambil otomatis dari akun pengguna yang dipilih</p>
                         </div>
                     </div>
 
-                    <div class="row g-4 mb-3">
-                        <div class="col-12 col-md-6">
-                            <label class="form-label-custom">JENIS KELAMIN</label>
-                            <div class="d-flex gap-2">
-                                <div class="w-100">
-                                    <input type="radio" name="gender" id="genderMale" class="toggle-radio" checked>
-                                    <label for="genderMale" class="toggle-label"><i class="fa-solid fa-mars"></i>
-                                        Laki-laki</label>
-                                </div>
-                                <div class="w-100">
-                                    <input type="radio" name="gender" id="genderFemale" class="toggle-radio">
-                                    <label for="genderFemale" class="toggle-label"><i class="fa-solid fa-venus"></i>
-                                        Perempuan</label>
-                                </div>
+                    {{-- Hidden inputs untuk dikirim ke backend --}}
+                    <input type="hidden" name="gender" id="hidden_gender" value="">
+                    <input type="hidden" name="birth_date" id="hidden_birth_date" value="">
+                    <input type="hidden" name="occupation" id="hidden_occupation" value="">
+                    <input type="hidden" name="institution" id="hidden_institution" value="">
+
+                    <div id="user_info_empty" class="text-center py-4 text-muted small">
+                        <i class="fa-solid fa-circle-info me-2"></i> Pilih pengguna di atas untuk melihat data profilnya.
+                    </div>
+
+                    <div id="user_info_card" class="d-none">
+                        <div class="row g-4">
+                            <div class="col-12 col-md-6">
+                                <p class="form-label-custom">NAMA LENGKAP</p>
+                                <p class="text-dark fw-bold mb-0" id="display_name">-</p>
                             </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label-custom">TANGGAL LAHIR</label>
-                            <input type="date" class="form-control form-control-custom w-100 text-muted">
-                        </div>
-                    </div>
-
-                    <div class="row g-4">
-                        <div class="col-12 col-md-6">
-                            <label class="form-label-custom">PEKERJAAN</label>
-                            <input type="text" class="form-control form-control-custom w-100"
-                                placeholder="Contoh: Software Engineer">
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label-custom">NAMA INSTANSI</label>
-                            <input type="text" class="form-control form-control-custom w-100"
-                                placeholder="Contoh: PT Bangun Sejahtera">
+                            <div class="col-12 col-md-6">
+                                <p class="form-label-custom">JENIS KELAMIN</p>
+                                <p class="text-dark fw-bold mb-0" id="display_gender">-</p>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <p class="form-label-custom">TANGGAL LAHIR</p>
+                                <p class="text-dark fw-bold mb-0" id="display_birth">-</p>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <p class="form-label-custom">PEKERJAAN</p>
+                                <p class="text-dark fw-bold mb-0" id="display_occ">-</p>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <p class="form-label-custom">INSTANSI</p>
+                                <p class="text-dark fw-bold mb-0" id="display_inst">-</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -380,65 +393,58 @@
                     </div>
 
                     <div class="row g-3 mb-4">
+                        @forelse($rooms as $room)
                         <div class="col-12 col-md-4">
-                            <input type="radio" name="room" id="roomA102" class="room-select-radio" checked>
-                            <label for="roomA102" class="room-select-card d-block">
-                                <span class="room-badge-small bg-suite mb-2 d-inline-block">SUITE PREMIUM</span>
+                            <input type="radio" name="room_select" id="room_{{ $room->id }}" class="room-select-radio"
+                                data-id="{{ $room->id }}"
+                                data-name="{{ $room->room_name }}"
+                                data-type="{{ $room->room_type }}"
+                                data-daily="{{ $room->daily_price ?? 0 }}"
+                                data-weekly="{{ $room->weekly_price ?? 0 }}"
+                                data-monthly="{{ $room->monthly_price ?? 0 }}"
+                                {{ ($selectedRoomId == $room->id) ? 'checked' : '' }}>
+                            <label for="room_{{ $room->id }}" class="room-select-card d-block">
+                                <span class="room-badge-small bg-{{ $room->room_type == 'Deluxe' ? 'suite' : 'standard' }} mb-2 d-inline-block">{{ strtoupper($room->room_type) }}</span>
                                 <p class="text-muted small mb-0" style="font-size: 0.7rem;">ROOM</p>
-                                <h4 class="fw-bold text-dark mb-4">A-102</h4>
+                                <h4 class="fw-bold text-dark mb-4">{{ $room->room_name }}</h4>
                                 <div class="d-flex justify-content-between align-items-center border-top pt-3">
-                                    <span class="text-secondary small">Rp 3.500.000/bln</span>
+                                    <span class="room-price-label text-secondary small">Rp {{ number_format($room->monthly_price,0,',','.') }}/bln</span>
                                 </div>
                             </label>
                         </div>
-                        <div class="col-12 col-md-4">
-                            <input type="radio" name="room" id="roomB205" class="room-select-radio">
-                            <label for="roomB205" class="room-select-card d-block">
-                                <span class="room-badge-small bg-standard mb-2 d-inline-block">STANDARD</span>
-                                <p class="text-muted small mb-0" style="font-size: 0.7rem;">ROOM</p>
-                                <h4 class="fw-bold text-dark mb-4">B-205</h4>
-                                <div class="d-flex justify-content-between align-items-center border-top pt-3">
-                                    <span class="text-secondary small">Rp 2.100.000/bln</span>
-                                </div>
-                            </label>
+                        @empty
+                        <div class="col-12">
+                            <p class="text-muted text-center">Tidak ada kamar yang tersedia.</p>
                         </div>
-                        <div class="col-12 col-md-4">
-                            <input type="radio" name="room" id="roomC301" class="room-select-radio">
-                            <label for="roomC301" class="room-select-card d-block">
-                                <span class="room-badge-small bg-standard mb-2 d-inline-block">STANDARD</span>
-                                <p class="text-muted small mb-0" style="font-size: 0.7rem;">ROOM</p>
-                                <h4 class="fw-bold text-dark mb-4">C-301</h4>
-                                <div class="d-flex justify-content-between align-items-center border-top pt-3">
-                                    <span class="text-secondary small">Rp 2.100.000/bln</span>
-                                </div>
-                            </label>
-                        </div>
+                        @endforelse
                     </div>
 
                     <div class="row g-4">
                         <div class="col-12 col-md-6">
                             <label class="form-label-custom">TIPE SEWA</label>
-                            <select class="form-select form-control-grey text-dark">
-                                <option>Bulanan</option>
+                            <select name="rental_type" id="select_rental_type" class="form-select form-control-grey text-dark" required>
+                                <option value="monthly">Bulanan</option>
+                                <option value="weekly">Mingguan</option>
+                                <option value="daily">Harian</option>
                             </select>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label-custom">STATUS SEWA</label>
                             <div class="d-flex p-1" style="background-color: #e9ecef; border-radius: 8px;">
-                                <input type="radio" name="status_sewa" id="sewaAktif" class="toggle-radio" checked>
+                                <input type="radio" name="status_sewa" id="sewaAktif" value="active" class="toggle-radio" checked>
                                 <label for="sewaAktif" class="toggle-label border-0 m-0 py-2">Aktif</label>
-                                <input type="radio" name="status_sewa" id="sewaPending" class="toggle-radio">
+                                <input type="radio" name="status_sewa" id="sewaPending" value="pending" class="toggle-radio">
                                 <label for="sewaPending" class="toggle-label border-0 m-0 py-2"
                                     style="background:transparent; color:#6c757d;">Pending</label>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label-custom">TANGGAL MASUK</label>
-                            <input type="date" class="form-control form-control-grey" value="2023-10-27">
+                            <input type="date" name="start_date" id="input_start_date" class="form-control form-control-grey" value="{{ date('Y-m-d') }}" required>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label-custom">TANGGAL KELUAR (OPSIONAL)</label>
-                            <input type="date" class="form-control form-control-grey">
+                            <input type="date" name="end_date" id="input_end_date" class="form-control form-control-grey">
                         </div>
                     </div>
                 </div>
@@ -459,8 +465,8 @@
                                 <div class="input-group">
                                     <span class="input-group-text border-0"
                                         style="background-color: #e9ecef; color: #495057; font-weight: 600;">Rp</span>
-                                    <input type="text" class="form-control form-control-grey text-dark fw-bold"
-                                        value="3.500.000">
+                                    <input type="number" name="total_price" id="input_total_price" class="form-control form-control-grey text-dark fw-bold"
+                                        placeholder="0">
                                 </div>
                             </div>
                             <div class="mb-4">
@@ -482,19 +488,19 @@
                             <div>
                                 <label class="form-label-custom">TANGGAL PEMBAYARAN</label>
                                 <input type="date" class="form-control form-control-grey text-dark"
-                                    value="2023-10-27">
+                                    value="{{ date('Y-m-d') }}">
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="summary-box">
-                                <div class="d-flex justify-content-between mb-2"><span class="text-secondary small">Durasi
-                                        Sewa</span><span class="text-dark fw-bold small">1 Bulan</span></div>
+                                <div class="d-flex justify-content-between mb-2"><span class="text-secondary small">Kamar</span><span class="text-dark fw-bold small" id="summary_room_label">-</span></div>
+                                <div class="d-flex justify-content-between mb-2"><span class="text-secondary small">Tipe Sewa</span><span class="text-dark fw-bold small" id="summary_rental_type">-</span></div>
                                 <div class="d-flex justify-content-between mb-4 pb-4 border-bottom"><span
-                                        class="text-secondary small">Biaya Kamar</span><span
-                                        class="text-dark fw-bold small">Rp 3.500.000</span></div>
+                                        class="text-secondary small">Harga Kamar/Bulan</span><span
+                                        class="text-dark fw-bold small" id="summary_room_price">-</span></div>
                                 <div class="d-flex justify-content-between align-items-center"><span
                                         class="text-secondary fw-bold" style="font-size: 0.8rem;">TOTAL
-                                        TAGIHAN</span><span class="text-primary fw-bold fs-4">Rp 3.500.000</span></div>
+                                        TAGIHAN</span><span class="text-primary fw-bold fs-4" id="summary_total">-</span></div>
                             </div>
                         </div>
                     </div>
@@ -528,11 +534,11 @@
                             <div class="row g-4">
                                 <div class="col-12 col-md-6">
                                     <p class="form-label-custom">NAMA LENGKAP</p>
-                                    <p class="text-dark fw-bold mb-0">Yuyun Wahyuni</p>
+                                    <p class="text-dark fw-bold mb-0" id="conf_name">-</p>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <p class="form-label-custom">JENIS KELAMIN</p>
-                                    <p class="text-dark fw-bold mb-0">Perempuan</p>
+                                    <p class="text-dark fw-bold mb-0" id="conf_gender">-</p>
                                 </div>
                             </div>
                         </div>
@@ -548,10 +554,10 @@
                             </div>
                             <div class="d-flex align-items-center gap-4 mb-4">
                                 <div class="d-flex align-items-center gap-3 bg-light p-3 rounded-3 border">
-                                    <div class="bg-primary text-white rounded px-2 py-1 fw-bold fs-5">A101</div>
+                                    <div class="bg-primary text-white rounded px-2 py-1 fw-bold fs-5" id="conf_room_name">-</div>
                                     <div>
-                                        <p class="text-muted small mb-0" style="font-size: 0.65rem;">Nomor Kamar</p>
-                                        <p class="text-dark fw-bold mb-0">Lantai 1 - Deluxe</p>
+                                        <p class="text-muted small mb-0" style="font-size: 0.65rem;">Tipe Kamar</p>
+                                        <p class="text-dark fw-bold mb-0" id="conf_room_type">-</p>
                                     </div>
                                 </div>
                             </div>
@@ -563,7 +569,7 @@
                             <h5 class="fw-bold text-primary mb-4">Ringkasan Pembayaran</h5>
                             <div class="mb-4">
                                 <p class="form-label-custom mb-1">TOTAL BILLING</p>
-                                <h3 class="text-primary fw-bold mb-0">Rp 2.000.000</h3>
+                                <h3 class="text-primary fw-bold mb-0" id="conf_total">-</h3>
                             </div>
                             <div class="bg-white p-3 rounded border mb-4">
                                 <div class="form-check">
@@ -587,7 +593,120 @@
 
     @push('scripts')
         <script>
+            function formatRp(n) {
+                if (!n) return 'Rp 0';
+                return 'Rp ' + parseInt(n).toLocaleString('id-ID');
+            }
+
+            // Saat pilih user, auto-fill info pribadi
+            document.getElementById('select_tenant').addEventListener('change', function() {
+                const opt = this.options[this.selectedIndex];
+                if (!opt.value) {
+                    document.getElementById('user_info_empty').classList.remove('d-none');
+                    document.getElementById('user_info_card').classList.add('d-none');
+                    return;
+                }
+                const gender = opt.dataset.gender;
+                const genderLabel = gender === 'female' ? 'Perempuan' : (gender === 'male' ? 'Laki-laki' : '-');
+
+                // Isi display (read-only)
+                document.getElementById('display_name').innerText = opt.dataset.name || '-';
+                document.getElementById('display_gender').innerText = genderLabel;
+                document.getElementById('display_birth').innerText = opt.dataset.birth || '-';
+                document.getElementById('display_occ').innerText = opt.dataset.occ || '-';
+                document.getElementById('display_inst').innerText = opt.dataset.inst || '-';
+
+                // Isi hidden inputs untuk dikirim ke backend
+                document.getElementById('hidden_gender').value = gender || 'unknown';
+                document.getElementById('hidden_birth_date').value = opt.dataset.birth || '';
+                document.getElementById('hidden_occupation').value = opt.dataset.occ || '';
+                document.getElementById('hidden_institution').value = opt.dataset.inst || '';
+
+                document.getElementById('user_info_empty').classList.add('d-none');
+                document.getElementById('user_info_card').classList.remove('d-none');
+
+                // Isi konfirmasi
+                document.getElementById('conf_name').innerText = opt.dataset.name || '-';
+                document.getElementById('conf_gender').innerText = genderLabel;
+            });
+
+            // Fungsi utama: update harga & tanggal dari pilihan kamar + tipe sewa
+            function updatePriceAndDate() {
+                const checkedRm = document.querySelector('.room-select-radio:checked');
+                const rentalSel = document.getElementById('select_rental_type');
+                if (!checkedRm || !rentalSel) return;
+
+                const type = rentalSel.value; // daily, weekly, monthly
+                const durationMap = { daily: 1, weekly: 7, monthly: 30 };
+                const days = durationMap[type] || 30;
+
+                // Ambil harga sesuai tipe sewa
+                const priceMap = {
+                    daily: checkedRm.dataset.daily,
+                    weekly: checkedRm.dataset.weekly,
+                    monthly: checkedRm.dataset.monthly
+                };
+                const price = priceMap[type] || 0;
+
+                // Update label harga di kartu kamar
+                const labelMap = { daily: 'hari', weekly: 'minggu', monthly: 'bulan' };
+                checkedRm.closest('.col-12').querySelector('.room-price-label').innerText =
+                    'Rp ' + parseInt(price).toLocaleString('id-ID') + '/' + labelMap[type];
+
+                // Update field total harga
+                document.getElementById('input_total_price').value = price;
+
+                // Update summary box
+                document.getElementById('summary_room_label').innerText = checkedRm.dataset.name;
+                document.getElementById('summary_room_price').innerText = formatRp(price);
+                document.getElementById('summary_total').innerText = formatRp(price);
+                document.getElementById('summary_rental_type').innerText = rentalSel.options[rentalSel.selectedIndex].text;
+                document.getElementById('hidden_room_id').value = checkedRm.dataset.id;
+
+                // Hitung tanggal keluar dari tanggal masuk
+                const startInput = document.getElementById('input_start_date');
+                if (startInput.value) {
+                    const startDate = new Date(startInput.value);
+                    startDate.setDate(startDate.getDate() + days);
+                    const yyyy = startDate.getFullYear();
+                    const mm = String(startDate.getMonth() + 1).padStart(2, '0');
+                    const dd = String(startDate.getDate()).padStart(2, '0');
+                    document.getElementById('input_end_date').value = `${yyyy}-${mm}-${dd}`;
+                }
+            }
+
+            // Saat pilih kamar
+            document.querySelectorAll('.room-select-radio').forEach(function(radio) {
+                radio.addEventListener('change', updatePriceAndDate);
+            });
+
+            // Saat ubah tipe sewa
+            document.getElementById('select_rental_type').addEventListener('change', updatePriceAndDate);
+
+            // Saat ubah tanggal masuk
+            document.getElementById('input_start_date').addEventListener('change', updatePriceAndDate);
+
+            // Trigger saat halaman load
+            const checkedRoom = document.querySelector('.room-select-radio:checked');
+            if (checkedRoom) updatePriceAndDate();
+
             function goToStep(step) {
+                if (step === 3) {
+                    const tenantOpt = document.getElementById('select_tenant');
+                    const selOpt = tenantOpt.options[tenantOpt.selectedIndex];
+                    // conf_name & conf_gender sudah diisi saat pilih user
+
+                    const checkedRm = document.querySelector('.room-select-radio:checked');
+                    document.getElementById('conf_room_name').innerText = checkedRm ? checkedRm.dataset.name : '-';
+                    document.getElementById('conf_room_type').innerText = checkedRm ? checkedRm.dataset.type : '-';
+
+                    const total = document.getElementById('input_total_price').value;
+                    document.getElementById('conf_total').innerText = formatRp(total);
+
+                    const rentalSel = document.getElementById('select_rental_type');
+                    document.getElementById('summary_rental_type').innerText = rentalSel.options[rentalSel.selectedIndex].text;
+                }
+
                 document.getElementById('step-1').classList.add('d-none');
                 document.getElementById('step-2').classList.add('d-none');
                 document.getElementById('step-3').classList.add('d-none');
@@ -615,10 +734,7 @@
                         circle.innerHTML = i;
                     }
                 }
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         </script>
     @endpush

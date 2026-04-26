@@ -11,9 +11,7 @@ class Room extends Model
 {
     use HasFactory;
 
-    /**
-     * Kolom yang dapat diisi secara massal.
-     */
+
     protected $fillable = [
         'boarding_house_id',
         'room_name',
@@ -23,21 +21,19 @@ class Room extends Model
         'daily_price',
         'weekly_price',
         'monthly_price',
+        'monthly_expense',
         'available',
     ];
 
     protected function casts(): array
     {
         return [
-            'facilities' => 'array',    // Supaya otomatis jadi Array PHP
-            'available' => 'boolean',  // Menangani 0/1 jadi true/false
+            'facilities' => 'array',    
+            'available' => 'boolean',  
         ];
     }
 
-    /**
-     * Relasi ke BoardingHouse
-     * Room dimiliki oleh satu BoardingHouse.
-     */
+
     public function boardingHouse(): BelongsTo
     {
         return $this->belongsTo(BoardingHouse::class);

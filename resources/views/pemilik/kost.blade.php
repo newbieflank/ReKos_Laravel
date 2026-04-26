@@ -54,92 +54,63 @@
     @endif
 
     <div class="d-flex gap-3 mb-4">
-        <button class="filter-pill active">Semua</button>
-        <button class="filter-pill inactive">Tersedia</button>
-        <button class="filter-pill inactive">Penuh</button>
+        <a href="{{ route('pemilik.kost') }}" class="filter-pill {{ !$filter ? 'active' : 'inactive' }}">Semua</a>
+        <a href="{{ route('pemilik.kost', ['filter' => 'tersedia']) }}" class="filter-pill {{ $filter === 'tersedia' ? 'active' : 'inactive' }}">Tersedia</a>
+        <a href="{{ route('pemilik.kost', ['filter' => 'penuh']) }}" class="filter-pill {{ $filter === 'penuh' ? 'active' : 'inactive' }}">Penuh</a>
     </div>
 
     <div class="row g-4 mb-5">
+        @forelse($kosts as $kost)
         <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-            <div class="kost-card">
+            <div class="kost-card" style="cursor: pointer;" onclick="window.location.href='{{ route('pemilik.kamar', $kost->id) }}'">
                 <div class="d-flex justify-content-end mb-2">
-                    <span class="badge-status-kost">TERSEDIA</span>
+                    @php
+                        $isFull = $kost->rooms_count > 0 && $kost->available_rooms_count == 0;
+                        $occupancyPct = $kost->rooms_count > 0
+                            ? round(($kost->occupied_rooms_count / $kost->rooms_count) * 100)
+                            : 0;
+                    @endphp
+                    @if($isFull)
+                        <span class="badge-status-kost" style="background-color: #fee2e2; color: #dc2626;">PENUH</span>
+                    @elseif($kost->rooms_count == 0)
+                        <span class="badge-status-kost" style="background-color: #f1f3f5; color: #6c757d;">KOSONG</span>
+                    @else
+                        <span class="badge-status-kost">TERSEDIA</span>
+                    @endif
                 </div>
-                <h5 class="fw-bold text-dark mb-1">Kost Melati</h5>
-                <p class="text-muted small mb-4"><i class="fa-solid fa-location-dot me-1"></i> Jl. Melati No. 45, Kebayoran Baru</p>
+                <h5 class="fw-bold text-dark mb-1">{{ $kost->boarding_house_name }}</h5>
+                <p class="text-muted small mb-3"><i class="fa-solid fa-location-dot me-1"></i> {{ $kost->alamat ?? 'Alamat tidak tersedia' }}</p>
                 
                 <div class="mt-auto">
                     <div class="d-flex justify-content-between align-items-end">
-                        <span class="text-secondary small fw-medium">Okupansi</span>
-                        <span class="text-dark fw-bold small">18 / 20 Kamar</span>
+                        <span class="text-secondary small fw-medium">Kamar Terisi</span>
+                        <span class="text-dark fw-bold small">{{ $kost->occupied_rooms_count }}/{{ $kost->rooms_count }}</span>
                     </div>
                     <div class="progress progress-custom">
-                        <div class="progress-bar progress-bar-custom" style="width: 90%"></div>
+                        @php
+                            $barColor = $occupancyPct >= 100 ? '#dc2626' : ($occupancyPct >= 70 ? '#f59e0b' : '#0d6efd');
+                        @endphp
+                        <div class="progress-bar" style="width: {{ $occupancyPct }}%; background-color: {{ $barColor }}; border-radius: 10px; transition: width 0.4s ease;"></div>
                     </div>
                     
-                    <div class="d-flex gap-2">
-                        <button class="btn-detail">Detail</button>
-                        <button class="btn-action-outline"><i class="fa-solid fa-plus"></i></button>
-                        <button class="btn-action-outline"><i class="fa-solid fa-pen"></i></button>
-                        <button class="btn-action-outline"><i class="fa-regular fa-trash-can"></i></button>
+                    <div class="d-flex gap-2" onclick="event.stopPropagation();">
+                        <a href="{{ route('pemilik.kamar', $kost->id) }}" class="btn-detail text-center text-decoration-none" style="display: flex; align-items: center; justify-content: center;">Daftar Kamar</a>
+                        <a href="{{ route('pemilik.kamar.tambah', $kost->id) }}" class="btn-action-outline text-decoration-none d-flex justify-content-center align-items-center" title="Tambah Kamar"><i class="fa-solid fa-plus"></i></a>
+                        <a href="{{ route('pemilik.kost.edit', $kost->id) }}" class="btn-action-outline text-decoration-none d-flex justify-content-center align-items-center" title="Edit Kost"><i class="fa-solid fa-pen"></i></a>
+                        <form action="{{ route('pemilik.kost.hapus', $kost->id) }}" method="POST" class="m-0" onsubmit="event.preventDefault(); confirmDelete(this, 'Yakin ingin menghapus kost ini?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn-action-outline border-0" title="Hapus Kost"><i class="fa-regular fa-trash-can"></i></button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-            <div class="kost-card">
-                <div class="d-flex justify-content-end mb-2">
-                    <span class="badge-status-kost">TERSEDIA</span>
-                </div>
-                <h5 class="fw-bold text-dark mb-1">Kost Melati</h5>
-                <p class="text-muted small mb-4"><i class="fa-solid fa-location-dot me-1"></i> Jl. Melati No. 45, Kebayoran Baru</p>
-                
-                <div class="mt-auto">
-                    <div class="d-flex justify-content-between align-items-end">
-                        <span class="text-secondary small fw-medium">Okupansi</span>
-                        <span class="text-dark fw-bold small">18 / 20 Kamar</span>
-                    </div>
-                    <div class="progress progress-custom">
-                        <div class="progress-bar progress-bar-custom" style="width: 90%"></div>
-                    </div>
-                    
-                    <div class="d-flex gap-2">
-                        <button class="btn-detail">Detail</button>
-                        <button class="btn-action-outline"><i class="fa-solid fa-plus"></i></button>
-                        <button class="btn-action-outline"><i class="fa-solid fa-pen"></i></button>
-                        <button class="btn-action-outline"><i class="fa-regular fa-trash-can"></i></button>
-                    </div>
-                </div>
-            </div>
+        @empty
+        <div class="col-12">
+            <p class="text-center text-muted">Belum ada properti kost. Silakan tambahkan kost baru.</p>
         </div>
-
-        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-            <div class="kost-card">
-                <div class="d-flex justify-content-end mb-2">
-                    <span class="badge-status-kost">TERSEDIA</span>
-                </div>
-                <h5 class="fw-bold text-dark mb-1">Kost Melati</h5>
-                <p class="text-muted small mb-4"><i class="fa-solid fa-location-dot me-1"></i> Jl. Melati No. 45, Kebayoran Baru</p>
-                
-                <div class="mt-auto">
-                    <div class="d-flex justify-content-between align-items-end">
-                        <span class="text-secondary small fw-medium">Okupansi</span>
-                        <span class="text-dark fw-bold small">18 / 20 Kamar</span>
-                    </div>
-                    <div class="progress progress-custom">
-                        <div class="progress-bar progress-bar-custom" style="width: 90%"></div>
-                    </div>
-                    
-                    <div class="d-flex gap-2">
-                        <button class="btn-detail">Detail</button>
-                        <button class="btn-action-outline"><i class="fa-solid fa-plus"></i></button>
-                        <button class="btn-action-outline"><i class="fa-solid fa-pen"></i></button>
-                        <button class="btn-action-outline"><i class="fa-regular fa-trash-can"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @endforelse
 
         <div class="col-12 col-md-6 col-lg-4 col-xl-3">
             <a href="{{ route('pemilik.kost.tambah') }}" class="add-kost-card">

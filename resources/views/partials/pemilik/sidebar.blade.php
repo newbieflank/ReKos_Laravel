@@ -19,36 +19,11 @@
             <span>Dashboard</span>
         </a>
 
-        <div class="mt-2">
-            @php
-                $isManajemenActive = request()->routeIs('pemilik.kost') || request()->routeIs('pemilik.kamar');
-            @endphp
-
-            <div class="nav-link-custom d-flex justify-content-between align-items-center w-100 {{ $isManajemenActive ? 'text-primary' : '' }}"
-                data-bs-toggle="collapse" data-bs-target="#collapseManajemen"
-                aria-expanded="{{ $isManajemenActive ? 'true' : 'false' }}"
-                style="cursor: pointer; {{ $isManajemenActive ? 'background-color: #f8f9fa;' : '' }}">
-
-                <div class="d-flex align-items-center gap-2">
-                    <i class="fa-solid fa-building" style="width: 20px;"></i>
-                    <span class="{{ $isManajemenActive ? 'fw-medium' : '' }}">Manajemen kost</span>
-                </div>
-                <i class="fa-solid fa-chevron-down" style="font-size: 12px; transition: transform 0.3s;"></i>
-            </div>
-
-            <div class="collapse {{ $isManajemenActive ? 'show' : '' }} mt-1" id="collapseManajemen">
-                <div class="d-flex flex-column" style="margin-left: 44px;">
-                    <a href="{{ route('pemilik.kost') }}"
-                        class="py-2 text-decoration-none small {{ request()->routeIs('pemilik.kost') ? 'text-primary fw-bold' : 'text-secondary' }} hover-primary">
-                        Data Kost
-                    </a>
-                    <a href="{{ route('pemilik.kamar') }}"
-                        class="py-2 text-decoration-none small {{ request()->routeIs('pemilik.kamar') ? 'text-primary fw-bold' : 'text-secondary' }} hover-primary">
-                        Kamar Kost
-                    </a>
-                </div>
-            </div>
-        </div>
+        <a href="{{ route('pemilik.kost') }}"
+            class="nav-link-custom {{ request()->routeIs('pemilik.kost') || request()->routeIs('pemilik.kamar') ? 'active' : '' }} mt-2">
+            <i class="fa-solid fa-building" style="width: 20px;"></i>
+            <span>Manajemen Kost</span>
+        </a>
 
         <a href="{{ route('pemilik.penyewa') }}"
             class="nav-link-custom {{ request()->routeIs('pemilik.penyewa') ? 'active' : '' }} mt-2">
