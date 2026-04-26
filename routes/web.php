@@ -66,19 +66,3 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 });
-
-
-Route::prefix('pemilik')->name('pemilik.')->group(function () {
-    Route::get('/dashboard', [PemilikKosController::class, 'dashboard'])->name('dashboard');
-    Route::get('/kost', [PemilikKosController::class, 'kost'])->name('kost');
-    Route::get('/kost/tambah', [PemilikKosController::class, 'tambahKost'])->name('kost.tambah');
-    Route::post('/kost/simpan', [PemilikKosController::class, 'simpanKost'])->name('kost.simpan');
-
-    Route::get('/kamar', [PemilikKosController::class, 'kamar'])->name('kamar');
-    Route::get('/kamar/tambah', [PemilikKosController::class, 'tambahKamar'])->name('kamar.tambah');
-    Route::post('/kamar/simpan', [PemilikKosController::class, 'simpanKamar'])->name('kamar.simpan');
-
-    Route::get('/penyewa', [PemilikKosController::class, 'penyewa'])->name('penyewa');
-    Route::get('/penyewa/tambah', [PemilikKosController::class, 'tambahPenyewa'])->name('penyewa.tambah');
-    Route::post('/penyewa/simpan', [PemilikKosController::class, 'simpanPenyewa'])->name('penyewa.simpan');
-});
