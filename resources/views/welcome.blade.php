@@ -295,87 +295,89 @@
             <div class="text-center mb-5">
                 <h6 class="fw-bold text-primary mb-1">Service</h6>
                 <h2 class="fw-bold">Ulasan Pengguna Re-Kost</h2>
-                <div class="d-flex justify-content-center gap-2 mt-3">
-                    <button class="btn btn-outline-secondary rounded-circle" style="width: 40px; height: 40px;"><i
-                            class="fas fa-arrow-left"></i></button>
-                    <button class="btn btn-outline-secondary rounded-circle" style="width: 40px; height: 40px;"><i
-                            class="fas fa-arrow-right"></i></button>
-                </div>
+
             </div>
 
-            <div class="row g-3">
-                <div class="col-lg-3 col-md-6">
-                    <div class="p-4 rounded-4 bg-light border-0 h-100">
-                        <div class="text-warning mb-2">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                class="fas fa-star"></i><i class="fas fa-star"></i>
+            <div class="swiper-container-wrapper">
+                <div class="swiper reviewSwiper">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <div class="p-4 rounded-4 bg-light border-0 h-100 text-start">
+                                <div class="text-warning mb-2">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                        class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </div>
+                                <p class="text-muted small fst-italic">"Sangat membantu saya menemukan kost yang dekat dengan
+                                    kampus. Aplikasinya mudah digunakan dan informasinya akurat!"</p>
+                                <div class="d-flex align-items-center mt-3">
+                                    <img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle me-2"
+                                        width="40" height="40" alt="User">
+                                    <div>
+                                        <h6 class="fw-bold mb-0" style="font-size: 14px;">Intan Pertiwi</h6>
+                                        <span class="text-muted" style="font-size: 12px;">Mahasiswa</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-muted small fst-italic">"Sangat membantu saya menemukan kost yang dekat dengan
-                            kampus. Aplikasinya mudah digunakan dan informasinya akurat!"</p>
-                        <div class="d-flex align-items-center mt-3">
-                            <img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle me-2"
-                                width="40" height="40" alt="User">
-                            <div>
-                                <h6 class="fw-bold mb-0" style="font-size: 14px;">Intan Pertiwi</h6>
-                                <span class="text-muted" style="font-size: 12px;">Mahasiswa</span>
+                        <div class="swiper-slide">
+                            <div class="p-4 rounded-4 bg-light border-0 h-100 text-start">
+                                <div class="text-warning mb-2">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                        class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </div>
+                                <p class="text-muted small fst-italic">"Harga transparan, tidak ada tipu-tipu. Saya langsung
+                                    booking dan besoknya bisa langsung masuk. Mantap Re-Kost!"</p>
+                                <div class="d-flex align-items-center mt-3">
+                                    <img src="https://randomuser.me/api/portraits/men/32.jpg" class="rounded-circle me-2"
+                                        width="40" height="40" alt="User">
+                                    <div>
+                                        <h6 class="fw-bold mb-0" style="font-size: 14px;">Budi Santoso</h6>
+                                        <span class="text-muted" style="font-size: 12px;">Karyawan</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="p-4 rounded-4 bg-light border-0 h-100 text-start">
+                                <div class="text-warning mb-2">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                        class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <p class="text-muted small fst-italic">"Pilihan kostnya sangat banyak. Saya bisa filter sesuai
+                                    budget bulanan saya dengan sangat mudah."</p>
+                                <div class="d-flex align-items-center mt-3">
+                                    <img src="https://randomuser.me/api/portraits/women/68.jpg" class="rounded-circle me-2"
+                                        width="40" height="40" alt="User">
+                                    <div>
+                                        <h6 class="fw-bold mb-0" style="font-size: 14px;">Siti Aminah</h6>
+                                        <span class="text-muted" style="font-size: 12px;">Mahasiswa</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="p-4 rounded-4 bg-light border-0 h-100 text-start">
+                                <div class="text-warning mb-2">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                        class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </div>
+                                <p class="text-muted small fst-italic">"Sangat direkomendasikan buat anak rantau yang bingung cari
+                                    kostan di area Bondowoso!"</p>
+                                <div class="d-flex align-items-center mt-3">
+                                    <img src="https://randomuser.me/api/portraits/men/46.jpg" class="rounded-circle me-2"
+                                        width="40" height="40" alt="User">
+                                    <div>
+                                        <h6 class="fw-bold mb-0" style="font-size: 14px;">Rizky Pratama</h6>
+                                        <span class="text-muted" style="font-size: 12px;">Freelancer</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <div class="swiper-pagination"></div>
                 </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="p-4 rounded-4 bg-light border-0 h-100">
-                        <div class="text-warning mb-2">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
-                        <p class="text-muted small fst-italic">"Harga transparan, tidak ada tipu-tipu. Saya langsung
-                            booking dan besoknya bisa langsung masuk. Mantap Re-Kost!"</p>
-                        <div class="d-flex align-items-center mt-3">
-                            <img src="https://randomuser.me/api/portraits/men/32.jpg" class="rounded-circle me-2"
-                                width="40" height="40" alt="User">
-                            <div>
-                                <h6 class="fw-bold mb-0" style="font-size: 14px;">Budi Santoso</h6>
-                                <span class="text-muted" style="font-size: 12px;">Karyawan</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="p-4 rounded-4 bg-light border-0 h-100">
-                        <div class="text-warning mb-2">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                        </div>
-                        <p class="text-muted small fst-italic">"Pilihan kostnya sangat banyak. Saya bisa filter sesuai
-                            budget bulanan saya dengan sangat mudah."</p>
-                        <div class="d-flex align-items-center mt-3">
-                            <img src="https://randomuser.me/api/portraits/women/68.jpg" class="rounded-circle me-2"
-                                width="40" height="40" alt="User">
-                            <div>
-                                <h6 class="fw-bold mb-0" style="font-size: 14px;">Siti Aminah</h6>
-                                <span class="text-muted" style="font-size: 12px;">Mahasiswa</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="p-4 rounded-4 bg-light border-0 h-100">
-                        <div class="text-warning mb-2">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
-                        <p class="text-muted small fst-italic">"Sangat direkomendasikan buat anak rantau yang bingung cari
-                            kostan di area Bondowoso!"</p>
-                        <div class="d-flex align-items-center mt-3">
-                            <img src="https://randomuser.me/api/portraits/men/46.jpg" class="rounded-circle me-2"
-                                width="40" height="40" alt="User">
-                            <div>
-                                <h6 class="fw-bold mb-0" style="font-size: 14px;">Rizky Pratama</h6>
-                                <span class="text-muted" style="font-size: 12px;">Freelancer</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div class="swiper-button-prev d-none d-md-flex"></div>
+                <div class="swiper-button-next d-none d-md-flex"></div>
             </div>
         </div>
     </section>
@@ -386,6 +388,24 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var swiper = new Swiper(".roomSwiper", {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+            breakpoints: {
+                640: { slidesPerView: 2, spaceBetween: 20 },
+                768: { slidesPerView: 3, spaceBetween: 30 },
+                1024: { slidesPerView: 4, spaceBetween: 30 },
+            },
+        });
+
+        var reviewSwiper = new Swiper(".reviewSwiper", {
             slidesPerView: 1,
             spaceBetween: 20,
             navigation: {

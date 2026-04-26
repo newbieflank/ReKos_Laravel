@@ -19,8 +19,8 @@ class KosController extends Controller
         $totalKamar = $kos->rooms->count();
         
         // Untuk rating dan jumlah review
-        $rating = $kos->reviews()->avg('rating') ?? $kos->rating;
         $reviewsCount = $kos->reviews()->count();
+        $rating = $reviewsCount > 0 ? $kos->reviews()->avg('rating') : 0;
 
         return view('kos.detailkos', compact('kos', 'hargaHarian', 'hargaMingguan', 'hargaBulanan', 'rating', 'reviewsCount', 'sisaKamar', 'totalKamar'));
     }
