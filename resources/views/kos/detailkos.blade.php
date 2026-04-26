@@ -356,11 +356,13 @@
             </div>
         </div>
 
+        {{--
         <div class="mt-4 mb-2 text-center">
             <button class="btn btn-primary w-100 fw-bold py-3 shadow-sm heading-text">
                 Tanya Pemilik Sebelum Sewa
             </button>
         </div>
+        --}}
 
     </div>
 
