@@ -14,7 +14,7 @@ class SpecificUserSeeder extends Seeder
             ->has(UserDetail::factory())
             ->create([
                 'name' => 'Admin RE-KOST',
-                'email' => 'admin@gmail.com',
+                'email' => 'admin1@gmail.com',
                 'password' => bcrypt('123qweasd'),
                 'role' => 'admin',
             ]);
