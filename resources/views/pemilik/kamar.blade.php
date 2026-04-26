@@ -273,7 +273,8 @@
     </style>
 
     <div class="container-fluid-custom">
-        <a href="{{ route('pemilik.kost') }}" class="btn btn-light border btn-sm mb-3 text-muted"><i class="fa-solid fa-arrow-left me-1"></i> Kembali ke Daftar Kost</a>
+        <a href="{{ route('pemilik.kost') }}" class="btn btn-light border btn-sm mb-3 text-muted"><i
+                class="fa-solid fa-arrow-left me-1"></i> Kembali ke Daftar Kost</a>
         <div class="mb-4">
             <h3 class="text-dark fw-bold mb-1">Daftar Kamar - {{ $kost->boarding_house_name }}</h3>
             <p class="text-secondary small">Kelola hunian, fasilitas, dan status penyewa Kost Anda.</p>
@@ -309,104 +310,129 @@
         <div class="row g-4 mb-5" id="roomsContainer">
 
             @forelse($rooms->sortByDesc('available') as $room)
-            <div class="col-12 col-sm-6 col-lg-4 col-xl-3 room-wrapper" data-room-name="{{ strtolower($room->room_name) }}" data-room-status="{{ $room->available ? 'tersedia' : 'terisi' }}">
-                <div class="room-card p-4 {{ !$room->available ? 'bg-light border' : '' }}" style="{{ !$room->available ? 'opacity: 0.85;' : '' }}">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h5 class="fw-bold mb-0 {{ $room->available ? 'text-primary' : 'text-secondary' }}">{{ $room->room_name }}</h5>
-                        <button class="btn-info-icon" title="Detail Kamar" data-bs-toggle="modal"
-                            data-bs-target="#detailKamarModal{{ $room->id }}"><i class="fa-solid fa-info"></i></button>
-                    </div>
-                    <p class="text-secondary small mb-3">
-                        @if($room->available)
-                            Tersedia
-                        @else
-                            Terisi
-                        @endif
-                    </p>
-                    <div class="d-flex flex-wrap gap-2 mb-4">
-                        @if(is_array($room->facilities))
-                            @foreach(array_slice($room->facilities, 0, 3) as $fasilitas)
-                                <span class="room-badge">{{ $fasilitas }}</span>
-                            @endforeach
-                            @if(count($room->facilities) > 3)
-                                <span class="room-badge">{{ count($room->facilities) - 3 }}+</span>
-                            @endif
-                        @else
-                            <span class="room-badge">Fasilitas Standar</span>
-                        @endif
-                    </div>
-                    <div class="mt-auto d-flex justify-content-between align-items-center">
-                        <span class="status-dot {{ $room->available ? 'tersedia' : 'terisi' }}" title="{{ $room->available ? 'Tersedia' : 'Terisi' }}"></span>
-                        <div class="d-flex gap-2">
-                            @if($room->available)
-                                <a href="{{ route('pemilik.penyewa.tambah', ['room_id' => $room->id]) }}" class="action-btn btn-add text-decoration-none" title="Tambah Penyewa"><i class="fa-solid fa-plus"></i></a>
-                            @endif
-                            <a href="{{ route('pemilik.kamar.edit', ['id' => $kost->id, 'room_id' => $room->id]) }}" class="action-btn btn-edit text-decoration-none" title="Edit Data"><i class="fa-solid fa-pen"></i></a>
-                            <form action="{{ route('pemilik.kamar.hapus', ['id' => $kost->id, 'room_id' => $room->id]) }}" method="POST" class="m-0" onsubmit="event.preventDefault(); confirmDelete(this, 'Yakin ingin menghapus kamar ini?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="action-btn btn-expense border-0" title="Hapus Kamar" style="background-color: #fee2e2; color: #ef4444;"><i class="fa-regular fa-trash-can"></i></button>
-                            </form>
+                <div class="col-12 col-sm-6 col-lg-4 col-xl-3 room-wrapper"
+                    data-room-name="{{ strtolower($room->room_name) }}"
+                    data-room-status="{{ $room->available ? 'tersedia' : 'terisi' }}">
+                    <div class="room-card p-4 {{ !$room->available ? 'bg-light border' : '' }}"
+                        style="{{ !$room->available ? 'opacity: 0.85;' : '' }}">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="fw-bold mb-0 {{ $room->available ? 'text-primary' : 'text-secondary' }}">
+                                {{ $room->room_name }}</h5>
+                            <button class="btn-info-icon" title="Detail Kamar" data-bs-toggle="modal"
+                                data-bs-target="#detailKamarModal{{ $room->id }}"><i
+                                    class="fa-solid fa-info"></i></button>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Modal Detail Kamar (Dinamis) -->
-                <div class="modal fade" id="detailKamarModal{{ $room->id }}" tabindex="-1" aria-labelledby="detailKamarModalLabel{{ $room->id }}"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-lg">
-                        <div class="modal-content modal-content-custom shadow-lg">
-                            <div class="modal-header border-0 pb-0 px-4 pt-4">
-                                <h5 class="modal-title text-primary fw-bold" id="detailKamarModalLabel{{ $room->id }}">Detail {{ $room->room_name }}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body px-4 py-4">
-                                <div class="row mb-5">
-                                    <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                        <h5 class="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
-                                            Status: {{ $room->available ? 'Tersedia' : 'Terisi' }} <span class="status-dot {{ $room->available ? 'tersedia' : 'terisi' }}"></span>
-                                        </h5>
-                                        <p class="text-muted small fw-bold mb-0" style="letter-spacing: 1px;">
-                                            TIPE : <span class="text-dark">{{ strtoupper($room->room_type) }}</span>
-                                        </p>
-                                    </div>
-                                    <div class="col-12 col-md-6 text-md-end">
-                                        <p class="text-muted small fw-bold mb-1" style="letter-spacing: 0.5px;">
-                                            UKURAN : <span class="text-dark">{{ $room->room_size }} Meter</span>
-                                        </p>
-                                        <p class="text-muted small fw-bold mb-0" style="letter-spacing: 0.5px;">
-                                            HARGA : <span class="text-dark">Rp {{ number_format($room->monthly_price, 0, ',', '.') }}/Bulan</span>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="mb-4">
-                                    <div class="section-title mb-3">FASILITAS KAMAR</div>
-                                    <div class="row g-3">
-                                        @if(is_array($room->facilities) && count($room->facilities) > 0)
-                                            @foreach($room->facilities as $fac)
-                                            <div class="col-12 col-sm-6 col-md-4">
-                                                <div class="facility-box"><i class="fa-solid fa-check text-primary"></i> {{ $fac }}</div>
-                                            </div>
-                                            @endforeach
-                                        @else
-                                            <div class="col-12"><p class="text-muted small">Tidak ada fasilitas.</p></div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <a href="{{ route('pemilik.kamar.edit', ['id' => $kost->id, 'room_id' => $room->id]) }}" class="btn-update-status text-decoration-none d-flex justify-content-center align-items-center gap-2">
-                                    Edit Kamar <i class="fa-solid fa-arrow-right"></i>
-                                </a>
+                        <p class="text-secondary small mb-3">
+                            @if ($room->available)
+                                Tersedia
+                            @else
+                                Terisi
+                            @endif
+                        </p>
+                        <div class="d-flex flex-wrap gap-2 mb-4">
+                            @if (is_array($room->facilities))
+                                @foreach (array_slice($room->facilities, 0, 3) as $fasilitas)
+                                    <span class="room-badge">{{ $fasilitas }}</span>
+                                @endforeach
+                                @if (count($room->facilities) > 3)
+                                    <span class="room-badge">{{ count($room->facilities) - 3 }}+</span>
+                                @endif
+                            @else
+                                <span class="room-badge">Fasilitas Standar</span>
+                            @endif
+                        </div>
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <span class="status-dot {{ $room->available ? 'tersedia' : 'terisi' }}"
+                                title="{{ $room->available ? 'Tersedia' : 'Terisi' }}"></span>
+                            <div class="d-flex gap-2">
+                                @if ($room->available)
+                                    <a href="{{ route('pemilik.penyewa.tambah', ['room_id' => $room->id]) }}"
+                                        class="action-btn btn-add text-decoration-none" title="Tambah Penyewa"><i
+                                            class="fa-solid fa-plus"></i></a>
+                                @endif
+                                <a href="{{ route('pemilik.kamar.edit', ['id' => $kost->id, 'room_id' => $room->id]) }}"
+                                    class="action-btn btn-edit text-decoration-none" title="Edit Data"><i
+                                        class="fa-solid fa-pen"></i></a>
+                                <form
+                                    action="{{ route('pemilik.kamar.hapus', ['id' => $kost->id, 'room_id' => $room->id]) }}"
+                                    method="POST" class="m-0"
+                                    onsubmit="event.preventDefault(); confirmDelete(this, 'Yakin ingin menghapus kamar ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="action-btn btn-expense border-0" title="Hapus Kamar"
+                                        style="background-color: #fee2e2; color: #ef4444;"><i
+                                            class="fa-regular fa-trash-can"></i></button>
+                                </form>
                             </div>
                         </div>
                     </div>
-                </div>
-                
 
-            </div>
+                    <!-- Modal Detail Kamar (Dinamis) -->
+                    <div class="modal fade" id="detailKamarModal{{ $room->id }}" tabindex="-1"
+                        aria-labelledby="detailKamarModalLabel{{ $room->id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content modal-content-custom shadow-lg">
+                                <div class="modal-header border-0 pb-0 px-4 pt-4">
+                                    <h5 class="modal-title text-primary fw-bold"
+                                        id="detailKamarModalLabel{{ $room->id }}">Detail {{ $room->room_name }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body px-4 py-4">
+                                    <div class="row mb-5">
+                                        <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                            <h5 class="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                                                Status: {{ $room->available ? 'Tersedia' : 'Terisi' }} <span
+                                                    class="status-dot {{ $room->available ? 'tersedia' : 'terisi' }}"></span>
+                                            </h5>
+                                            <p class="text-muted small fw-bold mb-0" style="letter-spacing: 1px;">
+                                                TIPE : <span class="text-dark">{{ strtoupper($room->room_type) }}</span>
+                                            </p>
+                                        </div>
+                                        <div class="col-12 col-md-6 text-md-end">
+                                            <p class="text-muted small fw-bold mb-1" style="letter-spacing: 0.5px;">
+                                                UKURAN : <span class="text-dark">{{ $room->room_size }} Meter</span>
+                                            </p>
+                                            <p class="text-muted small fw-bold mb-0" style="letter-spacing: 0.5px;">
+                                                HARGA : <span class="text-dark">Rp
+                                                    {{ number_format($room->monthly_price, 0, ',', '.') }}/Bulan</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <div class="section-title mb-3">FASILITAS KAMAR</div>
+                                        <div class="row g-3">
+                                            @if (is_array($room->facilities) && count($room->facilities) > 0)
+                                                @foreach ($room->facilities as $fac)
+                                                    <div class="col-12 col-sm-6 col-md-4">
+                                                        <div class="facility-box"><i
+                                                                class="fa-solid fa-check text-primary"></i>
+                                                            {{ $fac }}</div>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="col-12">
+                                                    <p class="text-muted small">Tidak ada fasilitas.</p>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <a href="{{ route('pemilik.kamar.edit', ['id' => $kost->id, 'room_id' => $room->id]) }}"
+                                        class="btn-update-status text-decoration-none d-flex justify-content-center align-items-center gap-2">
+                                        Edit Kamar <i class="fa-solid fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
             @empty
-            <div class="col-12">
-                <p class="text-center text-muted">Belum ada data kamar untuk kost ini. Silakan tambahkan kamar baru.</p>
-            </div>
+                <div class="col-12">
+                    <p class="text-center text-muted">Belum ada data kamar untuk kost ini. Silakan tambahkan kamar baru.
+                    </p>
+                </div>
             @endforelse
 
             <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
@@ -435,28 +461,28 @@
                                     <div class="stat-box">
                                         <p class="text-muted small fw-bold mb-1"
                                             style="font-size: 0.65rem; letter-spacing: 1px;">TOTAL KAMAR</p>
-                                        <h3 class="fw-bold text-dark mb-0">24</h3>
+                                        <h3 class="fw-bold text-dark mb-0">{{ $totalRooms }}</h3>
                                     </div>
                                 </div>
                                 <div class="col-6 col-md-3">
                                     <div class="stat-box border-left-primary">
                                         <p class="text-muted small fw-bold mb-1"
                                             style="font-size: 0.65rem; letter-spacing: 1px;">TERISI</p>
-                                        <h3 class="fw-bold text-dark mb-0">18</h3>
+                                        <h3 class="fw-bold text-dark mb-0">{{ $occupiedRooms }}</h3>
                                     </div>
                                 </div>
                                 <div class="col-6 col-md-3">
                                     <div class="stat-box">
                                         <p class="text-muted small fw-bold mb-1"
                                             style="font-size: 0.65rem; letter-spacing: 1px;">TERSEDIA</p>
-                                        <h3 class="fw-bold text-primary mb-0">6</h3>
+                                        <h3 class="fw-bold text-primary mb-0">{{ $availableRooms }}</h3>
                                     </div>
                                 </div>
                                 <div class="col-6 col-md-3">
                                     <div class="stat-box">
                                         <p class="text-muted small fw-bold mb-1"
                                             style="font-size: 0.65rem; letter-spacing: 1px;">EFISIENSI</p>
-                                        <h3 class="fw-bold mb-0" style="color: #20c997;">75%</h3>
+                                        <h3 class="fw-bold mb-0" style="color: #20c997;">{{ $occupancyRate }}%</h3>
                                     </div>
                                 </div>
                             </div>
@@ -470,44 +496,44 @@
 @endsection
 
 @push('scripts')
-<script>
-    let currentFilter = 'semua';
-    
-    function filterRooms(status, btnElement) {
-        currentFilter = status;
-        
-        // Update active class on buttons
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.remove('active');
-            btn.classList.add('inactive');
-        });
-        btnElement.classList.remove('inactive');
-        btnElement.classList.add('active');
-        
-        applyFilters();
-    }
+    <script>
+        let currentFilter = 'semua';
 
-    document.querySelector('.search-input').addEventListener('input', function() {
-        applyFilters();
-    });
+        function filterRooms(status, btnElement) {
+            currentFilter = status;
 
-    function applyFilters() {
-        const searchQuery = document.querySelector('.search-input').value.toLowerCase();
-        const rooms = document.querySelectorAll('.room-wrapper');
-        
-        rooms.forEach(room => {
-            const name = room.getAttribute('data-room-name');
-            const status = room.getAttribute('data-room-status');
-            
-            const matchSearch = name.includes(searchQuery);
-            const matchFilter = (currentFilter === 'semua') || (status === currentFilter);
-            
-            if (matchSearch && matchFilter) {
-                room.style.display = 'block';
-            } else {
-                room.style.display = 'none';
-            }
+            // Update active class on buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('inactive');
+            });
+            btnElement.classList.remove('inactive');
+            btnElement.classList.add('active');
+
+            applyFilters();
+        }
+
+        document.querySelector('.search-input').addEventListener('input', function() {
+            applyFilters();
         });
-    }
-</script>
+
+        function applyFilters() {
+            const searchQuery = document.querySelector('.search-input').value.toLowerCase();
+            const rooms = document.querySelectorAll('.room-wrapper');
+
+            rooms.forEach(room => {
+                const name = room.getAttribute('data-room-name');
+                const status = room.getAttribute('data-room-status');
+
+                const matchSearch = name.includes(searchQuery);
+                const matchFilter = (currentFilter === 'semua') || (status === currentFilter);
+
+                if (matchSearch && matchFilter) {
+                    room.style.display = 'block';
+                } else {
+                    room.style.display = 'none';
+                }
+            });
+        }
+    </script>
 @endpush

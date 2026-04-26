@@ -323,7 +323,8 @@
             </div>
         </div>
 
-        <form id="tambahKamarForm" action="{{ route('pemilik.kamar.update', ['id' => $kost->id, 'room_id' => $room->id]) }}" method="POST">
+        <form id="tambahKamarForm" action="{{ route('pemilik.kamar.update', ['id' => $kost->id, 'room_id' => $room->id]) }}"
+            method="POST">
             @csrf
             @method('PUT')
 
@@ -332,15 +333,20 @@
                     <div class="row g-4 mb-4">
                         <div class="col-12 col-md-6">
                             <label class="form-label-custom">Nama Kamar</label>
-                            <input type="text" name="room_name" id="input_room_name" class="form-control form-control-custom w-100"
-                                placeholder="e.g. Kamar Standard" value="{{ old('room_name', $room->room_name) }}" required>
+                            <input type="text" name="room_name" id="input_room_name"
+                                class="form-control form-control-custom w-100" placeholder="e.g. Kamar Standard"
+                                value="{{ old('room_name', $room->room_name) }}" required>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label-custom">Tipe Kamar</label>
-                            <select name="room_type" id="input_room_type" class="form-select form-control-custom text-muted" required>
+                            <select name="room_type" id="input_room_type" class="form-select form-control-custom text-muted"
+                                required>
                                 <option value="">Pilih Tipe</option>
-                                <option value="Standard" {{ (old('room_type', $room->room_type) == 'Standard') ? 'selected' : '' }}>Standard</option>
-                                <option value="Deluxe" {{ (old('room_type', $room->room_type) == 'Deluxe') ? 'selected' : '' }}>Deluxe</option>
+                                <option value="Standard"
+                                    {{ old('room_type', $room->room_type) == 'Standard' ? 'selected' : '' }}>Standard
+                                </option>
+                                <option value="Deluxe"
+                                    {{ old('room_type', $room->room_type) == 'Deluxe' ? 'selected' : '' }}>Deluxe</option>
                             </select>
                         </div>
                     </div>
@@ -348,7 +354,8 @@
                         <div class="col-12 col-md-4">
                             <label class="form-label-custom">Ukuran Kamar (m)</label>
                             <div class="position-relative">
-                                <input type="text" name="room_size" id="input_room_size" class="form-control form-control-custom w-100" placeholder="e.g. 3x4"
+                                <input type="text" name="room_size" id="input_room_size"
+                                    class="form-control form-control-custom w-100" placeholder="e.g. 3x4"
                                     style="padding-right: 60px;" value="{{ old('room_size', $room->room_size) }}" required>
                                 <span class="position-absolute text-muted"
                                     style="right: 16px; top: 12px; font-size: 0.85rem;">Meter</span>
@@ -357,14 +364,18 @@
                         <div class="col-12 col-md-4">
                             <label class="form-label-custom">Ketersediaan</label>
                             <div class="form-check form-switch mt-2">
-                                <input class="form-check-input" type="checkbox" role="switch" name="available" id="input_available" style="width: 40px; height: 20px; cursor: pointer;" {{ old('available', $room->available) ? 'checked' : '' }}>
-                                <label class="form-check-label ms-2 fw-medium text-dark" for="input_available" style="line-height: 20px; cursor: pointer;">Kamar Tersedia</label>
+                                <input class="form-check-input" type="checkbox" role="switch" name="available"
+                                    id="input_available" style="width: 40px; height: 20px; cursor: pointer;"
+                                    {{ old('available', $room->available) ? 'checked' : '' }}>
+                                <label class="form-check-label ms-2 fw-medium text-dark" for="input_available"
+                                    style="line-height: 20px; cursor: pointer;">Kamar Tersedia</label>
                             </div>
                         </div>
                         <div class="col-12 col-md-4">
                             <label class="form-label-custom">Kost Terpilih</label>
                             <div class="position-relative">
-                                <input type="text" class="form-control form-control-custom text-muted bg-light" value="{{ $kost->boarding_house_name }}" readonly>
+                                <input type="text" class="form-control form-control-custom text-muted bg-light"
+                                    value="{{ $kost->boarding_house_name }}" readonly>
                                 <i class="fa-solid fa-building position-absolute text-muted"
                                     style="right: 16px; top: 14px;"></i>
                             </div>
@@ -372,7 +383,8 @@
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center mt-5">
-                        <a href="{{ route('pemilik.kamar', $kost->id) }}" class="btn-outline-custom text-decoration-none">Batal</a>
+                        <a href="{{ route('pemilik.kamar', $kost->id) }}"
+                            class="btn-outline-custom text-decoration-none">Batal</a>
                         <button type="button" class="btn-primary-custom" onclick="goToStep(2)">Lanjut <i
                                 class="fa-solid fa-arrow-right ms-2"></i></button>
                     </div>
@@ -388,22 +400,26 @@
                     </div>
                     <div class="row g-3 mb-5">
                         <div class="col-6 col-md-3">
-                            <input type="checkbox" name="facilities[]" value="AC" id="fac_ac" class="facility-check">
+                            <input type="checkbox" name="facilities[]" value="AC" id="fac_ac"
+                                class="facility-check">
                             <label for="fac_ac" class="facility-card"><i
                                     class="fa-solid fa-snowflake"></i><span>AC</span></label>
                         </div>
                         <div class="col-6 col-md-3">
-                            <input type="checkbox" name="facilities[]" value="WIFI" id="fac_wifi" class="facility-check">
+                            <input type="checkbox" name="facilities[]" value="WIFI" id="fac_wifi"
+                                class="facility-check">
                             <label for="fac_wifi" class="facility-card"><i
                                     class="fa-solid fa-wifi"></i><span>WIFI</span></label>
                         </div>
                         <div class="col-6 col-md-3">
-                            <input type="checkbox" name="facilities[]" value="Kamar Mandi" id="fac_km" class="facility-check">
+                            <input type="checkbox" name="facilities[]" value="Kamar Mandi" id="fac_km"
+                                class="facility-check">
                             <label for="fac_km" class="facility-card"><i class="fa-solid fa-bath"></i><span>Kamar
                                     Mandi</span></label>
                         </div>
                         <div class="col-6 col-md-3">
-                            <input type="checkbox" name="facilities[]" value="TV" id="fac_tv" class="facility-check">
+                            <input type="checkbox" name="facilities[]" value="TV" id="fac_tv"
+                                class="facility-check">
                             <label for="fac_tv" class="facility-card"><i
                                     class="fa-solid fa-tv"></i><span>TV</span></label>
                         </div>
@@ -415,7 +431,8 @@
                     </div>
                     <div class="row g-3 mb-4">
                         <div class="col-6 col-md-3">
-                            <input type="checkbox" name="facilities[]" value="Kursi" id="fac_kursi" class="facility-check">
+                            <input type="checkbox" name="facilities[]" value="Kursi" id="fac_kursi"
+                                class="facility-check">
                             <label for="fac_kursi" class="facility-card"
                                 style="min-height: 80px; padding: 10px; flex-direction: row; justify-content: start;">
                                 <i class="fa-solid fa-chair text-muted ms-2 me-2"></i>
@@ -424,7 +441,8 @@
                             </label>
                         </div>
                         <div class="col-6 col-md-3">
-                            <input type="checkbox" name="facilities[]" value="Lemari" id="fac_lemari" class="facility-check">
+                            <input type="checkbox" name="facilities[]" value="Lemari" id="fac_lemari"
+                                class="facility-check">
                             <label for="fac_lemari" class="facility-card"
                                 style="min-height: 80px; padding: 10px; flex-direction: row; justify-content: start;">
                                 <i class="fa-solid fa-door-closed text-muted ms-2 me-2"></i>
@@ -433,7 +451,8 @@
                             </label>
                         </div>
                         <div class="col-6 col-md-3">
-                            <input type="checkbox" name="facilities[]" value="Meja" id="fac_meja" class="facility-check">
+                            <input type="checkbox" name="facilities[]" value="Meja" id="fac_meja"
+                                class="facility-check">
                             <label for="fac_meja" class="facility-card"
                                 style="min-height: 80px; padding: 10px; flex-direction: row; justify-content: start;">
                                 <i class="fa-solid fa-table text-muted ms-2 me-2"></i>
@@ -442,7 +461,8 @@
                             </label>
                         </div>
                         <div class="col-6 col-md-3">
-                            <input type="checkbox" name="facilities[]" value="Lampu" id="fac_lampu" class="facility-check">
+                            <input type="checkbox" name="facilities[]" value="Lampu" id="fac_lampu"
+                                class="facility-check">
                             <label for="fac_lampu" class="facility-card"
                                 style="min-height: 80px; padding: 10px; flex-direction: row; justify-content: start;">
                                 <i class="fa-solid fa-lightbulb text-muted ms-2 me-2"></i>
@@ -487,7 +507,9 @@
                                 <label class="form-label-custom">Harga Harian</label>
                                 <div class="price-input-group">
                                     <span class="prefix">Rp</span>
-                                    <input type="number" name="daily_price" id="input_daily_price" class="form-control form-control-custom w-100" placeholder="0" value="{{ old('daily_price', $room->daily_price) }}">
+                                    <input type="number" name="daily_price" id="input_daily_price"
+                                        class="form-control form-control-custom w-100" placeholder="0"
+                                        value="{{ old('daily_price', $room->daily_price) }}">
                                     <span class="suffix">PER HARI</span>
                                 </div>
                             </div>
@@ -495,7 +517,9 @@
                                 <label class="form-label-custom">Harga Mingguan</label>
                                 <div class="price-input-group">
                                     <span class="prefix">Rp</span>
-                                    <input type="number" name="weekly_price" id="input_weekly_price" class="form-control form-control-custom w-100" placeholder="0" value="{{ old('weekly_price', $room->weekly_price) }}">
+                                    <input type="number" name="weekly_price" id="input_weekly_price"
+                                        class="form-control form-control-custom w-100" placeholder="0"
+                                        value="{{ old('weekly_price', $room->weekly_price) }}">
                                     <span class="suffix">PER MINGGU</span>
                                 </div>
                             </div>
@@ -503,7 +527,9 @@
                                 <label class="form-label-custom">Harga Bulanan</label>
                                 <div class="price-input-group">
                                     <span class="prefix">Rp</span>
-                                    <input type="number" name="monthly_price" id="input_monthly_price" class="form-control form-control-custom w-100" placeholder="0" value="{{ old('monthly_price', $room->monthly_price) }}" required>
+                                    <input type="number" name="monthly_price" id="input_monthly_price"
+                                        class="form-control form-control-custom w-100" placeholder="0"
+                                        value="{{ old('monthly_price', $room->monthly_price) }}" required>
                                     <span class="suffix">PER BULAN</span>
                                 </div>
                             </div>
@@ -696,7 +722,8 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="text-secondary small">Status</span>
-                                <h5 class="fw-bold text-success mb-0" id="summary_available"><i class="fa-solid fa-circle-check"></i> Tersedia</h5>
+                                <h5 class="fw-bold text-success mb-0" id="summary_available"><i
+                                        class="fa-solid fa-circle-check"></i> Tersedia</h5>
                             </div>
                         </div>
 
@@ -723,20 +750,30 @@
     @push('scripts')
         <script>
             function formatRupiah(number) {
-                if(!number) return "Rp 0";
-                return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+                if (!number) return "Rp 0";
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(number);
             }
 
             function goToStep(step) {
                 if (step === 5) {
-                    document.getElementById('summary_room_name').innerText = document.getElementById('input_room_name').value || '-';
-                    document.getElementById('summary_room_type').innerText = document.getElementById('input_room_type').value || '-';
-                    document.getElementById('summary_room_size').innerText = (document.getElementById('input_room_size').value || '-') + ' Meter';
-                    
-                    document.getElementById('summary_daily_price').innerText = formatRupiah(document.getElementById('input_daily_price').value);
-                    document.getElementById('summary_weekly_price').innerText = formatRupiah(document.getElementById('input_weekly_price').value);
-                    document.getElementById('summary_monthly_price').innerText = formatRupiah(document.getElementById('input_monthly_price').value);
-                    
+                    document.getElementById('summary_room_name').innerText = document.getElementById('input_room_name').value ||
+                        '-';
+                    document.getElementById('summary_room_type').innerText = document.getElementById('input_room_type').value ||
+                        '-';
+                    document.getElementById('summary_room_size').innerText = (document.getElementById('input_room_size')
+                        .value || '-') + ' Meter';
+
+                    document.getElementById('summary_daily_price').innerText = formatRupiah(document.getElementById(
+                        'input_daily_price').value);
+                    document.getElementById('summary_weekly_price').innerText = formatRupiah(document.getElementById(
+                        'input_weekly_price').value);
+                    document.getElementById('summary_monthly_price').innerText = formatRupiah(document.getElementById(
+                        'input_monthly_price').value);
+
                     const isAvailable = document.getElementById('input_available').checked;
                     const availEl = document.getElementById('summary_available');
                     if (isAvailable) {
@@ -750,11 +787,12 @@
                     const facilitiesDiv = document.getElementById('summary_facilities');
                     facilitiesDiv.innerHTML = '';
                     const checkedFacs = document.querySelectorAll('.facility-check:checked');
-                    if(checkedFacs.length === 0) {
+                    if (checkedFacs.length === 0) {
                         facilitiesDiv.innerHTML = '<span class="text-muted small">Tidak ada fasilitas.</span>';
                     } else {
                         checkedFacs.forEach(cb => {
-                            facilitiesDiv.innerHTML += `<span class="badge-facility"><i class="fa-solid fa-check text-primary"></i> ${cb.value}</span>`;
+                            facilitiesDiv.innerHTML +=
+                                `<span class="badge-facility"><i class="fa-solid fa-check text-primary"></i> ${cb.value}</span>`;
                         });
                     }
                 }

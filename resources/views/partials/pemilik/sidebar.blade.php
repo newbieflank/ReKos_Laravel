@@ -2,10 +2,10 @@
     style="width: var(--sidebar-width); top: 0; left: 0; z-index: 1040; transition: transform 0.3s ease-in-out;">
     <div class="d-flex align-items-center justify-content-between px-4 flex-shrink-0"
         style="height: 64px; border-bottom: 1px solid #f3f4f6;">
-        <div class="d-flex align-items-center gap-2 text-primary fw-bold fs-5">
-            <i class="fa-solid fa-hurricane"></i>
+        <a href="{{ route('home') }}" class="d-flex align-items-center gap-2 text-decoration-none fw-bold fs-5">
+            <i class="fa-solid fa-hurricane text-primary"></i>
             <span class="text-dark fs-6" style="letter-spacing: 2px;">RE-KOST</span>
-        </div>
+        </a>
 
         <button id="closeSidebar" class="btn btn-link text-secondary p-0 border-0 d-lg-none">
             <i class="fa-solid fa-xmark fs-4"></i>

@@ -56,14 +56,31 @@ class PemilikKosController extends Controller
         $totalReviews = $reviewsQuery->count();
         $avgRating = $totalReviews > 0 ? $reviewsQuery->avg('rating') : 0;
 
-        return view('pemilik.dashboard', compact('months', 'chartIncome', 'chartExpense', 'totalIncome', 'totalExpense', 'currentYear', 'avgRating', 'totalReviews')); 
+        // Okupansi Keseluruhan
+        $totalRooms = \App\Models\Room::whereIn('id', $roomIds)->count();
+        $availableRooms = \App\Models\Room::whereIn('id', $roomIds)->where('available', true)->count();
+        $occupiedRooms = $totalRooms - $availableRooms;
+        $occupancyRate = $totalRooms > 0 ? round(($occupiedRooms / $totalRooms) * 100) : 0;
+
+        return view('pemilik.dashboard', compact(
+            'months', 'chartIncome', 'chartExpense', 'totalIncome', 'totalExpense', 
+            'currentYear', 'avgRating', 'totalReviews', 
+            'totalRooms', 'availableRooms', 'occupiedRooms', 'occupancyRate'
+        )); 
     }
 
     public function kamar($id)
     {
         $kost = \App\Models\BoardingHouse::findOrFail($id);
         $rooms = \App\Models\Room::where('boarding_house_id', $id)->get();
-        return view('pemilik.kamar', compact('kost', 'rooms'));
+
+        // Statistik Okupansi Properti Ini
+        $totalRooms = $rooms->count();
+        $availableRooms = $rooms->where('available', true)->count();
+        $occupiedRooms = $totalRooms - $availableRooms;
+        $occupancyRate = $totalRooms > 0 ? round(($occupiedRooms / $totalRooms) * 100) : 0;
+
+        return view('pemilik.kamar', compact('kost', 'rooms', 'totalRooms', 'availableRooms', 'occupiedRooms', 'occupancyRate'));
     }
 
     public function penyewa(Request $request)
@@ -290,7 +307,18 @@ class PemilikKosController extends Controller
 
         $kosts = $query->get();
 
-        return view('pemilik.kost', compact('kosts', 'filter'));
+        // Statistik Okupansi Keseluruhan (dari semua properti)
+        $totalRooms = \App\Models\Room::whereHas('boardingHouse', function($q) {
+            $q->where('owner_id', auth()->id());
+        })->count();
+        $availableRooms = \App\Models\Room::whereHas('boardingHouse', function($q) {
+            $q->where('owner_id', auth()->id());
+        })->where('available', true)->count();
+        $occupiedRooms = $totalRooms - $availableRooms;
+        $occupancyRate = $totalRooms > 0 ? round(($occupiedRooms / $totalRooms) * 100) : 0;
+        $totalKosts = $kosts->count();
+
+        return view('pemilik.kost', compact('kosts', 'filter', 'totalRooms', 'availableRooms', 'occupiedRooms', 'occupancyRate', 'totalKosts'));
     }
 
     public function tambahKost()
