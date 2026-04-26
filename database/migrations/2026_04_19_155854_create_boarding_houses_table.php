@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('owner_id')->constrained('users')->onDelete('cascade');
             $table->string('boarding_house_name');
             $table->text('alamat');
-            $table->decimal('latitude', 10, 8);
-            $table->decimal('longitude', 10, 8);
+            $table->decimal('latitude', 11, 8);
+            $table->decimal('longitude', 11, 8);
             $table->enum('boarding_house_type', ['male', 'female', 'mixed'])->default('mixed');
             $table->json('facilities')->nullable();
             $table->text('description')->nullable();
