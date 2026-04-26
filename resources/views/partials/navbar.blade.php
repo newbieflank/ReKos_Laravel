@@ -41,17 +41,24 @@
                             <span>{{ Str::limit(auth()->user()->name, 15, '...') }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                            @if (auth()->user()->role === 'owner')
-                                <li><a class="dropdown-item" href="{{ route('pemilik.dashboard') }}">Manajemen Kost</a></li>
-                            @else
-                                <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
-                                <li><a class="dropdown-item" href="#">Riwayat</a></li>
+                            <!-- Profile Link (Semua Role) -->
                             <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
 
+                            <!-- Menu Owner -->
+                            @if (auth()->user()->role === 'owner')
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="{{ route('pemilik.dashboard') }}">Manajemen Kost</a>
+                                </li>
+                                <li><a class="dropdown-item" href="#">Data Kamar</a></li>
+
+                                <!-- Menu Tenant -->
                             @elseif (auth()->user()->role === 'tenant')
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
+                                <li><a class="dropdown-item" href="#">Riwayat</a></li>
                                 @if (auth()->user()->roleRequest && auth()->user()->roleRequest->status == 'pending')
                                     <li><button class="dropdown-item text-muted" disabled>Menunggu Persetujuan...</button>
                                     </li>
@@ -65,6 +72,7 @@
                                 @endif
                             @endif
 
+                            <!-- Logout -->
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
