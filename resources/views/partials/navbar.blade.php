@@ -51,8 +51,6 @@
                                 </li>
                                 <li><a class="dropdown-item" href="{{ route('pemilik.dashboard') }}">Manajemen Kost</a>
                                 </li>
-                                <li><a class="dropdown-item" href="#">Data Kamar</a></li>
-
                                 <!-- Menu Tenant -->
                             @elseif (auth()->user()->role === 'tenant')
                                 <li>
