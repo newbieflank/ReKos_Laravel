@@ -41,15 +41,11 @@
                             <span>{{ Str::limit(auth()->user()->name, 15, '...') }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
-                            <li><a class="dropdown-item" href="{{ route('login') }}">Riwayat</a></li>
-
                             @if (auth()->user()->role === 'owner')
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="{{ route('login') }}">Data Kost</a></li>
-                                <li><a class="dropdown-item" href="{{ route('login') }}">Data Kamar</a></li>
+                                <li><a class="dropdown-item" href="{{ route('pemilik.dashboard') }}">Manajemen Kost</a></li>
+                            @else
+                                <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
+                                <li><a class="dropdown-item" href="#">Riwayat</a></li>
                             @endif
 
                             <li>

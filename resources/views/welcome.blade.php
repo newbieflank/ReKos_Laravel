@@ -93,66 +93,33 @@
             </div>
 
             <div class="row g-4">
+                @foreach($kosts as $kost)
                 <div class="col-lg-3 col-md-6">
-                    <div class="card card-kost h-100 p-2 border-0 shadow-sm">
-                        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                            class="card-img-top rounded-3" alt="Kost">
-                        <div class="card-body px-2 pb-1 pt-3">
-                            <h6 class="fw-bold text-dark mb-1">Kost Putri Anggrek</h6>
-                            <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i>
-                                Kalianget, Bondowoso</p>
-                            <div class="mt-3">
-                                <span class="fw-bold text-primary fs-5">Rp 450.000<span
-                                        class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                    <a href="{{ route('detail', $kost->id) }}" class="text-decoration-none">
+                        <div class="card card-kost h-100 p-2 border-0 shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                                class="card-img-top rounded-3" alt="Kost">
+                            <div class="card-body px-2 pb-1 pt-3">
+                                <h6 class="fw-bold text-dark mb-1">{{ $kost->boarding_house_name }}</h6>
+                                <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i>
+                                    {{ Str::limit($kost->alamat, 25) }}</p>
+                                
+                                @php $sisa = $kost->rooms->where('available', true)->count(); @endphp
+                                @if($sisa > 0)
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 mb-2" style="font-size: 0.7rem;"><i class="fa-solid fa-door-open me-1"></i> Sisa {{ $sisa }} Kamar</span>
+                                @else
+                                    <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 mb-2" style="font-size: 0.7rem;"><i class="fa-solid fa-door-closed me-1"></i> Penuh</span>
+                                @endif
+
+                                <div class="mt-2 border-top pt-2">
+                                    <span class="fw-bold text-primary fs-5">Rp {{ number_format($kost->rooms->min('monthly_price') ?? 0, 0, ',', '.') }}<span
+                                            class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="card card-kost h-100 p-2 border-0 shadow-sm">
-                        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                            class="card-img-top rounded-3" alt="Kost">
-                        <div class="card-body px-2 pb-1 pt-3">
-                            <h6 class="fw-bold text-dark mb-1">Kost Putra Wijaya</h6>
-                            <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i>
-                                Tenggarang, Bondowoso</p>
-                            <div class="mt-3">
-                                <span class="fw-bold text-primary fs-5">Rp 500.000<span
-                                        class="text-muted small fw-normal fs-6"> / Bulan</span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="card card-kost h-100 p-2 border-0 shadow-sm">
-                        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                            class="card-img-top rounded-3" alt="Kost">
-                        <div class="card-body px-2 pb-1 pt-3">
-                            <h6 class="fw-bold text-dark mb-1">Kost Campur Mawar</h6>
-                            <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> Tamanan,
-                                Bondowoso</p>
-                            <div class="mt-3">
-                                <span class="fw-bold text-primary fs-5">Rp 400.000<span
-                                        class="text-muted small fw-normal fs-6"> / Bulan</span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="card card-kost h-100 p-2 border-0 shadow-sm">
-                        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                            class="card-img-top rounded-3" alt="Kost">
-                        <div class="card-body px-2 pb-1 pt-3">
-                            <h6 class="fw-bold text-dark mb-1">Kost Eksklusif Melati</h6>
-                            <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> Pujer,
-                                Bondowoso</p>
-                            <div class="mt-3">
-                                <span class="fw-bold text-primary fs-5">Rp 800.000<span
-                                        class="text-muted small fw-normal fs-6"> / Bulan</span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
             </div>
 
             <div class="text-center mt-5">
@@ -180,66 +147,33 @@
             </div>
 
             <div class="row g-4">
+                @foreach($kosts as $kost)
                 <div class="col-lg-3 col-md-6">
-                    <div class="card card-kost h-100 p-2 border shadow-sm">
-                        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                            class="card-img-top rounded-3" alt="Kost">
-                        <div class="card-body px-2 pb-1 pt-3">
-                            <h6 class="fw-bold text-dark mb-1">Kost Putri Anggrek</h6>
-                            <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i>
-                                Kalianget</p>
-                            <div class="mt-3">
-                                <span class="fw-bold text-primary fs-5">Rp 450.000<span
-                                        class="text-muted small fw-normal fs-6"> / bln</span></span>
+                    <a href="{{ route('detail', $kost->id) }}" class="text-decoration-none">
+                        <div class="card card-kost h-100 p-2 border shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                                class="card-img-top rounded-3" alt="Kost">
+                            <div class="card-body px-2 pb-1 pt-3">
+                                <h6 class="fw-bold text-dark mb-1">{{ $kost->boarding_house_name }}</h6>
+                                <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i>
+                                    {{ Str::limit($kost->alamat, 25) }}</p>
+                                
+                                @php $sisa = $kost->rooms->where('available', true)->count(); @endphp
+                                @if($sisa > 0)
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 mb-2" style="font-size: 0.7rem;"><i class="fa-solid fa-door-open me-1"></i> Sisa {{ $sisa }} Kamar</span>
+                                @else
+                                    <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 mb-2" style="font-size: 0.7rem;"><i class="fa-solid fa-door-closed me-1"></i> Penuh</span>
+                                @endif
+
+                                <div class="mt-2 border-top pt-2">
+                                    <span class="fw-bold text-primary fs-5">Rp {{ number_format($kost->rooms->min('monthly_price') ?? 0, 0, ',', '.') }}<span
+                                            class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="card card-kost h-100 p-2 border shadow-sm">
-                        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                            class="card-img-top rounded-3" alt="Kost">
-                        <div class="card-body px-2 pb-1 pt-3">
-                            <h6 class="fw-bold text-dark mb-1">Kost Putra Wijaya</h6>
-                            <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i>
-                                Tenggarang</p>
-                            <div class="mt-3">
-                                <span class="fw-bold text-primary fs-5">Rp 500.000<span
-                                        class="text-muted small fw-normal fs-6"> / bln</span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="card card-kost h-100 p-2 border shadow-sm">
-                        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                            class="card-img-top rounded-3" alt="Kost">
-                        <div class="card-body px-2 pb-1 pt-3">
-                            <h6 class="fw-bold text-dark mb-1">Kost Campur Mawar</h6>
-                            <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i>
-                                Tamanan</p>
-                            <div class="mt-3">
-                                <span class="fw-bold text-primary fs-5">Rp 400.000<span
-                                        class="text-muted small fw-normal fs-6"> / bln</span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="card card-kost h-100 p-2 border shadow-sm">
-                        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                            class="card-img-top rounded-3" alt="Kost">
-                        <div class="card-body px-2 pb-1 pt-3">
-                            <h6 class="fw-bold text-dark mb-1">Kost Eksklusif Melati</h6>
-                            <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> Pujer
-                            </p>
-                            <div class="mt-3">
-                                <span class="fw-bold text-primary fs-5">Rp 800.000<span
-                                        class="text-muted small fw-normal fs-6"> / bln</span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>
