@@ -58,9 +58,12 @@ class AuthController extends Controller
     {
         $request->validate([
             'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|max:255|unique:users',
-            'phone'    => 'required|numeric',
+            'email'    => 'required|string|email|max:255|unique:users,email',
+            'phone'    => 'required|numeric|unique:user_details,phone',
             'password' => 'required|string|min:8',
+        ], [
+            'email.unique' => 'Email sudah terdaftar, silakan gunakan email lain.',
+            'phone.unique' => 'Nomor telepon sudah digunakan, silakan gunakan nomor lain.',
         ]);
 
         DB::beginTransaction();
