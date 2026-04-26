@@ -73,6 +73,11 @@ class User extends Authenticatable
         return $this->hasMany(BoardingHouse::class, 'owner_id');
     }
 
+    public function roleRequest()
+    {
+        return $this->hasOne(RoleRequest::class);
+    }
+
     public function rentals(): HasMany
     {
         return $this->hasMany(Tenant::class, 'tenant_id');

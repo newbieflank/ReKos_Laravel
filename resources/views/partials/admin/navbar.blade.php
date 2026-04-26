@@ -32,8 +32,16 @@
                 <span class="text-dark small fw-medium d-none d-md-block">Administrator</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
-                <li><a class="dropdown-item py-2 text-danger" href="#"><i
-                            class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+                <li>
+                    <a class="dropdown-item py-2 text-danger" href="{{ route('logout') }}"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                    </a>
+
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        @csrf
+                    </form>
+                </li>
             </ul>
         </div>
 

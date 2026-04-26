@@ -46,6 +46,23 @@
                             @else
                                 <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
                                 <li><a class="dropdown-item" href="#">Riwayat</a></li>
+                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
+
+                            @elseif (auth()->user()->role === 'tenant')
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                @if (auth()->user()->roleRequest && auth()->user()->roleRequest->status == 'pending')
+                                    <li><button class="dropdown-item text-muted" disabled>Menunggu Persetujuan...</button>
+                                    </li>
+                                @else
+                                    <li>
+                                        <form action="{{ route('role.request') }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item">Ajukan Jadi Owner</button>
+                                        </form>
+                                    </li>
+                                @endif
                             @endif
 
                             <li>
