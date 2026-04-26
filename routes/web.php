@@ -10,8 +10,8 @@ use App\Http\Controllers\RoleRequestController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    $kosts = \App\Models\BoardingHouse::with('rooms')->take(4)->get();
-    return view('welcome', compact('kosts'));
+    $rooms = \App\Models\Room::with('boardingHouse')->where('available', true)->take(12)->get();
+    return view('welcome', compact('rooms'));
 })->name('home');
 
 Route::get('/login', [AuthController::class, 'login'])->name('login');

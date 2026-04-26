@@ -269,8 +269,10 @@
                     return 'fa-solid fa-circle-check';
                 };
             @endphp
+            
+            <h6 class="fw-bold text-dark mb-3">Fasilitas Umum (Kos)</h6>
             <div class="row gy-3 mb-4">
-                @if ($kos->facilities)
+                @if ($kos->facilities && count($kos->facilities) > 0)
                     @foreach ($kos->facilities as $f)
                         <div class="col-6 col-md-3 text-muted d-flex align-items-center">
                             <div class="d-flex justify-content-center align-items-center bg-light rounded-circle me-3" style="width: 36px; height: 36px;">
@@ -280,7 +282,33 @@
                         </div>
                     @endforeach
                 @else
-                    <div class="col-12 text-muted">Belum ada data fasilitas</div>
+                    <div class="col-12 text-muted">Belum ada data fasilitas umum</div>
+                @endif
+            </div>
+
+            <h6 class="fw-bold text-dark mb-3">Fasilitas Kamar</h6>
+            <div class="row gy-3 mb-4">
+                @php
+                    $roomFacilities = [];
+                    foreach($kos->rooms as $room) {
+                        if (is_array($room->facilities)) {
+                            $roomFacilities = array_merge($roomFacilities, $room->facilities);
+                        }
+                    }
+                    $roomFacilities = array_unique($roomFacilities);
+                @endphp
+                
+                @if (count($roomFacilities) > 0)
+                    @foreach ($roomFacilities as $f)
+                        <div class="col-6 col-md-3 text-muted d-flex align-items-center">
+                            <div class="d-flex justify-content-center align-items-center bg-light rounded-circle me-3" style="width: 36px; height: 36px;">
+                                <i class="{{ $getIcon($f) }} text-primary" style="font-size: 1rem;"></i>
+                            </div>
+                            <span class="fw-medium icon-text">{{ $f }}</span>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="col-12 text-muted">Belum ada data fasilitas kamar</div>
                 @endif
             </div>
         </div>
