@@ -65,12 +65,22 @@
         <div class="row shadow-lg login-card w-100 h-100 m-0 g-0">
 
             <div class="col-lg-6 p-5 bg-white">
-                <img src="{{ asset('images/Logo.svg') }}" class="logo mb-3" alt="Logo">
+                <img src="{{ asset('images/logo.svg') }}" class="logo mb-3" alt="Logo">
 
                 <h4 class="fw-bold">Selamat Datang</h4>
                 <p class="text-muted mb-5">
                     Selamat Datang di laman Re-kost! Tempat terbaik untuk mencari rekomendasi kost
                 </p>
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
                 <form method="post" action="{{ route('login.auth') }}">
                     @csrf
@@ -78,7 +88,7 @@
                     <div class="mb-3">
                         <label class="form-label">Email</label>
                         <input type="text" name="email" class="form-control" placeholder="example@gmail.com"
-                            required>
+                            value="{{ old('email') }}" required>
                     </div>
 
                     <div class="mb-3">

@@ -85,25 +85,35 @@
                         </p>
                     </div>
 
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <form method="post" action="/register">
                         @csrf
 
                         <div class="mb-3">
                             <label class="form-label">Name</label>
                             <input type="text" name="name" class="form-control py-2" placeholder="example"
-                                required>
+                                value="{{ old('name') }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Email</label>
                             <input type="text" name="email" class="form-control py-2"
-                                placeholder="example@gmail.com" required>
+                                placeholder="example@gmail.com" value="{{ old('email') }}" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Phone</label>
                             <input type="number" name="phone" class="form-control py-2" placeholder="082xxxxxxxxxxxx"
-                                required>
+                                value="{{ old('phone') }}" required>
                         </div>
 
                         <div class="mb-3">
