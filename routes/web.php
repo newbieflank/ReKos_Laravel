@@ -5,6 +5,8 @@ use App\Http\Controllers\KosController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\admin\AdminController;
 use App\Http\Controllers\admin\UserController;
+use App\Http\Controllers\landing\allKosController;
+use App\Http\Controllers\landing\kosTerbaikController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PemilikKosController;
 use App\Http\Controllers\RoleRequestController;
@@ -14,6 +16,9 @@ Route::get('/', function () {
     $rooms = \App\Models\Room::with('boardingHouse')->where('available', true)->take(12)->get();
     return view('welcome', compact('rooms'));
 })->name('home');
+
+Route::get('/kos-terbaik', [kosTerbaikController::class, 'index'])->name('kosterbaik.index');
+Route::get('/all-kos', [allKosController::class, 'index'])->name('allkos.index');
 
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/register', [AuthController::class, 'register'])->name('register');

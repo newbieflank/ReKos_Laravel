@@ -168,8 +168,8 @@
             </div>
 
             <div class="text-center mt-5">
-                <button class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm bg-white">Lihat <i
-                        class="fas fa-arrow-right ms-2"></i></button>
+                <a class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm bg-white" href="{{ route('kosterbaik.index') }}">Lihat <i
+                        class="fas fa-arrow-right ms-2"></i></a>
             </div>
         </div>
     </section>
@@ -230,6 +230,10 @@
                 </div>
                 <div class="swiper-button-prev d-none d-md-flex"></div>
                 <div class="swiper-button-next d-none d-md-flex"></div>
+            </div>
+             <div class="text-center mt-5">
+                <a class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm bg-white" href="{{ route('allkos.index') }}">Lihat <i
+                        class="fas fa-arrow-right ms-2"></i></a>
             </div>
         </div>
     </section>
