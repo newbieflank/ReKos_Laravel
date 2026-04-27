@@ -11,7 +11,7 @@ class UserController extends Controller
 {
     public function pencariKos()
     {
-        $users = User::with(['userDetail', 'rentals.rooms.boardingHouse'])
+        $users = User::with(['userDetail', 'rentals.room.boardingHouse'])
             ->where('role', 'tenant')
             ->get();
         $title = "Pencari Kos";
