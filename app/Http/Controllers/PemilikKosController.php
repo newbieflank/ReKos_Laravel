@@ -289,6 +289,40 @@ class PemilikKosController extends Controller
         return redirect()->route('pemilik.kamar', $id)->with('success', 'Data kamar berhasil dihapus!');
     }
 
+    public function duplicateKamar($id, $roomId)
+    {
+        $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
+        $room = \App\Models\Room::where('boarding_house_id', $id)->findOrFail($roomId);
+        
+        $newRoom = $room->replicate();
+        
+        // Buat nama khusus misalnya angkanya nambah atau tambah nomor baru
+        if (preg_match('/(.*?)\s*(\d+)$/', $room->room_name, $matches)) {
+            $baseName = rtrim($matches[1]);
+            $number = intval($matches[2]) + 1;
+            $checkName = $baseName . ' ' . $number;
+            while (\App\Models\Room::where('boarding_house_id', $id)->where('room_name', $checkName)->exists()) {
+                $number++;
+                $checkName = $baseName . ' ' . $number;
+            }
+            $newRoom->room_name = $checkName;
+        } else {
+            $baseName = trim($room->room_name);
+            $number = 2;
+            $checkName = $baseName . ' ' . $number;
+            while (\App\Models\Room::where('boarding_house_id', $id)->where('room_name', $checkName)->exists()) {
+                $number++;
+                $checkName = $baseName . ' ' . $number;
+            }
+            $newRoom->room_name = $checkName;
+        }
+        
+        $newRoom->available = true; // Kamar baru default tersedia
+        $newRoom->save();
+        
+        return redirect()->route('pemilik.kamar', $id)->with('success', 'Data kamar berhasil diduplikasi menjadi: ' . $newRoom->room_name);
+    }
+
     public function kost(Request $request)
     {
         $filter = $request->query('filter'); // null, 'tersedia', 'penuh'
