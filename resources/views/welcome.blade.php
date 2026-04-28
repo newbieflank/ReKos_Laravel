@@ -7,28 +7,53 @@
             position: relative;
             padding: 0 50px;
         }
-        .swiper { width: 100%; height: 100%; padding-bottom: 50px; }
-        .swiper-slide { height: auto; }
-        .swiper-pagination-bullet { background: #59A1FF; }
-        .section-biru .swiper-pagination-bullet { background: #fff; }
-        
+
+        .swiper {
+            width: 100%;
+            height: 100%;
+            padding-bottom: 50px;
+        }
+
+        .swiper-slide {
+            height: auto;
+        }
+
+        .swiper-pagination-bullet {
+            background: #59A1FF;
+        }
+
+        .section-biru .swiper-pagination-bullet {
+            background: #fff;
+        }
+
         /* Swiper Navigation Buttons */
-        .swiper-button-next, .swiper-button-prev {
+        .swiper-button-next,
+        .swiper-button-prev {
             color: #59A1FF;
             background: rgba(255, 255, 255, 1);
             width: 45px;
             height: 45px;
             border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             margin-top: -22px;
         }
-        .swiper-button-prev { left: 0; }
-        .swiper-button-next { right: 0; }
-        .swiper-button-next:after, .swiper-button-prev:after {
+
+        .swiper-button-prev {
+            left: 0;
+        }
+
+        .swiper-button-next {
+            right: 0;
+        }
+
+        .swiper-button-next:after,
+        .swiper-button-prev:after {
             font-size: 18px;
             font-weight: bold;
         }
-        .section-biru .swiper-button-next, .section-biru .swiper-button-prev {
+
+        .section-biru .swiper-button-next,
+        .section-biru .swiper-button-prev {
             color: #59A1FF;
         }
     </style>
@@ -129,36 +154,45 @@
             <div class="swiper-container-wrapper">
                 <div class="swiper roomSwiper">
                     <div class="swiper-wrapper">
-                        @foreach($rooms as $room)
-                        <div class="swiper-slide">
-                            <a href="{{ route('detail', $room->boardingHouse->id) }}" class="text-decoration-none">
-                                <div class="card card-kost h-100 p-2 border-0 shadow-sm">
-                                    <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                                        class="card-img-top rounded-3" alt="Kamar">
-                                    <div class="card-body px-2 pb-1 pt-3 text-start">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
-                                            <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1" style="font-size: 0.7rem;">{{ $room->room_type }}</span>
-                                        </div>
-                                        <p class="text-muted small mb-1"><i class="fas fa-house text-secondary me-1"></i>
-                                            {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }}</p>
-                                        <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i>
-                                            {{ Str::limit($room->boardingHouse->alamat, 25) }}</p>
-                                        
-                                        @if($room->available)
-                                            <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 mb-2" style="font-size: 0.7rem;"><i class="fa-solid fa-door-open me-1"></i> Tersedia</span>
-                                        @else
-                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 mb-2" style="font-size: 0.7rem;"><i class="fa-solid fa-door-closed me-1"></i> Penuh</span>
-                                        @endif
+                        @foreach ($rooms as $room)
+                            <div class="swiper-slide">
+                                <a href="{{ route('detail', $room->boardingHouse->id) }}" class="text-decoration-none">
+                                    <div class="card card-kost h-100 p-2 border-0 shadow-sm">
+                                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                                            class="card-img-top rounded-3" alt="Kamar">
+                                        <div class="card-body px-2 pb-1 pt-3 text-start">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
+                                                <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1"
+                                                    style="font-size: 0.7rem;">{{ $room->room_type }}</span>
+                                            </div>
+                                            <p class="text-muted small mb-1"><i
+                                                    class="fas fa-house text-secondary me-1"></i>
+                                                {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }}</p>
+                                            <p class="text-muted small mb-2"><i
+                                                    class="fas fa-map-marker-alt text-danger me-1"></i>
+                                                {{ Str::limit($room->boardingHouse->alamat, 25) }}</p>
 
-                                        <div class="mt-2 border-top pt-2">
-                                            <span class="fw-bold text-primary fs-5">Rp {{ number_format($room->monthly_price ?? 0, 0, ',', '.') }}<span
-                                                    class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                                            @if ($room->available)
+                                                <span
+                                                    class="badge bg-success-subtle text-success rounded-pill px-2 py-1 mb-2"
+                                                    style="font-size: 0.7rem;"><i class="fa-solid fa-door-open me-1"></i>
+                                                    Tersedia</span>
+                                            @else
+                                                <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 mb-2"
+                                                    style="font-size: 0.7rem;"><i class="fa-solid fa-door-closed me-1"></i>
+                                                    Penuh</span>
+                                            @endif
+
+                                            <div class="mt-2 border-top pt-2">
+                                                <span class="fw-bold text-primary fs-5">Rp
+                                                    {{ number_format($room->monthly_price ?? 0, 0, ',', '.') }}<span
+                                                        class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </a>
-                        </div>
+                                </a>
+                            </div>
                         @endforeach
                     </div>
                     <div class="swiper-pagination"></div>
@@ -168,8 +202,8 @@
             </div>
 
             <div class="text-center mt-5">
-                <a class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm bg-white" href="{{ route('kosterbaik.index') }}">Lihat <i
-                        class="fas fa-arrow-right ms-2"></i></a>
+                <a class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm bg-white"
+                    href="{{ route('kosterbaik.index') }}">Lihat <i class="fas fa-arrow-right ms-2"></i></a>
             </div>
         </div>
     </section>
@@ -177,8 +211,8 @@
     <section class="py-5 bg-white">
         <div class="container py-4">
             <div class="mb-4">
-                <h3 class="fw-bold text-dark mb-2">Pilihan Kost Terbaik di Sekitarmu</h3>
-                <p class="text-muted">Menyesuaikan dengan lokasi Anda saat ini, ini adalah pilihan tepat untuk Anda.</p>
+                <h3 class="fw-bold text-dark mb-2">Kost-Kost yang ada di Bondowoso</h3>
+                <p class="text-muted">Berikut ini adalah pilihan kost-kost di Bondowoso</p>
             </div>
 
             <div class="d-flex flex-wrap gap-2 mb-4">
@@ -187,43 +221,52 @@
                     class="btn btn-outline-secondary rounded-pill px-4 text-dark border-light bg-light">Tenggarang</button>
                 <button
                     class="btn btn-outline-secondary rounded-pill px-4 text-dark border-light bg-light">Wonosari</button>
-                <button
-                    class="btn btn-outline-secondary rounded-pill px-4 text-dark border-light bg-light">Tamanan</button>
+                <button class="btn btn-outline-secondary rounded-pill px-4 text-dark border-light bg-light">Tamanan</button>
             </div>
 
             <div class="swiper-container-wrapper">
                 <div class="swiper roomSwiper">
                     <div class="swiper-wrapper">
-                        @foreach($rooms as $room)
-                        <div class="swiper-slide">
-                            <a href="{{ route('detail', $room->boardingHouse->id) }}" class="text-decoration-none">
-                                <div class="card card-kost h-100 p-2 border shadow-sm">
-                                    <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                                        class="card-img-top rounded-3" alt="Kamar">
-                                    <div class="card-body px-2 pb-1 pt-3 text-start">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
-                                            <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1" style="font-size: 0.7rem;">{{ $room->room_type }}</span>
-                                        </div>
-                                        <p class="text-muted small mb-1"><i class="fas fa-house text-secondary me-1"></i>
-                                            {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }}</p>
-                                        <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i>
-                                            {{ Str::limit($room->boardingHouse->alamat, 25) }}</p>
-                                        
-                                        @if($room->available)
-                                            <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 mb-2" style="font-size: 0.7rem;"><i class="fa-solid fa-door-open me-1"></i> Tersedia</span>
-                                        @else
-                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 mb-2" style="font-size: 0.7rem;"><i class="fa-solid fa-door-closed me-1"></i> Penuh</span>
-                                        @endif
+                        @foreach ($rooms as $room)
+                            <div class="swiper-slide">
+                                <a href="{{ route('detail', $room->boardingHouse->id) }}" class="text-decoration-none">
+                                    <div class="card card-kost h-100 p-2 border shadow-sm">
+                                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                                            class="card-img-top rounded-3" alt="Kamar">
+                                        <div class="card-body px-2 pb-1 pt-3 text-start">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
+                                                <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1"
+                                                    style="font-size: 0.7rem;">{{ $room->room_type }}</span>
+                                            </div>
+                                            <p class="text-muted small mb-1"><i
+                                                    class="fas fa-house text-secondary me-1"></i>
+                                                {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }}</p>
+                                            <p class="text-muted small mb-2"><i
+                                                    class="fas fa-map-marker-alt text-danger me-1"></i>
+                                                {{ Str::limit($room->boardingHouse->alamat, 25) }}</p>
 
-                                        <div class="mt-2 border-top pt-2">
-                                            <span class="fw-bold text-primary fs-5">Rp {{ number_format($room->monthly_price ?? 0, 0, ',', '.') }}<span
-                                                    class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                                            @if ($room->available)
+                                                <span
+                                                    class="badge bg-success-subtle text-success rounded-pill px-2 py-1 mb-2"
+                                                    style="font-size: 0.7rem;"><i class="fa-solid fa-door-open me-1"></i>
+                                                    Tersedia</span>
+                                            @else
+                                                <span
+                                                    class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 mb-2"
+                                                    style="font-size: 0.7rem;"><i
+                                                        class="fa-solid fa-door-closed me-1"></i> Penuh</span>
+                                            @endif
+
+                                            <div class="mt-2 border-top pt-2">
+                                                <span class="fw-bold text-primary fs-5">Rp
+                                                    {{ number_format($room->monthly_price ?? 0, 0, ',', '.') }}<span
+                                                        class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </a>
-                        </div>
+                                </a>
+                            </div>
                         @endforeach
                     </div>
                     <div class="swiper-pagination"></div>
@@ -231,9 +274,9 @@
                 <div class="swiper-button-prev d-none d-md-flex"></div>
                 <div class="swiper-button-next d-none d-md-flex"></div>
             </div>
-             <div class="text-center mt-5">
-                <a class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm bg-white" href="{{ route('allkos.index') }}">Lihat <i
-                        class="fas fa-arrow-right ms-2"></i></a>
+            <div class="text-center mt-5">
+                <a class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm bg-white"
+                    href="{{ route('allkos.index') }}">Lihat <i class="fas fa-arrow-right ms-2"></i></a>
             </div>
         </div>
     </section>
@@ -311,11 +354,12 @@
                                     <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
                                         class="fas fa-star"></i><i class="fas fa-star"></i>
                                 </div>
-                                <p class="text-muted small fst-italic">"Sangat membantu saya menemukan kost yang dekat dengan
+                                <p class="text-muted small fst-italic">"Sangat membantu saya menemukan kost yang dekat
+                                    dengan
                                     kampus. Aplikasinya mudah digunakan dan informasinya akurat!"</p>
                                 <div class="d-flex align-items-center mt-3">
-                                    <img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle me-2"
-                                        width="40" height="40" alt="User">
+                                    <img src="https://randomuser.me/api/portraits/women/44.jpg"
+                                        class="rounded-circle me-2" width="40" height="40" alt="User">
                                     <div>
                                         <h6 class="fw-bold mb-0" style="font-size: 14px;">Intan Pertiwi</h6>
                                         <span class="text-muted" style="font-size: 12px;">Mahasiswa</span>
@@ -329,7 +373,8 @@
                                     <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
                                         class="fas fa-star"></i><i class="fas fa-star"></i>
                                 </div>
-                                <p class="text-muted small fst-italic">"Harga transparan, tidak ada tipu-tipu. Saya langsung
+                                <p class="text-muted small fst-italic">"Harga transparan, tidak ada tipu-tipu. Saya
+                                    langsung
                                     booking dan besoknya bisa langsung masuk. Mantap Re-Kost!"</p>
                                 <div class="d-flex align-items-center mt-3">
                                     <img src="https://randomuser.me/api/portraits/men/32.jpg" class="rounded-circle me-2"
@@ -347,11 +392,12 @@
                                     <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
                                         class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
                                 </div>
-                                <p class="text-muted small fst-italic">"Pilihan kostnya sangat banyak. Saya bisa filter sesuai
+                                <p class="text-muted small fst-italic">"Pilihan kostnya sangat banyak. Saya bisa filter
+                                    sesuai
                                     budget bulanan saya dengan sangat mudah."</p>
                                 <div class="d-flex align-items-center mt-3">
-                                    <img src="https://randomuser.me/api/portraits/women/68.jpg" class="rounded-circle me-2"
-                                        width="40" height="40" alt="User">
+                                    <img src="https://randomuser.me/api/portraits/women/68.jpg"
+                                        class="rounded-circle me-2" width="40" height="40" alt="User">
                                     <div>
                                         <h6 class="fw-bold mb-0" style="font-size: 14px;">Siti Aminah</h6>
                                         <span class="text-muted" style="font-size: 12px;">Mahasiswa</span>
@@ -365,7 +411,8 @@
                                     <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
                                         class="fas fa-star"></i><i class="fas fa-star"></i>
                                 </div>
-                                <p class="text-muted small fst-italic">"Sangat direkomendasikan buat anak rantau yang bingung cari
+                                <p class="text-muted small fst-italic">"Sangat direkomendasikan buat anak rantau yang
+                                    bingung cari
                                     kostan di area Bondowoso!"</p>
                                 <div class="d-flex align-items-center mt-3">
                                     <img src="https://randomuser.me/api/portraits/men/46.jpg" class="rounded-circle me-2"
@@ -388,60 +435,78 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize all room sliders
-        document.querySelectorAll('.roomSwiper').forEach((el) => {
-            const container = el.closest('.swiper-container-wrapper');
-            const prevEl = container.querySelector('.swiper-button-prev');
-            const nextEl = container.querySelector('.swiper-button-next');
-            const paginationEl = el.querySelector('.swiper-pagination');
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all room sliders
+            document.querySelectorAll('.roomSwiper').forEach((el) => {
+                const container = el.closest('.swiper-container-wrapper');
+                const prevEl = container.querySelector('.swiper-button-prev');
+                const nextEl = container.querySelector('.swiper-button-next');
+                const paginationEl = el.querySelector('.swiper-pagination');
 
-            new Swiper(el, {
-                slidesPerView: 1,
-                spaceBetween: 20,
-                navigation: {
-                    nextEl: nextEl,
-                    prevEl: prevEl,
-                },
-                pagination: {
-                    el: paginationEl,
-                    clickable: true,
-                },
-                breakpoints: {
-                    640: { slidesPerView: 2, spaceBetween: 20 },
-                    768: { slidesPerView: 3, spaceBetween: 30 },
-                    1024: { slidesPerView: 4, spaceBetween: 30 },
-                },
+                new Swiper(el, {
+                    slidesPerView: 1,
+                    spaceBetween: 20,
+                    navigation: {
+                        nextEl: nextEl,
+                        prevEl: prevEl,
+                    },
+                    pagination: {
+                        el: paginationEl,
+                        clickable: true,
+                    },
+                    breakpoints: {
+                        640: {
+                            slidesPerView: 2,
+                            spaceBetween: 20
+                        },
+                        768: {
+                            slidesPerView: 3,
+                            spaceBetween: 30
+                        },
+                        1024: {
+                            slidesPerView: 4,
+                            spaceBetween: 30
+                        },
+                    },
+                });
+            });
+
+            // Initialize review slider
+            document.querySelectorAll('.reviewSwiper').forEach((el) => {
+                const container = el.closest('.swiper-container-wrapper');
+                const prevEl = container.querySelector('.swiper-button-prev');
+                const nextEl = container.querySelector('.swiper-button-next');
+                const paginationEl = el.querySelector('.swiper-pagination');
+
+                new Swiper(el, {
+                    slidesPerView: 1,
+                    spaceBetween: 20,
+                    navigation: {
+                        nextEl: nextEl,
+                        prevEl: prevEl,
+                    },
+                    pagination: {
+                        el: paginationEl,
+                        clickable: true,
+                    },
+                    breakpoints: {
+                        640: {
+                            slidesPerView: 2,
+                            spaceBetween: 20
+                        },
+                        768: {
+                            slidesPerView: 3,
+                            spaceBetween: 30
+                        },
+                        1024: {
+                            slidesPerView: 4,
+                            spaceBetween: 30
+                        },
+                    },
+                });
             });
         });
-
-        // Initialize review slider
-        document.querySelectorAll('.reviewSwiper').forEach((el) => {
-            const container = el.closest('.swiper-container-wrapper');
-            const prevEl = container.querySelector('.swiper-button-prev');
-            const nextEl = container.querySelector('.swiper-button-next');
-            const paginationEl = el.querySelector('.swiper-pagination');
-
-            new Swiper(el, {
-                slidesPerView: 1,
-                spaceBetween: 20,
-                navigation: {
-                    nextEl: nextEl,
-                    prevEl: prevEl,
-                },
-                pagination: {
-                    el: paginationEl,
-                    clickable: true,
-                },
-                breakpoints: {
-                    640: { slidesPerView: 2, spaceBetween: 20 },
-                    768: { slidesPerView: 3, spaceBetween: 30 },
-                    1024: { slidesPerView: 4, spaceBetween: 30 },
-                },
-            });
-        });
-    });
-</script>
+    </script>
 @endpush

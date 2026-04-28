@@ -354,6 +354,15 @@
                                     class="action-btn btn-edit text-decoration-none" title="Edit Data"><i
                                         class="fa-solid fa-pen"></i></a>
                                 <form
+                                    action="{{ route('pemilik.kamar.duplicate', ['id' => $kost->id, 'room_id' => $room->id]) }}"
+                                    method="POST" class="m-0"
+                                    onsubmit="event.preventDefault(); Swal.fire({ title: 'Duplikasi Kamar?', text: 'Kamar ini akan diduplikasi dengan fasilitas dan harga yang sama.', icon: 'question', showCancelButton: true, confirmButtonColor: '#0d6efd', cancelButtonColor: '#6c757d', confirmButtonText: 'Ya, Duplikasi!', cancelButtonText: 'Batal' }).then((result) => { if (result.isConfirmed) this.submit(); });">
+                                    @csrf
+                                    <button type="submit" class="action-btn btn-edit border-0" title="Duplikasi Kamar">
+                                        <i class="fa-solid fa-copy"></i>
+                                    </button>
+                                </form>
+                                <form
                                     action="{{ route('pemilik.kamar.hapus', ['id' => $kost->id, 'room_id' => $room->id]) }}"
                                     method="POST" class="m-0"
                                     onsubmit="event.preventDefault(); confirmDelete(this, 'Yakin ingin menghapus kamar ini?');">
