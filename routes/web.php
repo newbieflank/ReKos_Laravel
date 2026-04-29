@@ -62,6 +62,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/kost/{id}/kamar/{room_id}/edit', [PemilikKosController::class, 'editKamar'])->name('kamar.edit');
             Route::put('/kost/{id}/kamar/{room_id}/update', [PemilikKosController::class, 'updateKamar'])->name('kamar.update');
             Route::delete('/kost/{id}/kamar/{room_id}/hapus', [PemilikKosController::class, 'hapusKamar'])->name('kamar.hapus');
+            Route::post('/kost/{id}/kamar/{room_id}/duplicate', [PemilikKosController::class, 'duplicateKamar'])->name('kamar.duplicate');
 
             Route::get('/penyewa', [PemilikKosController::class, 'penyewa'])->name('penyewa');
             Route::get('/penyewa/tambah', [PemilikKosController::class, 'tambahPenyewa'])->name('penyewa.tambah');

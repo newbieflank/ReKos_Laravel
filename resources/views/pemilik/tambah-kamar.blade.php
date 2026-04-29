@@ -336,11 +336,7 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label-custom">Tipe Kamar</label>
-                            <select name="room_type" id="input_room_type" class="form-select form-control-custom text-muted" required>
-                                <option value="">Pilih Tipe</option>
-                                <option value="Standard">Standard</option>
-                                <option value="Deluxe">Deluxe</option>
-                            </select>
+                            <input type="text" name="room_type" id="input_room_type" class="form-control form-control-custom w-100" placeholder="e.g. Standard, Deluxe, VIP" required>
                         </div>
                     </div>
                     <div class="row g-4">
@@ -382,87 +378,50 @@
                 <div class="form-section-card">
 
                     <div class="d-flex align-items-center gap-2 mb-3">
-                        <i class="fa-solid fa-layer-group text-primary"></i>
-                        <h6 class="fw-bold mb-0">Fasilitas Utama</h6>
+                        <i class="fa-solid fa-bed text-primary"></i>
+                        <h6 class="fw-bold mb-0">Fasilitas Kamar</h6>
                     </div>
-                    <div class="row g-3 mb-5">
+                    <div class="row g-3 mb-5" id="facilities-container">
                         <div class="col-6 col-md-3">
                             <input type="checkbox" name="facilities[]" value="AC" id="fac_ac" class="facility-check">
-                            <label for="fac_ac" class="facility-card"><i
-                                    class="fa-solid fa-snowflake"></i><span>AC</span></label>
+                            <label for="fac_ac" class="facility-card"><i class="fa-solid fa-snowflake"></i><span>AC</span></label>
                         </div>
                         <div class="col-6 col-md-3">
                             <input type="checkbox" name="facilities[]" value="WIFI" id="fac_wifi" class="facility-check">
-                            <label for="fac_wifi" class="facility-card"><i
-                                    class="fa-solid fa-wifi"></i><span>WIFI</span></label>
+                            <label for="fac_wifi" class="facility-card"><i class="fa-solid fa-wifi"></i><span>WIFI</span></label>
                         </div>
                         <div class="col-6 col-md-3">
                             <input type="checkbox" name="facilities[]" value="Kamar Mandi" id="fac_km" class="facility-check">
-                            <label for="fac_km" class="facility-card"><i class="fa-solid fa-bath"></i><span>Kamar
-                                    Mandi</span></label>
+                            <label for="fac_km" class="facility-card"><i class="fa-solid fa-bath"></i><span>Kamar Mandi</span></label>
                         </div>
                         <div class="col-6 col-md-3">
                             <input type="checkbox" name="facilities[]" value="TV" id="fac_tv" class="facility-check">
-                            <label for="fac_tv" class="facility-card"><i
-                                    class="fa-solid fa-tv"></i><span>TV</span></label>
+                            <label for="fac_tv" class="facility-card"><i class="fa-solid fa-tv"></i><span>TV</span></label>
                         </div>
-                    </div>
-
-                    <div class="d-flex align-items-center gap-2 mb-3">
-                        <i class="fa-solid fa-couch text-primary"></i>
-                        <h6 class="fw-bold mb-0">Fasilitas Tambahan</h6>
-                    </div>
-                    <div class="row g-3 mb-4">
                         <div class="col-6 col-md-3">
                             <input type="checkbox" name="facilities[]" value="Kursi" id="fac_kursi" class="facility-check">
-                            <label for="fac_kursi" class="facility-card"
-                                style="min-height: 80px; padding: 10px; flex-direction: row; justify-content: start;">
-                                <i class="fa-solid fa-chair text-muted ms-2 me-2"></i>
-                                <div class="d-flex flex-column"><span class="mb-0">Kursi</span><small
-                                        class="text-muted" style="font-size:0.65rem;">Chair</small></div>
-                            </label>
+                            <label for="fac_kursi" class="facility-card"><i class="fa-solid fa-chair"></i><span>Kursi</span></label>
                         </div>
                         <div class="col-6 col-md-3">
                             <input type="checkbox" name="facilities[]" value="Lemari" id="fac_lemari" class="facility-check">
-                            <label for="fac_lemari" class="facility-card"
-                                style="min-height: 80px; padding: 10px; flex-direction: row; justify-content: start;">
-                                <i class="fa-solid fa-door-closed text-muted ms-2 me-2"></i>
-                                <div class="d-flex flex-column"><span class="mb-0">Lemari</span><small
-                                        class="text-muted" style="font-size:0.65rem;">Wardrobe</small></div>
-                            </label>
+                            <label for="fac_lemari" class="facility-card"><i class="fa-solid fa-door-closed"></i><span>Lemari</span></label>
                         </div>
                         <div class="col-6 col-md-3">
                             <input type="checkbox" name="facilities[]" value="Meja" id="fac_meja" class="facility-check">
-                            <label for="fac_meja" class="facility-card"
-                                style="min-height: 80px; padding: 10px; flex-direction: row; justify-content: start;">
-                                <i class="fa-solid fa-table text-muted ms-2 me-2"></i>
-                                <div class="d-flex flex-column"><span class="mb-0">Meja</span><small class="text-muted"
-                                        style="font-size:0.65rem;">Desk</small></div>
-                            </label>
+                            <label for="fac_meja" class="facility-card"><i class="fa-solid fa-table"></i><span>Meja</span></label>
                         </div>
                         <div class="col-6 col-md-3">
                             <input type="checkbox" name="facilities[]" value="Lampu" id="fac_lampu" class="facility-check">
-                            <label for="fac_lampu" class="facility-card"
-                                style="min-height: 80px; padding: 10px; flex-direction: row; justify-content: start;">
-                                <i class="fa-solid fa-lightbulb text-muted ms-2 me-2"></i>
-                                <div class="d-flex flex-column"><span class="mb-0">Lampu</span><small
-                                        class="text-muted" style="font-size:0.65rem;">Desk Lamp</small></div>
-                            </label>
+                            <label for="fac_lampu" class="facility-card"><i class="fa-solid fa-lightbulb"></i><span>Lampu</span></label>
                         </div>
                     </div>
 
                     <label class="form-label-custom">Tambahan lainnya</label>
                     <div class="d-flex gap-2 mb-3">
-                        <input type="text" class="form-control form-control-custom flex-grow-1"
+                        <input type="text" id="custom-facility-input" class="form-control form-control-custom flex-grow-1"
                             placeholder="Add custom facility (e.g. Balcony)">
-                        <button type="button" class="btn btn-primary shadow-sm px-4 rounded-3"><i
+                        <button type="button" class="btn btn-primary shadow-sm px-4 rounded-3" onclick="addCustomFacility()"><i
                                 class="fa-solid fa-plus me-1"></i> Add</button>
-                    </div>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-3 fw-medium">Water
-                            Heater <i class="fa-solid fa-xmark ms-2" style="cursor:pointer;"></i></span>
-                        <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-3 fw-medium">Exhaust
-                            Fan <i class="fa-solid fa-xmark ms-2" style="cursor:pointer;"></i></span>
                     </div>
 
                     <div class="d-flex justify-content-end align-items-center mt-5 gap-3">
@@ -475,91 +434,84 @@
             </div>
 
             <div id="step-3" class="d-none">
-                <div class="row g-4">
-                    <div class="col-12 col-md-8">
-                        <div class="form-section-card h-100">
-                            <h5 class="fw-bold mb-1">Penentuan Tarif</h5>
-                            <p class="text-secondary small mb-4">Tentukan harga sewa berdasarkan fleksibilitas durasi
-                                tinggal yang Anda tawarkan.</p>
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-10">
+                        <div class="form-section-card shadow-sm border-0">
+                            <div class="text-center mb-4">
+                                <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-3" style="width: 64px; height: 64px;">
+                                    <i class="fa-solid fa-money-bill-wave fs-3"></i>
+                                </div>
+                                <h4 class="fw-bold text-dark">Penentuan Tarif & Biaya</h4>
+                                <p class="text-secondary small">Tentukan harga sewa berdasarkan durasi tinggal dan catat estimasi pengeluaran bulanan.</p>
+                            </div>
 
-                            <div class="mb-4">
-                                <label class="form-label-custom">Harga Harian</label>
-                                <div class="price-input-group">
-                                    <span class="prefix">Rp</span>
-                                    <input type="number" name="daily_price" id="input_daily_price" class="form-control form-control-custom w-100" placeholder="0">
-                                    <span class="suffix">PER HARI</span>
+                            <div class="row g-4">
+                                <div class="col-12 col-md-6">
+                                    <div class="p-4 border rounded-4 bg-light h-100">
+                                        <h6 class="fw-bold text-dark mb-4 pb-2 border-bottom"><i class="fa-solid fa-tags text-primary me-2"></i>Tarif Sewa Kamar</h6>
+                                        
+                                        <div class="mb-4">
+                                            <label class="form-label-custom">Harga Harian</label>
+                                            <div class="input-group input-group-lg bg-white" style="border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden;">
+                                                <span class="input-group-text bg-transparent border-0 text-muted pe-1">Rp</span>
+                                                <input type="text" name="daily_price" id="input_daily_price" class="form-control border-0 px-2 fw-bold rupiah-input" placeholder="0">
+                                                <span class="input-group-text bg-transparent border-0 text-muted small fw-bold ps-1">/ HARI</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-4">
+                                            <label class="form-label-custom">Harga Mingguan</label>
+                                            <div class="input-group input-group-lg bg-white" style="border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden;">
+                                                <span class="input-group-text bg-transparent border-0 text-muted pe-1">Rp</span>
+                                                <input type="text" name="weekly_price" id="input_weekly_price" class="form-control border-0 px-2 fw-bold rupiah-input" placeholder="0">
+                                                <span class="input-group-text bg-transparent border-0 text-muted small fw-bold ps-1">/ MINGGU</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <label class="form-label-custom text-primary">Harga Bulanan <span class="text-danger">*</span></label>
+                                            <div class="input-group input-group-lg bg-white" style="border: 2px solid #0d6efd; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(13,110,253,0.1);">
+                                                <span class="input-group-text bg-primary text-white border-0 fw-bold pe-2">Rp</span>
+                                                <input type="text" name="monthly_price" id="input_monthly_price" class="form-control border-0 px-2 fw-bold text-primary fs-5 rupiah-input" placeholder="0" required>
+                                                <span class="input-group-text bg-primary text-white border-0 small fw-bold ps-2">/ BULAN</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label-custom">Harga Mingguan</label>
-                                <div class="price-input-group">
-                                    <span class="prefix">Rp</span>
-                                    <input type="number" name="weekly_price" id="input_weekly_price" class="form-control form-control-custom w-100" placeholder="0">
-                                    <span class="suffix">PER MINGGU</span>
-                                </div>
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label-custom">Harga Bulanan</label>
-                                <div class="price-input-group">
-                                    <span class="prefix">Rp</span>
-                                    <input type="number" name="monthly_price" id="input_monthly_price" class="form-control form-control-custom w-100" placeholder="0" required>
-                                    <span class="suffix">PER BULAN</span>
+                                
+                                <div class="col-12 col-md-6">
+                                    <div class="p-4 border rounded-4 h-100" style="background-color: #fffdf5; border-color: #ffe69c !important;">
+                                        <h6 class="fw-bold text-dark mb-4 pb-2 border-bottom"><i class="fa-solid fa-wallet text-warning me-2"></i>Pengeluaran Operasional</h6>
+                                        
+                                        <div class="mb-4">
+                                            <label class="form-label-custom text-dark">Estimasi Pengeluaran Bulanan <span class="text-danger">*</span></label>
+                                            <p class="text-muted mb-3" style="font-size: 0.75rem; line-height: 1.5;">Perkiraan biaya bulanan khusus untuk kamar ini (misal: porsi listrik, kebersihan, perawatan) untuk dihitung dalam laporan keuangan.</p>
+                                            <div class="input-group input-group-lg bg-white" style="border: 2px solid #ffc107; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(255,193,7,0.1);">
+                                                <span class="input-group-text border-0 fw-bold pe-2" style="background-color: #ffc107; color: white;">Rp</span>
+                                                <input type="text" name="monthly_expense" id="input_monthly_expense" class="form-control border-0 px-2 fw-bold text-dark fs-5 rupiah-input" placeholder="0" required>
+                                                <span class="input-group-text border-0 small fw-bold ps-2" style="background-color: #ffc107; color: white;">/ BULAN</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="alert border-0 d-flex gap-3 mb-0" style="background-color: white; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                                            <i class="fa-solid fa-circle-info fs-5 text-info mt-1"></i>
+                                            <div>
+                                                <h6 class="fw-bold mb-1" style="font-size: 0.8rem; color: #495057;">Saran Pengisian</h6>
+                                                <p class="mb-0 text-muted" style="font-size: 0.7rem; line-height: 1.4;">Isi dengan angka perkiraan rasional. Jika biaya seperti token listrik ditanggung penuh oleh penyewa, abaikan biaya tersebut dari estimasi ini.</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <hr class="my-4 text-muted">
-
-                            <div class="mb-4">
-                                <label class="form-label-custom text-warning">Estimasi Pengeluaran Bulanan</label>
-                                <p class="small text-muted mb-2">Perkiraan biaya bulanan kamar ini (misal: listrik, kebersihan) untuk dikalkulasikan di grafik keuangan.</p>
-                                <div class="price-input-group" style="border-color: #ffe69c;">
-                                    <span class="prefix" style="background-color: #fff3cd; color: #ffc107;">Rp</span>
-                                    <input type="number" name="monthly_expense" id="input_monthly_expense" class="form-control form-control-custom w-100" placeholder="0" required>
-                                    <span class="suffix" style="background-color: #fff3cd; color: #ffc107;">PER BULAN</span>
-                                </div>
-                            </div>
-
-                            <div class="alert alert-info border-0 mt-4 d-flex gap-3"
-                                style="background-color: #f1f8fc; border-radius: 12px; color: #495057;">
-                                <i class="fa-solid fa-circle-info fs-5" style="color: #4a85f6;"></i>
-                                <div>
-                                    <h6 class="fw-bold mb-1" style="font-size: 0.85rem;">Informasi Penting</h6>
-                                    <p class="mb-0 small text-muted">Sesuai kebijakan operasional saat ini, tidak ada opsi
-                                        harga tahunan untuk jenis kamar ini. Semua pembayaran dilakukan maksimal secara
-                                        bulanan.</p>
-                                </div>
+                            <div class="d-flex justify-content-end align-items-center mt-5 gap-3 pt-4 border-top">
+                                <button type="button" class="btn-outline-custom bg-light rounded-3 px-4 py-2"
+                                    onclick="goToStep(2)"><i class="fa-solid fa-arrow-left me-2"></i> Kembali</button>
+                                <button type="button" class="btn-primary-custom px-5 py-2 shadow-sm" onclick="goToStep(4)">Lanjut <i
+                                        class="fa-solid fa-arrow-right ms-2"></i></button>
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-12 col-md-4">
-                        <div class="form-section-card h-100 p-0 overflow-hidden d-flex flex-column">
-                            <div class="p-4" style="background-color: #4a85f6; color: white;">
-                                <h5 class="fw-bold mb-3">Strategi Harga</h5>
-                                <p class="small mb-4 text-white-50">Kamar dengan harga harian yang kompetitif cenderung
-                                    memiliki tingkat okupansi 30% lebih tinggi untuk tipe kamar Deluxe.</p>
-                                <div class="bg-white bg-opacity-10 p-3 rounded-3 small d-flex align-items-center gap-2">
-                                    <i class="fa-solid fa-lightbulb"></i> GUNAKAN ANGKA PSIKOLOGIS (e.g. 99K)
-                                </div>
-                            </div>
-                            <div class="p-4 bg-white mt-auto">
-                                <h6 class="fw-bold text-dark mb-3">Estimasi Pendapatan</h6>
-                                <div class="d-flex justify-content-between border-bottom pb-2 mb-3">
-                                    <span class="text-secondary small">Potensi Bulanan</span>
-                                    <span class="fw-bold text-primary">Rp 0</span>
-                                </div>
-                                <p class="text-muted" style="font-size: 0.65rem;">*Berdasarkan 100% okupansi bulanan.
-                                    Estimasi belum termasuk biaya operasional/pajak.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-end align-items-center mt-4 gap-3">
-                    <button type="button" class="btn-outline-custom bg-white border shadow-sm rounded-3 px-4"
-                        onclick="goToStep(2)"><i class="fa-solid fa-arrow-left me-2"></i> Kembali</button>
-                    <button type="button" class="btn-primary-custom" onclick="goToStep(4)">Lanjut <i
-                            class="fa-solid fa-arrow-right ms-2"></i></button>
                 </div>
             </div>
 
@@ -802,6 +754,60 @@
                     behavior: 'smooth'
                 });
             }
+            function addCustomFacility() {
+                const input = document.getElementById('custom-facility-input');
+                const val = input.value.trim();
+                if(!val) return;
+                
+                const container = document.getElementById('facilities-container');
+                const id = 'fac_custom_' + Date.now();
+                
+                const col = document.createElement('div');
+                col.className = 'col-6 col-md-3 custom-facility-item';
+                
+                col.innerHTML = `
+                    <input type="checkbox" name="facilities[]" value="${val}" id="${id}" class="facility-check" checked>
+                    <label for="${id}" class="facility-card position-relative">
+                        <i class="fa-solid fa-tag text-primary"></i>
+                        <span>${val}</span>
+                        <button type="button" class="btn btn-sm text-danger position-absolute" style="top: 2px; left: 2px; z-index: 10; padding: 2px 6px;" onclick="event.preventDefault(); this.closest('.custom-facility-item').remove()">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </label>
+                `;
+                
+                container.appendChild(col);
+                input.value = '';
+            }
+
+            // Rupiah Formatting
+            function formatRupiah(angka) {
+                var number_string = angka.replace(/[^,\d]/g, '').toString(),
+                    split = number_string.split(','),
+                    sisa = split[0].length % 3,
+                    rupiah = split[0].substr(0, sisa),
+                    ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+                if (ribuan) {
+                    let separator = sisa ? '.' : '';
+                    rupiah += separator + ribuan.join('.');
+                }
+
+                return split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            }
+
+            document.querySelectorAll('.rupiah-input').forEach(function(input) {
+                input.addEventListener('keyup', function(e) {
+                    this.value = formatRupiah(this.value);
+                });
+            });
+
+            // Clean form before submit
+            document.getElementById('tambahKamarForm').addEventListener('submit', function(e) {
+                document.querySelectorAll('.rupiah-input').forEach(function(input) {
+                    input.value = input.value.replace(/\./g, '');
+                });
+            });
         </script>
     @endpush
 @endsection
