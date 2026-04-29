@@ -23,7 +23,6 @@ Route::post('/register', [AuthController::class, 'auth_register'])->name('regist
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/detailkos', [KosController::class, 'showDetail'])->name('detail');
     Route::post('/ajukan-owner', [RoleRequestController::class, 'store'])->name('role.request');
 
     Route::get('/payment/create', [PaymentController::class, 'create'])->name('payments.create');
