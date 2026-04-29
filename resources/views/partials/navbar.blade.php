@@ -56,7 +56,7 @@
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
-                                <li><a class="dropdown-item" href="#">Riwayat</a></li>
+                                <li><a class="dropdown-item" href="{{ route('user.history') }}">Riwayat</a></li>
                                 @if (auth()->user()->roleRequest && auth()->user()->roleRequest->status == 'pending')
                                     <li><button class="dropdown-item text-muted" disabled>Menunggu Persetujuan...</button>
                                     </li>

@@ -9,12 +9,15 @@ use App\Http\Controllers\landing\allKosController;
 use App\Http\Controllers\landing\kosTerbaikController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PemilikKosController;
+use App\Http\Controllers\AppReviewController;
 use App\Http\Controllers\RoleRequestController;
+use App\Http\Controllers\HistoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     $rooms = \App\Models\Room::with('boardingHouse')->where('available', true)->take(12)->get();
-    return view('welcome', compact('rooms'));
+    $reviews = \App\Models\AppReview::with('user')->latest()->take(12)->get();
+    return view('welcome', compact('rooms', 'reviews'));
 })->name('home');
 
 Route::get('/kos-terbaik', [kosTerbaikController::class, 'index'])->name('kosterbaik.index');
@@ -29,6 +32,10 @@ Route::post('/register', [AuthController::class, 'auth_register'])->name('regist
 Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/ajukan-owner', [RoleRequestController::class, 'store'])->name('role.request');
+    Route::post('/app-review', [AppReviewController::class, 'store'])->name('app.review.store');
+    
+    Route::get('/riwayat', [HistoryController::class, 'index'])->name('user.history');
+    Route::post('/riwayat/review', [HistoryController::class, 'storeReview'])->name('user.history.review');
 
     Route::get('/payment/create', [PaymentController::class, 'create'])->name('payments.create');
     Route::post('/payment/store', [PaymentController::class, 'store'])->name('payments.store');
