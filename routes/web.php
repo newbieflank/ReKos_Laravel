@@ -37,8 +37,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/riwayat', [HistoryController::class, 'index'])->name('user.history');
     Route::post('/riwayat/review', [HistoryController::class, 'storeReview'])->name('user.history.review');
 
-    Route::get('/payment/create', [PaymentController::class, 'create'])->name('payments.create');
+    Route::get('/payment/create/{id}', [PaymentController::class, 'create'])->name('payments.create');
+    Route::post('/payment/save1', [PaymentController::class, 'save1'])->name('payments.save1');
     Route::get('/payment/pembayaran', [PaymentController::class, 'payment'])->name('payments.pembayaran');
+    Route::post('/payment/save2', [PaymentController::class, 'save2'])->name('payments.save2');
     Route::get('/payment/konfirmasi', [PaymentController::class, 'confirmation'])->name('payments.konfirmasi');
     Route::get('/payments/success', [PaymentController::class, 'success'])
         ->name('payments.success');

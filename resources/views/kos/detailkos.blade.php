@@ -218,7 +218,7 @@
                     @endif
                 </div>
 
-                <a href="{{ route('payments.create', ['kos_id' => $kos->id]) }}"
+                <a href="{{ route('payments.create', $kos->id) }}"
                     class="btn btn-primary btn-lg fw-bold rounded-pill shadow-sm ms-md-auto d-flex align-items-center justify-content-center gap-2"
                     style="width: 100%; max-width: 350px;">
                     <i class="fa-solid fa-check-circle"></i> Ajukan Sewa

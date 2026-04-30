@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->enum('payment_method', ['cash', 'payment_gateway'])->default('cash');
+            $table->string('order_id')->unique();
+            $table->foreignId('payment_id')->nullable()->constrained('tenants')->onDelete('set null');
+            $table->enum('payment_method', ['va', 'e-wallet'])->default('va');
             $table->unsignedInteger('amount');
             $table->enum('status', ['waiting', 'successful', 'failed'])->default('waiting');
             $table->dateTime('payment_date')->default(now());

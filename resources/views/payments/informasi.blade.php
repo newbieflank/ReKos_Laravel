@@ -354,10 +354,31 @@
         .terms-note a {
             color: #1E3A8A;
         }
+
+        .date-input {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Input asli disembunyikan tapi tetap bisa diklik di seluruh area */
+        .date-input input[type="date"] {
+            position: absolute;
+            opacity: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
     </style>
 
     <div class="page-wrapper">
-
         <div class="stepper-wrapper">
             <div class="step-item">
                 <div class="step-circle active">1</div>
@@ -374,113 +395,285 @@
                 <div class="step-label">Selesai</div>
             </div>
         </div>
-
-        <div class="main-layout">
-            <div>
-
-                <div class="card">
-                    <div class="property-header">
-                        <div class="property-img" style="background-image: url('');"></div>
-                        <div class="property-info">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <span class="property-badge">Kost Campur</span>
-                                <span class="property-rating">★ 4.8</span>
-                            </div>
-                            <div class="property-name">Kost Mentari Residence</div>
-                            <div class="property-location">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#666"
-                                    stroke-width="2.5">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                                    <circle cx="12" cy="10" r="3" />
-                                </svg>
-                                Kebayoran Baru, Jakarta Selatan
-                            </div>
-                            <div class="room-badge">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8"
-                                    stroke-width="2.5">
-                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                                </svg>
-                                Kamar Superior - No. 102
-                                <span class="amenity">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#555"
-                                        stroke-width="2">
-                                        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <form action="{{ route('payments.save1') }}" method="POST" id="bookingForm">
+            @csrf
+            <div class="main-layout">
+                <div>
+                    <div class="card">
+                        <div class="property-header">
+                            <div class="property-img" style="background-image: url('');"></div>
+                            <div class="property-info">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="property-badge">{{ $kos->boardingHouse->boarding_house_type }}</span>
+                                    <span class="property-rating">★ {{ $kos->boardingHouse->rating }}</span>
+                                </div>
+                                <div class="property-name">{{ $kos->boardingHouse->boarding_house_name }}</div>
+                                <div class="property-location">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#666"
+                                        stroke-width="2.5">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                        <circle cx="12" cy="10" r="3" />
                                     </svg>
-                                    12 m²
-                                </span>
-                                <span class="amenity">
-                                    <i class="bi bi-snow"></i> AC
-                                </span>
+                                    {{ $kos->boardingHouse->alamat }}
+                                </div>
+                                <input type="hidden" id="room_id" name="room_id" value="{{ $kos->id }}">
+                                <input type="hidden" id="boarding_house_id" name="boarding_house_id"
+                                    value="{{ $kos->boardingHouse->id }}">
+                                <div class="room-badge">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8"
+                                        stroke-width="2.5">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                                    </svg>
+                                    {{ $kos->room_name }}
+                                    <span class="amenity">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#555"
+                                            stroke-width="2">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                                        </svg>
+                                        {{ $kos->room_size }}
+                                    </span>
+                                    @foreach ($kos->facilities as $item)
+                                        <span class="amenity">
+                                            @if ($item == 'AC')
+                                                <i class="bi bi-snow"></i>
+                                            @elseif($item == 'WIFI')
+                                                <i class="bi bi-wifi"></i>
+                                            @elseif($item == 'Kamar Mandi')
+                                                <i class="bi bi-droplet"></i>
+                                            @elseif($item == 'Kursi')
+                                                <i class="bi bi-chair"></i>
+                                            @else
+                                                <i class="bi bi-check-circle"></i>
+                                            @endif
+                                            {{ $item }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                <span class="amenity">
-                                    <i class="bi bi-wifi"></i> WiFi
-                                </span>
+                    <div class="card">
+                        <div class="section-title">Pilih Durasi Sewa</div>
+                        <div class="duration-tabs">
+                            <input type="hidden" name="duration_type" id="durationType" value="harian">
+                            <input type="hidden" name="duratuon" id="durationType" value="harian">
+
+
+                            <button type="button" class="duration-tab {{ $kos->daily_price > 0 ? '' : 'disabled' }}"
+                                data-days="1" data-type="harian" {{ $kos->daily_price > 0 ? '' : 'disabled' }}
+                                onclick="setTab(this)">Harian</button>
+
+                            <button type="button" class="duration-tab {{ $kos->weekly_price > 0 ? '' : 'disabled' }}"
+                                data-days="7" data-type="mingguan" {{ $kos->weekly_price > 0 ? '' : 'disabled' }}
+                                onclick="setTab(this)">Mingguan</button>
+
+                            <button type="button" class="duration-tab {{ $kos->monthly_price > 0 ? '' : 'disabled' }}"
+                                data-days="30" data-type="bulanan" {{ $kos->monthly_price > 0 ? '' : 'disabled' }}
+                                onclick="setTab(this)">Bulanan</button>
+                        </div>
+                        <div class="date-row">
+                            <div class="date-group">
+                                <label>Tanggal Masuk</label>
+                                <div class="date-input">
+                                    <span id="textCheckIn">12 Okt 2023</span>
+                                    <i class="bi bi-calendar3"></i>
+                                    <input type="date" id="checkInDate" name="start_date">
+                                </div>
+                            </div>
+
+                            <div class="date-group">
+                                <label>Tanggal Keluar</label>
+                                <div class="date-input">
+                                    <span id="textCheckOut">13 Okt 2023</span>
+                                    <i class="bi bi-calendar3"></i>
+                                    <input type="date" id="checkOutDate" name="end_date">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="section-title">Pilih Durasi Sewa</div>
-                    <div class="duration-tabs">
-                        <button class="duration-tab active" onclick="setTab(this)">Harian</button>
-                        <button class="duration-tab" onclick="setTab(this)">Mingguan</button>
-                        <button class="duration-tab" onclick="setTab(this)">Bulanan</button>
+                <div class="summary-card">
+                    <div class="summary-title">Rincian Pembayaran</div>
+                    <div class="summary-row">
+                        <span id="labelDurasi">Harga Sewa (1 Hari)</span>
+                        <span id="displayTotalHarga">Rp {{ number_format($kos->daily_price, 0, ',', '.') }}</span>
                     </div>
-                    <div class="date-row">
-                        <div class="date-group">
-                            <label>Tanggal Masuk</label>
-                            <div class="date-input">
-                                <span>12 Okt 2023</span>
-                                <i class="bi bi-calendar3"></i>
-                            </div>
-                        </div>
-
-                        <div class="date-group">
-                            <label>Tanggal Keluar</label>
-                            <div class="date-input">
-                                <span>12 Okt 2023</span>
-                                <i class="bi bi-calendar3"></i>
-                            </div>
-                        </div>
+                    <div class="summary-row">
+                        <span>Biaya Layanan</span>
+                        <span>Rp 5.000</span>
+                    </div>
+                    <hr class="summary-divider">
+                    <div class="summary-total">
+                        <span>Total Pembayaran</span>
+                        <span class="summary-total-amount" id="grandTotalText">Rp 355.000</span>
+                        <input type="hidden" name="total_price" id="inputTotalPrice" value="0">
+                    </div>
+                    <div class="deposit-notice">
+                        <i class="bi bi-info-circle"></i>
+                        <span>Deposit akan dikembalikan penuh saat check-out jika tidak ada kerusakan pada fasilitas.</span>
+                    </div>
+                    <button type="submit" class="btn-primary">Lanjut ke Pembayaran</button>
+                    <div class="terms-note">
+                        Dengan menekan tombol di atas, Anda menyetujui
+                        <a href="#">Syarat & Ketentuan</a> yang berlaku.
                     </div>
                 </div>
             </div>
-
-            <div class="summary-card">
-                <div class="summary-title">Rincian Pembayaran</div>
-                <div class="summary-row">
-                    <span>Harga Sewa (1 Hari)</span>
-                    <span>Rp 250.000</span>
-                </div>
-                <div class="summary-row">
-                    <span>Biaya Layanan</span>
-                    <span>Rp 5.000</span>
-                </div>
-                <hr class="summary-divider">
-                <div class="summary-total">
-                    <span>Total Pembayaran</span>
-                    <span class="summary-total-amount">Rp 355.000</span>
-                </div>
-                <div class="deposit-notice">
-                    <i class="bi bi-info-circle"></i>
-                    <span>Deposit akan dikembalikan penuh saat check-out jika tidak ada kerusakan pada fasilitas.</span>
-                </div>
-                <a href="{{ route('payments.pembayaran') }}">
-                    <button class="btn-primary">Lanjut ke Pembayaran</button>
-                </a>
-                <div class="terms-note">
-                    Dengan menekan tombol di atas, Anda menyetujui
-                    <a href="#">Syarat & Ketentuan</a> yang berlaku.
-                </div>
-            </div>
-        </div>
+        </form>
     </div>
 
     <script>
-        function setTab(el) {
-            document.querySelectorAll('.duration-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
+        // Ambil harga langsung dari database, fallback ke 0 jika tidak ada
+        const hargaHarian = {{ $kos->daily_price ?? 0 }};
+        const hargaMingguan = {{ $kos->weekly_price ?? 0 }};
+        const hargaBulanan = {{ $kos->monthly_price ?? 0 }};
+        const biayaLayanan = 5000;
+
+        const checkInInput = document.getElementById('checkInDate');
+        const checkOutInput = document.getElementById('checkOutDate');
+        const textCheckIn = document.getElementById('textCheckIn');
+        const textCheckOut = document.getElementById('textCheckOut');
+
+        function formatDateDisplay(dateString) {
+            const options = {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            };
+            return new Date(dateString).toLocaleDateString('id-ID', options);
         }
+
+        function updateSummary() {
+            const checkIn = new Date(checkInInput.value);
+            const checkOut = new Date(checkOutInput.value);
+            const activeTabElement = document.querySelector('.duration-tab.active');
+
+            if (!activeTabElement || isNaN(checkIn) || isNaN(checkOut)) return;
+
+            const activeTab = activeTabElement.getAttribute('data-days');
+            const diffTime = checkOut - checkIn;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays <= 0) return;
+
+            let sewaHarga = 0;
+            let label = "";
+
+            // Logika Perhitungan Berdasarkan Tab Aktif
+            if (activeTab == "1") {
+                sewaHarga = diffDays * hargaHarian;
+                label = `Harga Sewa (${diffDays} Hari)`;
+            } else if (activeTab == "7") {
+                // Jika user pilih mingguan, kita hitung kelipatan minggunya
+                const weeks = Math.ceil(diffDays / 7);
+                sewaHarga = weeks * hargaMingguan;
+                label = `Harga Sewa (${weeks} Minggu)`;
+            } else if (activeTab == "30") {
+                // Jika user pilih bulanan, kita hitung kelipatan bulannya
+                const months = Math.ceil(diffDays / 30);
+                sewaHarga = months * hargaBulanan;
+                label = `Harga Sewa (${months} Bulan)`;
+            }
+
+            const totalFinal = sewaHarga + biayaLayanan;
+
+            // Update UI
+            const inputHarga = document.getElementById('inputTotalPrice');
+            if (inputHarga) inputHarga.value = totalFinal;
+
+            document.getElementById('labelDurasi').innerText = label;
+            document.getElementById('displayTotalHarga').innerText = "Rp " + sewaHarga.toLocaleString('id-ID');
+            document.getElementById('grandTotalText').innerText = "Rp " + totalFinal.toLocaleString('id-ID');
+        }
+
+        function setTab(element) {
+            if (event) event.preventDefault();
+
+            if (element.classList.contains('disabled')) return;
+
+            document.querySelectorAll('.duration-tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+
+            const days = parseInt(element.getAttribute('data-days'));
+            const typeMapping = {
+                "1": "harian",
+                "7": "mingguan",
+                "30": "bulanan"
+            };
+
+            document.getElementById('durationType').value = typeMapping[days];
+
+
+            const startDate = new Date(checkInInput.value);
+            if (!isNaN(startDate.getTime())) {
+                const endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + days);
+
+                const valEndDate = endDate.toISOString().split('T')[0];
+                checkOutInput.value = valEndDate;
+                textCheckOut.innerText = formatDateDisplay(valEndDate);
+            }
+
+            updateSummary();
+        }
+
+        window.onload = function() {
+            const today = new Date();
+            const valToday = today.toISOString().split('T')[0];
+            checkInInput.value = valToday;
+            textCheckIn.innerText = formatDateDisplay(valToday);
+
+            const firstTab = document.querySelector('.duration-tab:not(.disabled)');
+            if (firstTab) {
+                setTab(firstTab);
+            } else {
+                updateSummary();
+            }
+        };
+
+        checkInInput.addEventListener('change', function() {
+            textCheckIn.innerText = formatDateDisplay(this.value);
+            const activeTab = document.querySelector('.duration-tab.active');
+            if (activeTab) setTab(activeTab);
+        });
+
+        checkOutInput.addEventListener('change', function() {
+            const start = new Date(checkInInput.value);
+            let end = new Date(this.value);
+            const activeTab = document.querySelector('.duration-tab.active').getAttribute('data-days');
+            const interval = parseInt(activeTab);
+
+            if (end <= start) {
+                alert("Tanggal keluar harus setelah tanggal masuk");
+                end = new Date(start);
+                end.setDate(start.getDate() + interval);
+            } else {
+                const diffTime = end - start;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (interval > 1) {
+                    const multiplier = Math.ceil(diffDays / interval);
+                    const fixedDays = multiplier * interval;
+
+                    end = new Date(start);
+                    end.setDate(start.getDate() + fixedDays);
+
+                    // Beri tahu user (opsional)
+                    if (diffDays % interval !== 0) {
+                        alert(
+                            `Untuk durasi ${document.querySelector('.duration-tab.active').innerText}, tanggal disesuaikan ke kelipatan ${interval} hari terdekat.`
+                            );
+                    }
+                }
+            }
+
+            const finalDate = end.toISOString().split('T')[0];
+            this.value = finalDate;
+            textCheckOut.innerText = formatDateDisplay(finalDate);
+
+            updateSummary();
+        });
     </script>
 @endsection

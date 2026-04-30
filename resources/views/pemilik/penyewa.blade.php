@@ -284,7 +284,6 @@
                             <th>KAMAR</th>
                             <th>TGL MASUK</th>
                             <th>TGL KELUAR</th>
-                            <th>STATUS</th>
                             <th>BAYAR</th>
                             <th>NO HP</th>
                             <th>AKSI</th>
@@ -292,40 +291,39 @@
                     </thead>
                     <tbody>
                         @forelse($tenants as $tenant)
-                        <tr>
-                            <td class="fw-bold">{{ $tenant->user->name ?? '-' }}</td>
-                            <td>{{ $tenant->room->room_name ?? '-' }}</td>
-                            <td>{{ $tenant->start_date ? $tenant->start_date->format('d-m-y') : '-' }}</td>
-                            <td>{{ $tenant->end_date ? $tenant->end_date->format('d-m-y') : '-' }}</td>
-                            <td>
-                                <span class="badge-status {{ $tenant->status }}">
-                                    {{ strtoupper($tenant->status) }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge-pay {{ $tenant->total_price > 0 ? 'lunas' : 'belum' }}">
-                                    {{ $tenant->total_price > 0 ? 'LUNAS' : 'BELUM BAYAR' }}
-                                </span>
-                            </td>
-                            <td>{{ $tenant->user->userDetail->phone ?? '-' }}</td>
-                            <td>
-                                <a href="{{ route('pemilik.penyewa.edit', $tenant->id) }}" class="table-action-icon edit" title="Edit">
-                                    <i class="fa-solid fa-pen"></i>
-                                </a>
-                                <form action="{{ route('pemilik.penyewa.hapus', $tenant->id) }}" method="POST" class="d-inline" onsubmit="event.preventDefault(); confirmDelete(this, 'Yakin ingin menghapus data penyewa ini?')">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="border-0 bg-transparent p-0">
-                                        <i class="fa-regular fa-trash-can table-action-icon delete" style="color: #e03131;"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td class="fw-bold">{{ $tenant->user->name ?? '-' }}</td>
+                                <td>{{ $tenant->room->room_name ?? '-' }}</td>
+                                <td>{{ $tenant->start_date ? $tenant->start_date->format('d-m-y') : '-' }}</td>
+                                <td>{{ $tenant->end_date ? $tenant->end_date->format('d-m-y') : '-' }}</td>
+                                <td>
+                                    <span class="badge-pay {{ $tenant->has_paid > 0 ? 'lunas' : 'belum' }}">
+                                        {{ $tenant->has_paid > 0 ? 'LUNAS' : 'BELUM BAYAR' }}
+                                    </span>
+                                </td>
+                                <td>{{ $tenant->user->userDetail->phone ?? '-' }}</td>
+                                <td>
+                                    <a href="{{ route('pemilik.penyewa.edit', $tenant->id) }}"
+                                        class="table-action-icon edit" title="Edit">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                    <form action="{{ route('pemilik.penyewa.hapus', $tenant->id) }}" method="POST"
+                                        class="d-inline"
+                                        onsubmit="event.preventDefault(); confirmDelete(this, 'Yakin ingin menghapus data penyewa ini?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="border-0 bg-transparent p-0">
+                                            <i class="fa-regular fa-trash-can table-action-icon delete"
+                                                style="color: #e03131;"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
                         @empty
-                        <tr>
-                            <td colspan="8" class="text-center text-muted py-4">
-                                <i class="fa-solid fa-inbox me-2"></i> Belum ada penyewa terdaftar.
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="fa-solid fa-inbox me-2"></i> Belum ada penyewa terdaftar.
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -333,7 +331,8 @@
         </div>
 
         <div class="pagination-container">
-            <span class="text-secondary small">Showing {{ $tenants->firstItem() }}-{{ $tenants->lastItem() }} of {{ $tenants->total() }} penyewa</span>
+            <span class="text-secondary small">Showing {{ $tenants->firstItem() }}-{{ $tenants->lastItem() }} of
+                {{ $tenants->total() }} penyewa</span>
             <div class="d-flex gap-1 align-items-center">
                 {{ $tenants->links('pagination::simple-bootstrap-4') }}
             </div>

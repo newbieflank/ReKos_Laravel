@@ -15,12 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tenant_id')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('room_id')->nullable()->constrained('rooms')->onDelete('set null');
-            $table->date('start_date')->default(now());
+            $table->date('start_date');
             $table->date('end_date')->nullable();
             $table->integer('duration')->nullable();
             $table->enum('rental_type', ['daily', 'weekly', 'monthly']);
-            $table->unsignedInteger('total_price')->nullable();
-            $table->enum('status', ['pending', 'active', 'complete', 'cancelled'])->default('pending');
             $table->timestamps();
         });
     }

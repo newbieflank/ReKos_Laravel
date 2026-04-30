@@ -382,28 +382,27 @@
                             </div>
                             <div class="card-title">Profil Penyewa</div>
                         </div>
-                        <a href="{{ route('profile.edit') }}" class="edit-link">Edit</a>
                     </div>
                     <div class="profile-grid">
                         <div class="field-group">
                             <div class="field-label">Nama Lengkap</div>
-                            <div class="field-value">Yuyun Wahyuni</div>
+                            <div class="field-value">{{ $user->name }}</div>
                         </div>
                         <div class="field-group">
                             <div class="field-label">Jenis Kelamin</div>
-                            <div class="field-value">Perempuan</div>
+                            <div class="field-value">{{ $user->userDetail->gender }}</div>
                         </div>
                         <div class="field-group">
                             <div class="field-label">Nomor Telepon</div>
-                            <div class="field-value">+62 812-3456-7890</div>
+                            <div class="field-value">{{ $user->userDetail->phone }}</div>
                         </div>
                         <div class="field-group">
                             <div class="field-label">Pekerjaan</div>
-                            <div class="field-value">Mahasiswi</div>
+                            <div class="field-value">{{ $user->userDetail->occupation ?? '-' }}</div>
                         </div>
                         <div class="field-group field-full">
                             <div class="field-label">Alamat Asal</div>
-                            <div class="field-value">Jl. Melati No. 45, Kecamatan Sukajadi, Kota Bandung, Jawa Barat</div>
+                            <div class="field-value">{{ $user->userDetail->address ?? '-' }}</div>
                         </div>
                     </div>
                 </div>
@@ -416,30 +415,103 @@
                             </div>
                             <div class="card-title">Detail Sewa</div>
                         </div>
-                        <a href="{{ route('profile.edit') }}" class="edit-link">Edit</a>
                     </div>
 
                     <div class="room-detail-box">
                         <div class="room-number-badge">A101</div>
                         <div class="room-detail-info">
                             <div class="room-lbl">Nomor Kamar</div>
-                            <div class="room-name">Lantai 1 – Deluxe</div>
+                            <div class="room-name">{{ $kos->boardingHouse->boarding_house_name }} - {{ $kos->room_name }}
+                            </div>
                         </div>
                         <div style="margin-left:auto;">
                             <div class="field-label">Tipe Sewa</div>
                             <span
-                                style="background:#EFF6FF;color:#1D4ED8;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;">Bulanan</span>
+                                style="background:#EFF6FF;color:#1D4ED8;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;">{{ $detail['duration_type'] }}</span>
                         </div>
                     </div>
 
                     <div class="profile-grid">
                         <div class="field-group">
                             <div class="field-label">Tanggal Masuk</div>
-                            <div class="field-value">01 Oktober 2023</div>
+                            <div class="field-value">
+                                {{ \Carbon\Carbon::parse($detail['start_date'])->translatedFormat('d F Y') }}
+                            </div>
                         </div>
                         <div class="field-group">
                             <div class="field-label">Durasi Sewa</div>
-                            <div class="field-value">12 Bulan (1 Tahun)</div>
+                            <div class="field-value">
+                                @php
+                                    $start = \Carbon\Carbon::parse($detail['start_date']);
+                                    $end = \Carbon\Carbon::parse($detail['end_date']);
+
+                                    $diffInDays = $start->diffInDays($end);
+                                    $diffInWeeks = $start->diffInWeeks($end);
+                                    $diffInMonths = $start->diffInMonths($end);
+
+                                    if ($detail['duration_type'] === 'bulanan' && $diffInMonths >= 1) {
+                                        $label = $diffInMonths . ' Bulan';
+                                    } elseif ($detail['duration_type'] === 'mingguan' && $diffInWeeks >= 1) {
+                                        $label = $diffInWeeks . ' Minggu';
+                                    } else {
+                                        $label = $diffInDays . ' Hari';
+                                    }
+                                @endphp
+                                {{ $label }}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                @php
+                    $bookingData = session('booking_data');
+                    $midtrans = $bookingData['midtrans_response'] ?? null;
+                @endphp
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Instruksi Pembayaran</h5>
+
+                        <div class="payment-box p-3 border rounded bg-light mb-3 text-center">
+                            <div class="text-muted small mb-2">Metode: {{ $bookingData['payment_method'] }}</div>
+
+                            @if (isset($midtrans['va_numbers']))
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h3 class="mb-0 fw-bold text-primary" id="paymentNumber">
+                                        {{ $midtrans['va_numbers'][0]['va_number'] }}
+                                    </h3>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="copyToClipboard()">
+                                        <i class="bi bi-clipboard"></i> Salin
+                                    </button>
+                                </div>
+                            @elseif(isset($midtrans['actions']))
+                                @php
+                                    $qrAction = collect($midtrans['actions'])
+                                        ->where('name', 'generate-qr-code')
+                                        ->first();
+                                @endphp
+
+                                @if ($qrAction)
+                                    <div class="qr-wrapper mb-3">
+                                        <img src="{{ $qrAction['url'] }}" alt="QR Code GoPay"
+                                            style="width: 200px; height: 200px;">
+                                    </div>
+                                    <div class="small text-muted">Scan QR Code di atas melalui aplikasi Gojek Anda</div>
+                                    <a href="{{ collect($midtrans['actions'])->where('name', 'deeplink-redirect')->first()['url'] }}"
+                                        class="btn btn-sm btn-primary mt-2">Buka Aplikasi Gojek</a>
+                                @endif
+                            @endif
+                        </div>
+
+                        <div class="alert alert-info py-2 small">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Silahkan Melakukan Pembayaran Sebelum: <br>
+                            <strong>{{ \Carbon\Carbon::parse($midtrans['expiry_time'])->format('d M Y, H:i') }}
+                                WIB</strong>
+                        </div>
+
+                        <div class="small text-muted">
+                            *Segera lakukan pembayaran agar pesanan tidak otomatis dibatalkan.
                         </div>
                     </div>
                 </div>
@@ -450,39 +522,39 @@
                 <div class="summary-title">Ringkasan Pembayaran</div>
 
                 <div class="summary-row">
-                    <span>Sewa Kamar (1 Bln)</span>
-                    <span>Rp 1.500.000</span>
-                </div>
-                <div class="summary-row">
-                    <span>Deposit Keamanan</span>
-                    <span>Rp 500.000</span>
+                    <span>Sewa Kamar ( {{ $detail['duration_type'] }} )</span>
+                    <span>Rp {{ number_format($detail['total_price'], 0, ',', '.') }}</span>
                 </div>
                 <hr class="summary-divider">
 
                 <div class="summary-total-block">
                     <div class="summary-total-label">Total Billing</div>
                     <div class="summary-total-row">
-                        <div class="summary-total-amount">Rp 2.000.000</div>
-                        <span class="badge-lunas">LUNAS</span>
+                        <div class="summary-total-amount">Rp {{ number_format($detail['total_price'], 0, ',', '.') }}</div>
                     </div>
-                    <div class="paid-date">Paid 28 Sep 2023</div>
                 </div>
 
                 <form action="{{ route('payments.store') }}" method="POST">
                     @csrf
+                    @php
+                        $detail = session('booking_data');
+                        $methodType = str_contains($detail['payment_method'], 'Virtual') ? 'va' : 'e-wallet';
+                    @endphp
+
+                    <input type="hidden" name="tenant_id" value="{{ auth()->id() }}">
+                    <input type="hidden" name="amount" value="{{ $detail['total_price'] }}">
+                    <input type="hidden" name="payment_date" value="{{ now() }}">
+                    <input type="hidden" name="payment_method" value="{{ $methodType }}">
 
                     <div class="confirm-box">
                         <input type="checkbox" name="confirm" id="confirm-check" required>
                         <label for="confirm-check">
-                            Saya mengonfirmasi bahwa seluruh data yang dimasukkan adalah benar dan sesuai.
+                            Saya mengonfirmasi bahwa sudah melakukan pembayaran sesuai instruksi.
                         </label>
                     </div>
 
                     <button type="submit" class="btn-primary">
                         Simpan & Selesaikan
-                    </button>
-                    <button type="submit" class="btn-secondary">
-                        Kembali
                     </button>
                 </form>
             </div>
@@ -499,6 +571,13 @@
             }
 
             window.location.href = "{{ route('payments.success') }}";
+        }
+
+        function copyToClipboard() {
+            const num = document.getElementById('paymentNumber').innerText;
+            navigator.clipboard.writeText(num).then(() => {
+                alert('Nomor pembayaran berhasil disalin!');
+            });
         }
     </script>
 @endsection
