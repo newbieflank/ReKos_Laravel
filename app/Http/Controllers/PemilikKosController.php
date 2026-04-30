@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Room;
+use App\Models\Tenant;
 use Illuminate\Http\Request;
 
 class PemilikKosController extends Controller
@@ -9,13 +11,11 @@ class PemilikKosController extends Controller
     public function dashboard()
     {
         $ownerId = auth()->id();
-        
-        // Ambil ID kamar milik pemilik ini
-        $roomIds = \App\Models\Room::whereHas('boardingHouse', function($q) use ($ownerId) {
+
+        $roomIds = Room::whereHas('boardingHouse', function ($q) use ($ownerId) {
             $q->where('owner_id', $ownerId);
         })->pluck('id');
 
-        // Buat array 12 bulan (Januari - Desember tahun ini)
         $months = [];
         $chartIncome = [];
         $chartExpense = [];
@@ -24,25 +24,28 @@ class PemilikKosController extends Controller
         for ($month = 1; $month <= 12; $month++) {
             $startOfMonth = \Carbon\Carbon::create($currentYear, $month, 1)->startOfMonth();
             $endOfMonth = \Carbon\Carbon::create($currentYear, $month, 1)->endOfMonth();
-            
-            $months[] = $startOfMonth->translatedFormat('M'); // Misal: "Jan", "Feb"
-            
-            // Hitung pemasukan di bulan ini (dari tenant yang mulai sewa di bulan ini)
-            $income = \App\Models\Tenant::whereIn('room_id', $roomIds)
+
+            $months[] = $startOfMonth->translatedFormat('M');
+
+            $income = Tenant::whereIn('room_id', $roomIds)
                 ->whereYear('start_date', $currentYear)
                 ->whereMonth('start_date', $month)
-                ->sum('total_price');
-                
+                ->withSum('payments', 'amount')
+                ->get()
+                ->sum('payments_sum_amount');
+
             $chartIncome[] = $income ?: 0;
-            
-            // Pengeluaran dihitung HANYA pada bulan pembayaran/start_date
-            $occupiedRoomIdsThisMonth = \App\Models\Tenant::whereIn('room_id', $roomIds)
+
+            $occupiedRoomIdsThisMonth = Tenant::whereIn('room_id', $roomIds)
                 ->whereYear('start_date', $currentYear)
                 ->whereMonth('start_date', $month)
-                ->whereIn('status', ['active', 'pending'])
+                ->whereHas('payments', function ($query) {
+                    $query->whereIn('status', ['successful', 'waiting']);
+                })
                 ->pluck('room_id')
-                ->unique();
-                
+                ->unique()
+                ->values();
+
             // Total pengeluaran bulan ini = jumlah dari (Estimasi Pengeluaran Bulanan) kamar yang disewa di bulan ini
             $expense = \App\Models\Room::whereIn('id', $occupiedRoomIdsThisMonth)->sum('monthly_expense');
             $chartExpense[] = $expense ?: 0;
@@ -63,10 +66,19 @@ class PemilikKosController extends Controller
         $occupancyRate = $totalRooms > 0 ? round(($occupiedRooms / $totalRooms) * 100) : 0;
 
         return view('pemilik.dashboard', compact(
-            'months', 'chartIncome', 'chartExpense', 'totalIncome', 'totalExpense', 
-            'currentYear', 'avgRating', 'totalReviews', 
-            'totalRooms', 'availableRooms', 'occupiedRooms', 'occupancyRate'
-        )); 
+            'months',
+            'chartIncome',
+            'chartExpense',
+            'totalIncome',
+            'totalExpense',
+            'currentYear',
+            'avgRating',
+            'totalReviews',
+            'totalRooms',
+            'availableRooms',
+            'occupiedRooms',
+            'occupancyRate'
+        ));
     }
 
     public function kamar($id)
@@ -86,17 +98,18 @@ class PemilikKosController extends Controller
     public function penyewa(Request $request)
     {
         $ownerId = auth()->id();
-        $statusFilter = $request->query('status'); // null = semua
+        $statusFilter = $request->query('status');
 
-        // Ambil ID kamar milik pemilik ini
-        $roomIds = \App\Models\Room::whereHas('boardingHouse', function($q) use ($ownerId) {
+        $roomIds = Room::whereHas('boardingHouse', function ($q) use ($ownerId) {
             $q->where('owner_id', $ownerId);
         })->pluck('id');
 
-        // Ambil tenant, filter status jika ada
-        $query = \App\Models\Tenant::whereIn('room_id', $roomIds)
-            ->with(['user', 'user.userDetail', 'room', 'room.boardingHouse'])
+        $query = Tenant::whereIn('room_id', $roomIds)
+            ->with(['user', 'user.userDetail', 'room', 'room.boardingHouse'])->withCount(['payments as has_paid' => function ($q) {
+                $q->where('status', 'successful');
+            }])
             ->latest();
+
 
         if ($statusFilter && in_array($statusFilter, ['active', 'pending', 'complete', 'cancelled'])) {
             $query->where('status', $statusFilter);
@@ -133,7 +146,6 @@ class PemilikKosController extends Controller
             'rental_type' => 'required|in:daily,weekly,monthly',
             'status_sewa' => 'required|in:active,pending',
             'total_price' => 'nullable|numeric',
-            // User details
             'gender' => 'nullable|in:male,female',
             'birth_date' => 'nullable|date',
             'occupation' => 'nullable|string',
@@ -208,7 +220,7 @@ class PemilikKosController extends Controller
         // Kembalikan kamar lama menjadi available jika pindah kamar atau terminated
         $oldRoomId = $tenant->room_id;
         $newStatus = $data['status'];
-        
+
         $tenant->update($data);
 
         // Update ketersediaan kamar
@@ -269,7 +281,7 @@ class PemilikKosController extends Controller
     {
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
         $room = \App\Models\Room::where('boarding_house_id', $id)->findOrFail($roomId);
-        
+
         $data = $request->all();
         if (!$request->has('available')) {
             $data['available'] = false;
@@ -293,9 +305,9 @@ class PemilikKosController extends Controller
     {
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
         $room = \App\Models\Room::where('boarding_house_id', $id)->findOrFail($roomId);
-        
+
         $newRoom = $room->replicate();
-        
+
         // Buat nama khusus misalnya angkanya nambah atau tambah nomor baru
         if (preg_match('/(.*?)\s*(\d+)$/', $room->room_name, $matches)) {
             $baseName = rtrim($matches[1]);
@@ -316,10 +328,10 @@ class PemilikKosController extends Controller
             }
             $newRoom->room_name = $checkName;
         }
-        
+
         $newRoom->available = true; // Kamar baru default tersedia
         $newRoom->save();
-        
+
         return redirect()->route('pemilik.kamar', $id)->with('success', 'Data kamar berhasil diduplikasi menjadi: ' . $newRoom->room_name);
     }
 
@@ -342,10 +354,10 @@ class PemilikKosController extends Controller
         $kosts = $query->get();
 
         // Statistik Okupansi Keseluruhan (dari semua properti)
-        $totalRooms = \App\Models\Room::whereHas('boardingHouse', function($q) {
+        $totalRooms = \App\Models\Room::whereHas('boardingHouse', function ($q) {
             $q->where('owner_id', auth()->id());
         })->count();
-        $availableRooms = \App\Models\Room::whereHas('boardingHouse', function($q) {
+        $availableRooms = \App\Models\Room::whereHas('boardingHouse', function ($q) {
             $q->where('owner_id', auth()->id());
         })->where('available', true)->count();
         $occupiedRooms = $totalRooms - $availableRooms;
@@ -366,7 +378,7 @@ class PemilikKosController extends Controller
         $data['owner_id'] = auth()->id();
         $data['latitude'] = $request->latitude ?? 0.0;
         $data['longitude'] = $request->longitude ?? 0.0;
-        
+
         // Pengecekan defensif jika form dari browser cache masih mengirimkan bahasa Indonesia atau "on"
         $type = strtolower($request->boarding_house_type ?? '');
         if (in_array($type, ['putra', 'male'])) {
@@ -376,7 +388,7 @@ class PemilikKosController extends Controller
         } else {
             $data['boarding_house_type'] = 'mixed';
         }
-        
+
         \App\Models\BoardingHouse::create($data);
 
         return redirect()->route('pemilik.kost')->with('success', 'Data Properti Kost berhasil ditambahkan!');
@@ -392,7 +404,7 @@ class PemilikKosController extends Controller
     {
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
         $data = $request->all();
-        
+
         $type = strtolower($request->boarding_house_type ?? '');
         if (in_array($type, ['putra', 'male'])) {
             $data['boarding_house_type'] = 'male';
@@ -423,7 +435,7 @@ class PemilikKosController extends Controller
         ]);
 
         // Pastikan kamar tersebut milik user yang login
-        $room = \App\Models\Room::whereHas('boardingHouse', function($q) {
+        $room = \App\Models\Room::whereHas('boardingHouse', function ($q) {
             $q->where('owner_id', auth()->id());
         })->findOrFail($request->room_id);
 

@@ -82,10 +82,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Tenant::class, 'tenant_id');
     }
-    public function payments(): HasMany
-    {
-        return $this->hasMany(Payment::class, 'tenant_id');
-    }
+
     public function appReview(): HasOne
     {
         return $this->hasOne(AppReview::class);

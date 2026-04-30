@@ -457,145 +457,151 @@
             </div>
         </div>
 
-        <div class="main-layout">
-            <div>
-                <div class="card">
-                    <div class="card-title">Pilih Metode Pembayaran</div>
+        <form action="{{ route('payments.save2') }}" method="POST" id="paymentForm">
+            @csrf
+            <div class="main-layout">
+                <div>
+                    <div class="card">
+                        <div class="card-title">Pilih Metode Pembayaran</div>
 
-                    <div class="method-section">
-                        <div class="method-header open" onclick="toggleSection(this)">
-                            <div style="display:flex;align-items:center;gap:10px;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333"
-                                    stroke-width="2">
-                                    <rect x="2" y="7" width="20" height="15" rx="2" />
-                                    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
-                                    <line x1="12" y1="12" x2="12" y2="16" />
+                        <input type="hidden" name="payment_method" id="selectedPaymentMethod" value="BRI Virtual">
+                        <div class="method-section">
+                            <div class="method-header open" onclick="toggleSection(this)">
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333"
+                                        stroke-width="2">
+                                        <rect x="2" y="7" width="20" height="15" rx="2" />
+                                        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+                                        <line x1="12" y1="12" x2="12" y2="16" />
+                                    </svg>
+                                    Transfer Bank (Virtual Account)
+                                </div>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888"
+                                    stroke-width="2.5">
+                                    <polyline points="6 9 12 15 18 9" />
                                 </svg>
-                                Transfer Bank (Virtual Account)
                             </div>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888"
-                                stroke-width="2.5">
-                                <polyline points="6 9 12 15 18 9" />
-                            </svg>
-                        </div>
-                        <div class="method-body" id="bank-body">
-                            <div class="pay-option" onclick="selectOption(this)">
-                                <span class="pay-option-logo" style="color:#005BAA;">BCA</span>
-                                <span class="pay-option-label">BCA Transfer</span>
-                            </div>
-                            <div class="pay-option" onclick="selectOption(this)">
-                                <span class="pay-option-logo" style="color:#F37021;">BNI</span>
-                                <span class="pay-option-label">BNI Transfer</span>
-                            </div>
-                            <div class="pay-option" onclick="selectOption(this)">
-                                <span class="pay-option-logo" style="color:#003087;">MANDIRI</span>
-                                <span class="pay-option-label">Mandiri VA</span>
-                            </div>
-                            <div class="pay-option selected" onclick="selectOption(this)">
-                                <span class="pay-option-logo" style="color:#005BAA;">BRI</span>
-                                <span class="pay-option-label">BRI Virtual</span>
+                            <div class="method-body" id="bank-body">
+                                <div class="pay-option" onclick="selectOption(this)">
+                                    <span class="pay-option-logo" style="color:#005BAA;">BCA</span>
+                                    <span class="pay-option-label">BCA Transfer</span>
+                                </div>
+                                <div class="pay-option" onclick="selectOption(this)">
+                                    <span class="pay-option-logo" style="color:#F37021;">BNI</span>
+                                    <span class="pay-option-label">BNI Transfer</span>
+                                </div>
+                                <div class="pay-option" onclick="selectOption(this)">
+                                    <span class="pay-option-logo" style="color:#003087;">MANDIRI</span>
+                                    <span class="pay-option-label">Mandiri VA</span>
+                                </div>
+                                <div class="pay-option selected" onclick="selectOption(this)">
+                                    <span class="pay-option-logo" style="color:#005BAA;">BRI</span>
+                                    <span class="pay-option-label">BRI Virtual</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="method-section">
-                        <div class="method-header open" onclick="toggleSection(this)">
-                            <div style="display:flex;align-items:center;gap:10px;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333"
-                                    stroke-width="2">
-                                    <rect x="1" y="4" width="22" height="16" rx="2" />
-                                    <line x1="1" y1="10" x2="23" y2="10" />
+                        <div class="method-section">
+                            <div class="method-header open" onclick="toggleSection(this)">
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333"
+                                        stroke-width="2">
+                                        <rect x="1" y="4" width="22" height="16" rx="2" />
+                                        <line x1="1" y1="10" x2="23" y2="10" />
+                                    </svg>
+                                    E-Wallet
+                                </div>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888"
+                                    stroke-width="2.5">
+                                    <polyline points="6 9 12 15 18 9" />
                                 </svg>
-                                E-Wallet
                             </div>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888"
-                                stroke-width="2.5">
-                                <polyline points="6 9 12 15 18 9" />
-                            </svg>
-                        </div>
-                        <div class="ewallet-row" id="ewallet-body">
-                            <div class="ewallet-option" onclick="selectOption(this)">
-                                <span class="ew-icon ew-gopay">Go</span>
-                                <span>GoPay</span>
-                            </div>
-                            <div class="ewallet-option" onclick="selectOption(this)">
-                                <span class="ew-icon ew-ovo">OVO</span>
-                                <span>OVO</span>
-                            </div>
-                            <div class="ewallet-option" onclick="selectOption(this)">
-                                <span class="ew-icon ew-dana">D</span>
-                                <span>DANA</span>
+                            <div class="ewallet-row" id="ewallet-body">
+                                <div class="ewallet-option" onclick="selectOption(this)">
+                                    <span class="ew-icon ew-gopay">Go</span>
+                                    <span>GoPay</span>
+                                </div>
+                                <div class="ewallet-option" onclick="selectOption(this)">
+                                    <span class="ew-icon ew-ovo">OVO</span>
+                                    <span>OVO</span>
+                                </div>
+                                <div class="ewallet-option" onclick="selectOption(this)">
+                                    <span class="ew-icon ew-dana">D</span>
+                                    <span>DANA</span>
+                                </div>
                             </div>
                         </div>
+
+                        <div class="method-section">
+                            <div class="cc-header">
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                        stroke="#333" stroke-width="2">
+                                        <rect x="1" y="4" width="22" height="16" rx="2" />
+                                        <line x1="1" y1="10" x2="23" y2="10" />
+                                    </svg>
+                                    Kartu Kredit
+                                </div>
+                                <div class="cc-cards">
+                                    <span class="cc-brand">VISA</span>
+                                    <span class="cc-brand">MC</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="security-notice">
+                            <i class="bi bi-info-circle"></i>
+                            <span>
+                                Pembayaran Anda aman dan terenkripsi. Detail pembayaran akan dikirimkan ke email Anda segera
+                                setelah transaksi selesai.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-title">Ringkasan Pesanan</div>
+                    <div class="order-room-box">
+                        <div class="room-thumb">
+                            <img src="">
+                        </div>
+                        <div class="room-info">
+                            <div class="room-name">{{ $kos->boardingHouse->boarding_house_name }} - {{ $kos->room_name }}
+                            </div>
+                            <div class="room-loc">{{ $kos->boardingHouse->alamat }}</div>
+                            <div class="room-date">
+                                <i class="bi bi-calendar3"></i>
+                                {{ ucfirst($bookingData['duration_type']) }}
+                                ({{ \Carbon\Carbon::parse($bookingData['start_date'])->format('d M') }} –
+                                {{ \Carbon\Carbon::parse($bookingData['end_date'])->format('d M Y') }})
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-row">
+                        <span>Harga Sewa ({{ ucfirst($bookingData['duration_type']) }})</span>
+                        <span>Rp {{ number_format($bookingData['total_price'] - 5000, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Biaya Layanan</span>
+                        <span>Rp 5.000</span>
+                    </div>
+                    <hr class="summary-divider">
+                    <div class="summary-total">
+                        <span>Total Pembayaran</span>
+                        <span class="summary-total-amt">Rp
+                            {{ number_format($bookingData['total_price'], 0, ',', '.') }}</span>
                     </div>
 
-                    <div class="method-section">
-                        <div class="cc-header">
-                            <div style="display:flex;align-items:center;gap:10px;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333"
-                                    stroke-width="2">
-                                    <rect x="1" y="4" width="22" height="16" rx="2" />
-                                    <line x1="1" y1="10" x2="23" y2="10" />
-                                </svg>
-                                Kartu Kredit
-                            </div>
-                            <div class="cc-cards">
-                                <span class="cc-brand">VISA</span>
-                                <span class="cc-brand">MC</span>
-                            </div>
-                        </div>
+                    <button type="submit" form="paymentForm" class="btn-primary">Bayar Sekarang ...</button>
+                    <div class="terms-note">
+                        Dengan menekan tombol di atas, Anda menyetujui
+                        <a href="#">Syarat & Ketentuan</a> serta
+                        <a href="#">Kebijakan Privasi</a> Re-Kost.
                     </div>
 
-                    <div class="security-notice">
-                        <i class="bi bi-info-circle"></i>
-                        <span>
-                            Pembayaran Anda aman dan terenkripsi. Detail pembayaran akan dikirimkan ke email Anda segera
-                            setelah transaksi selesai.
-                        </span>
-                    </div>
                 </div>
             </div>
-
-            <div class="summary-card">
-                <div class="summary-title">Ringkasan Pesanan</div>
-                <div class="order-room-box">
-                    <div class="room-thumb">
-                        <img src="">
-                    </div>
-                    <div class="room-info">
-                        <div class="room-name">Kamar Superior - No. 102</div>
-                        <div class="room-loc">Re-Kost Kemang, Jakarta Selatan</div>
-                        <div class="room-date">
-                            <i class="bi bi-calendar3"></i>
-                            1 Hari (24 Feb – 25 Feb)
-                        </div>
-                    </div>
-                </div>
-                <div class="summary-row">
-                    <span>Harga Sewa (1 Hari)</span>
-                    <span>Rp 300.000</span>
-                </div>
-                <div class="summary-row">
-                    <span>Biaya Layanan</span>
-                    <span>Rp 5.000</span>
-                </div>
-                <hr class="summary-divider">
-                <div class="summary-total">
-                    <span>Total Pembayaran</span>
-                    <span class="summary-total-amt">Rp 355.000</span>
-                </div>
-
-                <a href="{{ route('payments.konfirmasi') }}">
-                    <button class="btn-primary">Bayar Sekarang ...</button>
-                </a>
-                <div class="terms-note">
-                    Dengan menekan tombol di atas, Anda menyetujui
-                    <a href="#">Syarat & Ketentuan</a> serta
-                    <a href="#">Kebijakan Privasi</a> Re-Kost.
-                </div>
-
-            </div>
-        </div>
+        </form>
     </div>
 
     <script>
@@ -605,12 +611,14 @@
             body.classList.toggle('hidden');
         }
 
-        function selectOption(el) {
-            const parent = el.closest('.method-body, .ewallet-row');
-            if (parent) {
-                parent.querySelectorAll('.pay-option, .ewallet-option').forEach(o => o.classList.remove('selected'));
-                el.classList.add('selected');
-            }
+        function selectOption(element) {
+            document.querySelectorAll('.pay-option').forEach(opt => opt.classList.remove('selected'));
+
+            element.classList.add('selected');
+
+            const label = element.querySelector('.pay-option-label').innerText;
+
+            document.getElementById('selectedPaymentMethod').value = label;
         }
     </script>
 @endsection

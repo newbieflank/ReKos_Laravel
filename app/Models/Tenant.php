@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Tenant extends Model
 {
@@ -17,35 +18,27 @@ class Tenant extends Model
         'end_date',
         'duration',
         'rental_type',
-        'total_price',
-        'status',
     ];
 
-    /**
-     * Casting tipe data
-     */
     protected function casts(): array
     {
         return [
             'start_date' => 'date',
             'end_date' => 'date',
-            'total_price' => 'integer',
         ];
     }
-
-    /**
-     * Relasi ke User (Si penyewa)
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'tenant_id');
     }
 
-    /**
-     * Relasi ke Kamar yang disewa
-     */
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'payment_id');
     }
 }

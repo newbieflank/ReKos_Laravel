@@ -11,7 +11,8 @@ class Payment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id',
+        'payment_id',
+        'order_id',
         'payment_method',
         'amount',
         'status',
@@ -29,12 +30,8 @@ class Payment extends Model
         ];
     }
 
-    /**
-     * Relasi ke User (Pembayar)
-     */
-    public function user(): BelongsTo
+    public function tenant(): BelongsTo
     {
-        // Tetap arahkan ke tenant_id sebagai foreign key
-        return $this->belongsTo(User::class, 'tenant_id');
+        return $this->belongsTo(Tenant::class, 'payment_id');
     }
 }
