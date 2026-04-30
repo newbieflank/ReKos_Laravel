@@ -9,10 +9,20 @@ class PaymentController extends Controller
 {
     public function create()
     {
-        return view('payments.create');
+        return view('payments.informasi');
     }
 
-    // Menyimpan Data
+    public function payment()
+    {
+        return view('payments.pembayaran');
+    }
+
+    public function confirmation()
+    {
+        return view('payments.konfirmasi');
+    }
+
+    // Simpan data
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -25,6 +35,10 @@ class PaymentController extends Controller
 
         Payment::create($validated);
 
-        return back()->with('success', 'Pembayaran berhasil dikirim!');
+        return redirect()->route('payments.success');
+    }
+    public function success()
+    {
+        return view('payments.success');
     }
 }
