@@ -37,16 +37,16 @@ class AuthController extends Controller
 
             if ($user->role === 'owner') {
                 return redirect()->route('pemilik.dashboard')
-                    ->with('success', 'Selamat datang Owner, ' . $user->name . '!');
+                    ->with('login_success', 'Selamat datang kembali owner, ' . $user->name . '!');
             }
 
             if ($user->role === 'admin') {
                 return redirect()->route('admin.dashboard')
-                    ->with('success', 'Selamat datang Admin, ' . $user->name . '!');
+                    ->with('login_success', 'Selamat datang kembali admin, ' . $user->name . '!');
             }
 
             return redirect()->route('home')
-                ->with('success', 'Selamat datang kembali, ' . $user->name . '!');
+                ->with('login_success', 'Selamat datang kembali, ' . $user->name . '!');
         }
 
         return back()->withErrors([

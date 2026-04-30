@@ -7,28 +7,53 @@
             position: relative;
             padding: 0 50px;
         }
-        .swiper { width: 100%; height: 100%; padding-bottom: 50px; }
-        .swiper-slide { height: auto; }
-        .swiper-pagination-bullet { background: #59A1FF; }
-        .section-biru .swiper-pagination-bullet { background: #fff; }
-        
+
+        .swiper {
+            width: 100%;
+            height: 100%;
+            padding-bottom: 50px;
+        }
+
+        .swiper-slide {
+            height: auto;
+        }
+
+        .swiper-pagination-bullet {
+            background: #59A1FF;
+        }
+
+        .section-biru .swiper-pagination-bullet {
+            background: #fff;
+        }
+
         /* Swiper Navigation Buttons */
-        .swiper-button-next, .swiper-button-prev {
+        .swiper-button-next,
+        .swiper-button-prev {
             color: #59A1FF;
             background: rgba(255, 255, 255, 1);
             width: 45px;
             height: 45px;
             border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             margin-top: -22px;
         }
-        .swiper-button-prev { left: 0; }
-        .swiper-button-next { right: 0; }
-        .swiper-button-next:after, .swiper-button-prev:after {
+
+        .swiper-button-prev {
+            left: 0;
+        }
+
+        .swiper-button-next {
+            right: 0;
+        }
+
+        .swiper-button-next:after,
+        .swiper-button-prev:after {
             font-size: 18px;
             font-weight: bold;
         }
-        .section-biru .swiper-button-next, .section-biru .swiper-button-prev {
+
+        .section-biru .swiper-button-next,
+        .section-biru .swiper-button-prev {
             color: #59A1FF;
         }
     </style>
@@ -129,36 +154,45 @@
             <div class="swiper-container-wrapper">
                 <div class="swiper roomSwiper">
                     <div class="swiper-wrapper">
-                        @foreach($rooms as $room)
-                        <div class="swiper-slide">
-                            <a href="{{ route('detail', $room->boardingHouse->id) }}" class="text-decoration-none">
-                                <div class="card card-kost h-100 p-2 border-0 shadow-sm">
-                                    <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                                        class="card-img-top rounded-3" alt="Kamar">
-                                    <div class="card-body px-2 pb-1 pt-3 text-start">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
-                                            <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1" style="font-size: 0.7rem;">{{ $room->room_type }}</span>
-                                        </div>
-                                        <p class="text-muted small mb-1"><i class="fas fa-house text-secondary me-1"></i>
-                                            {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }}</p>
-                                        <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i>
-                                            {{ Str::limit($room->boardingHouse->alamat, 25) }}</p>
-                                        
-                                        @if($room->available)
-                                            <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 mb-2" style="font-size: 0.7rem;"><i class="fa-solid fa-door-open me-1"></i> Tersedia</span>
-                                        @else
-                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 mb-2" style="font-size: 0.7rem;"><i class="fa-solid fa-door-closed me-1"></i> Penuh</span>
-                                        @endif
+                        @foreach ($rooms as $room)
+                            <div class="swiper-slide">
+                                <a href="{{ route('detail', $room->boardingHouse->id) }}" class="text-decoration-none">
+                                    <div class="card card-kost h-100 p-2 border-0 shadow-sm">
+                                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                                            class="card-img-top rounded-3" alt="Kamar">
+                                        <div class="card-body px-2 pb-1 pt-3 text-start">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
+                                                <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1"
+                                                    style="font-size: 0.7rem;">{{ $room->room_type }}</span>
+                                            </div>
+                                            <p class="text-muted small mb-1"><i
+                                                    class="fas fa-house text-secondary me-1"></i>
+                                                {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }}</p>
+                                            <p class="text-muted small mb-2"><i
+                                                    class="fas fa-map-marker-alt text-danger me-1"></i>
+                                                {{ Str::limit($room->boardingHouse->alamat, 25) }}</p>
 
-                                        <div class="mt-2 border-top pt-2">
-                                            <span class="fw-bold text-primary fs-5">Rp {{ number_format($room->monthly_price ?? 0, 0, ',', '.') }}<span
-                                                    class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                                            @if ($room->available)
+                                                <span
+                                                    class="badge bg-success-subtle text-success rounded-pill px-2 py-1 mb-2"
+                                                    style="font-size: 0.7rem;"><i class="fa-solid fa-door-open me-1"></i>
+                                                    Tersedia</span>
+                                            @else
+                                                <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 mb-2"
+                                                    style="font-size: 0.7rem;"><i class="fa-solid fa-door-closed me-1"></i>
+                                                    Penuh</span>
+                                            @endif
+
+                                            <div class="mt-2 border-top pt-2">
+                                                <span class="fw-bold text-primary fs-5">Rp
+                                                    {{ number_format($room->monthly_price ?? 0, 0, ',', '.') }}<span
+                                                        class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </a>
-                        </div>
+                                </a>
+                            </div>
                         @endforeach
                     </div>
                     <div class="swiper-pagination"></div>
@@ -168,8 +202,8 @@
             </div>
 
             <div class="text-center mt-5">
-                <button class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm bg-white">Lihat <i
-                        class="fas fa-arrow-right ms-2"></i></button>
+                <a class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm bg-white"
+                    href="{{ route('kosterbaik.index') }}">Lihat <i class="fas fa-arrow-right ms-2"></i></a>
             </div>
         </div>
     </section>
@@ -177,8 +211,8 @@
     <section class="py-5 bg-white">
         <div class="container py-4">
             <div class="mb-4">
-                <h3 class="fw-bold text-dark mb-2">Pilihan Kost Terbaik di Sekitarmu</h3>
-                <p class="text-muted">Menyesuaikan dengan lokasi Anda saat ini, ini adalah pilihan tepat untuk Anda.</p>
+                <h3 class="fw-bold text-dark mb-2">Kost-Kost yang ada di Bondowoso</h3>
+                <p class="text-muted">Berikut ini adalah pilihan kost-kost di Bondowoso</p>
             </div>
 
             <div class="d-flex flex-wrap gap-2 mb-4">
@@ -187,49 +221,62 @@
                     class="btn btn-outline-secondary rounded-pill px-4 text-dark border-light bg-light">Tenggarang</button>
                 <button
                     class="btn btn-outline-secondary rounded-pill px-4 text-dark border-light bg-light">Wonosari</button>
-                <button
-                    class="btn btn-outline-secondary rounded-pill px-4 text-dark border-light bg-light">Tamanan</button>
+                <button class="btn btn-outline-secondary rounded-pill px-4 text-dark border-light bg-light">Tamanan</button>
             </div>
 
             <div class="swiper-container-wrapper">
                 <div class="swiper roomSwiper">
                     <div class="swiper-wrapper">
-                        @foreach($rooms as $room)
-                        <div class="swiper-slide">
-                            <a href="{{ route('detail', $room->boardingHouse->id) }}" class="text-decoration-none">
-                                <div class="card card-kost h-100 p-2 border shadow-sm">
-                                    <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                                        class="card-img-top rounded-3" alt="Kamar">
-                                    <div class="card-body px-2 pb-1 pt-3 text-start">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
-                                            <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1" style="font-size: 0.7rem;">{{ $room->room_type }}</span>
-                                        </div>
-                                        <p class="text-muted small mb-1"><i class="fas fa-house text-secondary me-1"></i>
-                                            {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }}</p>
-                                        <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i>
-                                            {{ Str::limit($room->boardingHouse->alamat, 25) }}</p>
-                                        
-                                        @if($room->available)
-                                            <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 mb-2" style="font-size: 0.7rem;"><i class="fa-solid fa-door-open me-1"></i> Tersedia</span>
-                                        @else
-                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 mb-2" style="font-size: 0.7rem;"><i class="fa-solid fa-door-closed me-1"></i> Penuh</span>
-                                        @endif
+                        @foreach ($rooms as $room)
+                            <div class="swiper-slide">
+                                <a href="{{ route('detail', $room->boardingHouse->id) }}" class="text-decoration-none">
+                                    <div class="card card-kost h-100 p-2 border shadow-sm">
+                                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                                            class="card-img-top rounded-3" alt="Kamar">
+                                        <div class="card-body px-2 pb-1 pt-3 text-start">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
+                                                <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1"
+                                                    style="font-size: 0.7rem;">{{ $room->room_type }}</span>
+                                            </div>
+                                            <p class="text-muted small mb-1"><i
+                                                    class="fas fa-house text-secondary me-1"></i>
+                                                {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }}</p>
+                                            <p class="text-muted small mb-2"><i
+                                                    class="fas fa-map-marker-alt text-danger me-1"></i>
+                                                {{ Str::limit($room->boardingHouse->alamat, 25) }}</p>
 
-                                        <div class="mt-2 border-top pt-2">
-                                            <span class="fw-bold text-primary fs-5">Rp {{ number_format($room->monthly_price ?? 0, 0, ',', '.') }}<span
-                                                    class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                                            @if ($room->available)
+                                                <span
+                                                    class="badge bg-success-subtle text-success rounded-pill px-2 py-1 mb-2"
+                                                    style="font-size: 0.7rem;"><i class="fa-solid fa-door-open me-1"></i>
+                                                    Tersedia</span>
+                                            @else
+                                                <span
+                                                    class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 mb-2"
+                                                    style="font-size: 0.7rem;"><i
+                                                        class="fa-solid fa-door-closed me-1"></i> Penuh</span>
+                                            @endif
+
+                                            <div class="mt-2 border-top pt-2">
+                                                <span class="fw-bold text-primary fs-5">Rp
+                                                    {{ number_format($room->monthly_price ?? 0, 0, ',', '.') }}<span
+                                                        class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </a>
-                        </div>
+                                </a>
+                            </div>
                         @endforeach
                     </div>
                     <div class="swiper-pagination"></div>
                 </div>
                 <div class="swiper-button-prev d-none d-md-flex"></div>
                 <div class="swiper-button-next d-none d-md-flex"></div>
+            </div>
+            <div class="text-center mt-5">
+                <a class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm bg-white"
+                    href="{{ route('allkos.index') }}">Lihat <i class="fas fa-arrow-right ms-2"></i></a>
             </div>
         </div>
     </section>
@@ -290,139 +337,210 @@
         </div>
     </div>
 
-    <section id="service" class="py-5 mb-5 bg-white">
+    <section id="service" class="py-5 bg-white">
         <div class="container">
             <div class="text-center mb-5">
-                <h6 class="fw-bold text-primary mb-1">Service</h6>
+                <h6 class="fw-bold text-primary mb-1">Ulasam</h6>
                 <h2 class="fw-bold">Ulasan Pengguna Re-Kost</h2>
-
             </div>
 
-            <div class="swiper-container-wrapper">
+            {{-- Alert sukses/error --}}
+            <div id="dynamicAlertContainer"></div>
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            {{-- Review Slider: hanya dari database --}}
+            @if($reviews->isNotEmpty())
+            <div class="swiper-container-wrapper mb-4">
                 <div class="swiper reviewSwiper">
                     <div class="swiper-wrapper">
+                        @foreach($reviews as $rev)
                         <div class="swiper-slide">
                             <div class="p-4 rounded-4 bg-light border-0 h-100 text-start">
                                 <div class="text-warning mb-2">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="fas fa-star"></i><i class="fas fa-star"></i>
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= floor($rev->rating))
+                                            <i class="fas fa-star"></i>
+                                        @elseif($i - $rev->rating < 1 && $i - $rev->rating > 0)
+                                            <i class="fas fa-star-half-alt"></i>
+                                        @else
+                                            <i class="far fa-star"></i>
+                                        @endif
+                                    @endfor
                                 </div>
-                                <p class="text-muted small fst-italic">"Sangat membantu saya menemukan kost yang dekat dengan
-                                    kampus. Aplikasinya mudah digunakan dan informasinya akurat!"</p>
+                                <p class="text-muted small fst-italic">"{{ $rev->review }}"</p>
                                 <div class="d-flex align-items-center mt-3">
-                                    <img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle me-2"
-                                        width="40" height="40" alt="User">
+                                    @if(\Illuminate\Support\Facades\Storage::disk('public')->exists('avatars/' . $rev->user->id . '.jpg'))
+                                        <img src="{{ asset('storage/avatars/' . $rev->user->id . '.jpg') }}"
+                                            class="rounded-circle me-2 object-fit-cover" width="40" height="40" alt="User">
+                                    @else
+                                        <div class="rounded-circle me-2 d-flex align-items-center justify-content-center bg-primary text-white fw-bold flex-shrink-0"
+                                            style="width:40px;height:40px;font-size:16px;">
+                                            {{ strtoupper(substr($rev->user->name, 0, 1)) }}
+                                        </div>
+                                    @endif
                                     <div>
-                                        <h6 class="fw-bold mb-0" style="font-size: 14px;">Intan Pertiwi</h6>
-                                        <span class="text-muted" style="font-size: 12px;">Mahasiswa</span>
+                                        <h6 class="fw-bold mb-0" style="font-size:14px;">{{ $rev->user->name }}</h6>
+                                        <span class="text-muted" style="font-size:12px;">
+                                            {{ $rev->user->userDetail?->city ?? 'Pengguna Re-Kost' }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="swiper-slide">
-                            <div class="p-4 rounded-4 bg-light border-0 h-100 text-start">
-                                <div class="text-warning mb-2">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="fas fa-star"></i><i class="fas fa-star"></i>
-                                </div>
-                                <p class="text-muted small fst-italic">"Harga transparan, tidak ada tipu-tipu. Saya langsung
-                                    booking dan besoknya bisa langsung masuk. Mantap Re-Kost!"</p>
-                                <div class="d-flex align-items-center mt-3">
-                                    <img src="https://randomuser.me/api/portraits/men/32.jpg" class="rounded-circle me-2"
-                                        width="40" height="40" alt="User">
-                                    <div>
-                                        <h6 class="fw-bold mb-0" style="font-size: 14px;">Budi Santoso</h6>
-                                        <span class="text-muted" style="font-size: 12px;">Karyawan</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="p-4 rounded-4 bg-light border-0 h-100 text-start">
-                                <div class="text-warning mb-2">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                                </div>
-                                <p class="text-muted small fst-italic">"Pilihan kostnya sangat banyak. Saya bisa filter sesuai
-                                    budget bulanan saya dengan sangat mudah."</p>
-                                <div class="d-flex align-items-center mt-3">
-                                    <img src="https://randomuser.me/api/portraits/women/68.jpg" class="rounded-circle me-2"
-                                        width="40" height="40" alt="User">
-                                    <div>
-                                        <h6 class="fw-bold mb-0" style="font-size: 14px;">Siti Aminah</h6>
-                                        <span class="text-muted" style="font-size: 12px;">Mahasiswa</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="p-4 rounded-4 bg-light border-0 h-100 text-start">
-                                <div class="text-warning mb-2">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="fas fa-star"></i><i class="fas fa-star"></i>
-                                </div>
-                                <p class="text-muted small fst-italic">"Sangat direkomendasikan buat anak rantau yang bingung cari
-                                    kostan di area Bondowoso!"</p>
-                                <div class="d-flex align-items-center mt-3">
-                                    <img src="https://randomuser.me/api/portraits/men/46.jpg" class="rounded-circle me-2"
-                                        width="40" height="40" alt="User">
-                                    <div>
-                                        <h6 class="fw-bold mb-0" style="font-size: 14px;">Rizky Pratama</h6>
-                                        <span class="text-muted" style="font-size: 12px;">Freelancer</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                     <div class="swiper-pagination"></div>
                 </div>
                 <div class="swiper-button-prev d-none d-md-flex"></div>
                 <div class="swiper-button-next d-none d-md-flex"></div>
             </div>
+            @else
+            <div class="text-center py-5 text-muted">
+                <i class="far fa-comment-dots fs-1 mb-3 d-block" style="color:#dee2e6;"></i>
+                <p class="mb-0">Belum ada ulasan. Jadilah yang pertama memberi ulasan!</p>
+            </div>
+            @endif
+
+            {{-- Form Rating --}}
+            <div class="row justify-content-center mt-5">
+                <div class="col-lg-8">
+                    <div class="p-4 rounded-4 bg-light border" style="background:#f8f9ff !important;">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            @auth
+                                @if(\Illuminate\Support\Facades\Storage::disk('public')->exists('avatars/' . auth()->user()->id . '.jpg'))
+                                    <img src="{{ asset('storage/avatars/' . auth()->user()->id . '.jpg') }}"
+                                        class="rounded-circle object-fit-cover" width="48" height="48" alt="Foto Profil">
+                                @else
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white fw-bold flex-shrink-0"
+                                        style="width:48px;height:48px;font-size:18px;">
+                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                    </div>
+                                @endif
+                            @else
+                                <div class="rounded-circle d-flex align-items-center justify-content-center bg-secondary text-white flex-shrink-0"
+                                    style="width:48px;height:48px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            @endauth
+                            <div>
+                                <div class="fw-semibold text-dark">
+                                    @auth {{ auth()->user()->name }} @else Masuk untuk memberi ulasan @endauth
+                                </div>
+                                {{-- Bintang interaktif --}}
+                                <div class="star-rating d-flex gap-1 mt-1" id="starRating">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fas fa-star star-icon fs-5"
+                                           data-value="{{ $i }}"
+                                           style="color: #ddd; cursor: pointer; transition: color 0.15s;"
+                                           id="star-{{ $i }}">
+                                        </i>
+                                    @endfor
+                                </div>
+                            </div>
+                        </div>
+
+                        @auth
+                            <form id="reviewForm" action="{{ route('app.review.store') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="rating" id="ratingInput" value="0">
+                                <div class="input-group">
+                                    <input type="text" name="review" id="reviewText"
+                                        class="form-control rounded-start-pill border-end-0 @error('review') is-invalid @enderror"
+                                        placeholder="Tulis ulasan anda disini..."
+                                        style="border-color:#dee2e6;"
+                                        maxlength="500">
+                                    <button type="submit" class="btn btn-primary rounded-end-pill px-3"
+                                        style="border-top-left-radius:0;border-bottom-left-radius:0;">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                                @error('review')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                                @error('rating')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </form>
+                        @else
+                            <div class="input-group">
+                                <input type="text" class="form-control rounded-start-pill border-end-0"
+                                    placeholder="Tulis ulasan anda disini..."
+                                    disabled style="border-color:#dee2e6;">
+                                <a href="{{ route('login') }}" class="btn btn-primary rounded-end-pill px-3">
+                                    <i class="fas fa-paper-plane"></i>
+                                </a>
+                            </div>
+                            <p class="text-muted small mt-2"><a href="{{ route('login') }}" class="text-primary">Login</a> untuk memberikan ulasan.</p>
+                        @endauth
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize all room sliders
-        document.querySelectorAll('.roomSwiper').forEach((el) => {
-            const container = el.closest('.swiper-container-wrapper');
-            const prevEl = container.querySelector('.swiper-button-prev');
-            const nextEl = container.querySelector('.swiper-button-next');
-            const paginationEl = el.querySelector('.swiper-pagination');
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all room sliders
+            document.querySelectorAll('.roomSwiper').forEach((el) => {
+                const container = el.closest('.swiper-container-wrapper');
+                const prevEl = container.querySelector('.swiper-button-prev');
+                const nextEl = container.querySelector('.swiper-button-next');
+                const paginationEl = el.querySelector('.swiper-pagination');
 
-            new Swiper(el, {
-                slidesPerView: 1,
-                spaceBetween: 20,
-                navigation: {
-                    nextEl: nextEl,
-                    prevEl: prevEl,
-                },
-                pagination: {
-                    el: paginationEl,
-                    clickable: true,
-                },
-                breakpoints: {
-                    640: { slidesPerView: 2, spaceBetween: 20 },
-                    768: { slidesPerView: 3, spaceBetween: 30 },
-                    1024: { slidesPerView: 4, spaceBetween: 30 },
-                },
+                new Swiper(el, {
+                    slidesPerView: 1,
+                    spaceBetween: 20,
+                    navigation: {
+                        nextEl: nextEl,
+                        prevEl: prevEl,
+                    },
+                    pagination: {
+                        el: paginationEl,
+                        clickable: true,
+                    },
+                    breakpoints: {
+                        640: {
+                            slidesPerView: 2,
+                            spaceBetween: 20
+                        },
+                        768: {
+                            slidesPerView: 3,
+                            spaceBetween: 30
+                        },
+                        1024: {
+                            slidesPerView: 4,
+                            spaceBetween: 30
+                        },
+                    },
+                });
             });
-        });
 
         // Initialize review slider
+        window.reviewSwiperInstances = [];
         document.querySelectorAll('.reviewSwiper').forEach((el) => {
             const container = el.closest('.swiper-container-wrapper');
             const prevEl = container.querySelector('.swiper-button-prev');
             const nextEl = container.querySelector('.swiper-button-next');
             const paginationEl = el.querySelector('.swiper-pagination');
 
-            new Swiper(el, {
+            const swiper = new Swiper(el, {
                 slidesPerView: 1,
                 spaceBetween: 20,
+                centerInsufficientSlides: true,
                 navigation: {
                     nextEl: nextEl,
                     prevEl: prevEl,
@@ -437,7 +555,169 @@
                     1024: { slidesPerView: 4, spaceBetween: 30 },
                 },
             });
+            window.reviewSwiperInstances.push(swiper);
         });
+
+        // === Bintang Rating Interaktif ===
+        const stars = document.querySelectorAll('.star-icon');
+        const ratingInput = document.getElementById('ratingInput');
+        let selectedRating = 0;
+
+        stars.forEach(star => {
+            // Hover: highlight bintang
+            star.addEventListener('mouseover', () => {
+                const val = parseInt(star.getAttribute('data-value'));
+                stars.forEach(s => {
+                    s.style.color = parseInt(s.getAttribute('data-value')) <= val ? '#FBBF24' : '#ddd';
+                });
+            });
+
+            // Keluar hover: kembali ke selected
+            star.addEventListener('mouseout', () => {
+                stars.forEach(s => {
+                    s.style.color = parseInt(s.getAttribute('data-value')) <= selectedRating ? '#FBBF24' : '#ddd';
+                });
+            });
+
+            // Klik: simpan rating
+            star.addEventListener('click', () => {
+                selectedRating = parseInt(star.getAttribute('data-value'));
+                if (ratingInput) ratingInput.value = selectedRating;
+                stars.forEach(s => {
+                    s.style.color = parseInt(s.getAttribute('data-value')) <= selectedRating ? '#FBBF24' : '#ddd';
+                });
+            });
+        });
+
+        // AJAX Form Submission untuk Review
+        const reviewForm = document.getElementById('reviewForm');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalBtnHtml = submitBtn.innerHTML;
+                const dynamicAlertContainer = document.getElementById('dynamicAlertContainer');
+                
+                // Reset alert container
+                dynamicAlertContainer.innerHTML = '';
+                
+                // Validasi manual cepat
+                if (formData.get('rating') == '0') {
+                    showAlert('danger', 'Silakan pilih rating bintang terlebih dahulu.');
+                    return;
+                }
+                if (!formData.get('review').trim()) {
+                    showAlert('danger', 'Silakan tulis ulasan Anda.');
+                    return;
+                }
+
+                // Tampilkan loading
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                submitBtn.disabled = true;
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    submitBtn.innerHTML = originalBtnHtml;
+                    submitBtn.disabled = false;
+
+                    if (data.success) {
+                        // Tampilkan pesan sukses
+                        showAlert('success', data.message);
+                        
+                        // Buat elemen slide baru
+                        const newSlide = generateReviewSlide(data.data);
+                        
+                        // Tambahkan slide ke Swiper
+                        if (window.reviewSwiperInstances && window.reviewSwiperInstances.length > 0) {
+                            const swiper = window.reviewSwiperInstances[0];
+                            swiper.appendSlide(newSlide);
+                            swiper.update();
+                            swiper.slideTo(swiper.slides.length - 1); // Geser ke slide terakhir
+                        } else {
+                            // Jika swiper belum ada (belum ada review), reload page saja atau buat swiper baru
+                            window.location.reload();
+                        }
+                        
+                        // Reset form
+                        reviewForm.reset();
+                        selectedRating = 0;
+                        ratingInput.value = 0;
+                        stars.forEach(s => s.style.color = '#ddd');
+
+                    } else {
+                        // Tampilkan error (sudah review)
+                        showAlert('danger', data.message || 'Terjadi kesalahan.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    submitBtn.innerHTML = originalBtnHtml;
+                    submitBtn.disabled = false;
+                    showAlert('danger', 'Terjadi kesalahan sistem. Coba lagi nanti.');
+                });
+            });
+        }
+
+        // Helper untuk memunculkan alert
+        function showAlert(type, message) {
+            const dynamicAlertContainer = document.getElementById('dynamicAlertContainer');
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            dynamicAlertContainer.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show rounded-3 mb-4" role="alert">
+                    <i class="fas ${icon} me-2"></i>${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+
+        // Helper untuk membuat HTML slide baru
+        function generateReviewSlide(data) {
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= Math.floor(data.rating)) {
+                    starsHtml += '<i class="fas fa-star"></i>';
+                } else if (i - data.rating < 1 && i - data.rating > 0) {
+                    starsHtml += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    starsHtml += '<i class="far fa-star"></i>';
+                }
+            }
+
+            let avatarHtml = '';
+            if (data.user_avatar) {
+                avatarHtml = `<img src="${data.user_avatar}" class="rounded-circle me-2 object-fit-cover" width="40" height="40" alt="User">`;
+            } else {
+                avatarHtml = `<div class="rounded-circle me-2 d-flex align-items-center justify-content-center bg-primary text-white fw-bold flex-shrink-0" style="width:40px;height:40px;font-size:16px;">${data.user_initial}</div>`;
+            }
+
+            return `
+                <div class="swiper-slide">
+                    <div class="p-4 rounded-4 bg-light border-0 h-100 text-start">
+                        <div class="text-warning mb-2">
+                            ${starsHtml}
+                        </div>
+                        <p class="text-muted small fst-italic">"${data.review}"</p>
+                        <div class="d-flex align-items-center mt-3">
+                            ${avatarHtml}
+                            <div>
+                                <h6 class="fw-bold mb-0" style="font-size:14px;">${data.user_name}</h6>
+                                <span class="text-muted" style="font-size:12px;">${data.user_city}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
     });
 </script>
 @endpush

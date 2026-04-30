@@ -5,15 +5,23 @@ use App\Http\Controllers\KosController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\admin\AdminController;
 use App\Http\Controllers\admin\UserController;
+use App\Http\Controllers\landing\allKosController;
+use App\Http\Controllers\landing\kosTerbaikController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PemilikKosController;
+use App\Http\Controllers\AppReviewController;
 use App\Http\Controllers\RoleRequestController;
+use App\Http\Controllers\HistoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     $rooms = \App\Models\Room::with('boardingHouse')->where('available', true)->take(12)->get();
-    return view('welcome', compact('rooms'));
+    $reviews = \App\Models\AppReview::with('user')->latest()->take(12)->get();
+    return view('welcome', compact('rooms', 'reviews'));
 })->name('home');
+
+Route::get('/kos-terbaik', [kosTerbaikController::class, 'index'])->name('kosterbaik.index');
+Route::get('/all-kos', [allKosController::class, 'index'])->name('allkos.index');
 
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
@@ -24,6 +32,10 @@ Route::post('/register', [AuthController::class, 'auth_register'])->name('regist
 Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/ajukan-owner', [RoleRequestController::class, 'store'])->name('role.request');
+    Route::post('/app-review', [AppReviewController::class, 'store'])->name('app.review.store');
+    
+    Route::get('/riwayat', [HistoryController::class, 'index'])->name('user.history');
+    Route::post('/riwayat/review', [HistoryController::class, 'storeReview'])->name('user.history.review');
 
     Route::get('/payment/create', [PaymentController::class, 'create'])->name('payments.create');
     Route::post('/payment/store', [PaymentController::class, 'store'])->name('payments.store');
@@ -31,8 +43,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/image', [ProfileController::class, 'updateImage'])->name('profile.image.update');
-
     Route::get('/kos/{id}', [KosController::class, 'showDetail'])->name('detail');
+
 
     Route::middleware(['role:owner'])->group(function () {
         Route::prefix('pemilik')->name('pemilik.')->group(function () {
@@ -50,6 +62,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/kost/{id}/kamar/{room_id}/edit', [PemilikKosController::class, 'editKamar'])->name('kamar.edit');
             Route::put('/kost/{id}/kamar/{room_id}/update', [PemilikKosController::class, 'updateKamar'])->name('kamar.update');
             Route::delete('/kost/{id}/kamar/{room_id}/hapus', [PemilikKosController::class, 'hapusKamar'])->name('kamar.hapus');
+            Route::post('/kost/{id}/kamar/{room_id}/duplicate', [PemilikKosController::class, 'duplicateKamar'])->name('kamar.duplicate');
 
             Route::get('/penyewa', [PemilikKosController::class, 'penyewa'])->name('penyewa');
             Route::get('/penyewa/tambah', [PemilikKosController::class, 'tambahPenyewa'])->name('penyewa.tambah');
