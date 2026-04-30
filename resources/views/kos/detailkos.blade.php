@@ -170,10 +170,13 @@
                     </div>
                     <span class="text-muted fw-medium">{{ number_format($rating, 1) }} ({{ $reviewsCount }}
                         Reviews)</span>
-                    @if($sisaKamar > 0)
-                        <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1" style="font-size: 0.75rem;"><i class="fa-solid fa-door-open me-1"></i> Sisa {{ $sisaKamar }} Kamar</span>
+                    @if ($sisaKamar > 0)
+                        <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1"
+                            style="font-size: 0.75rem;"><i class="fa-solid fa-door-open me-1"></i> Sisa
+                            {{ $sisaKamar }} Kamar</span>
                     @else
-                        <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1" style="font-size: 0.75rem;"><i class="fa-solid fa-door-closed me-1"></i> Penuh</span>
+                        <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1"
+                            style="font-size: 0.75rem;"><i class="fa-solid fa-door-closed me-1"></i> Penuh</span>
                     @endif
                 </div>
                 <p class="text-muted mb-0 body-text"><i class="fa-solid fa-location-dot me-2"></i> {{ $kos->alamat }}
@@ -215,13 +218,11 @@
                     @endif
                 </div>
 
-                <button
+                <a href="{{ route('payments.create', ['kos_id' => $kos->id]) }}"
                     class="btn btn-primary btn-lg fw-bold rounded-pill shadow-sm ms-md-auto d-flex align-items-center justify-content-center gap-2"
-                    style="width: 100%; max-width: 350px; transition: transform 0.2s ease, box-shadow 0.2s ease;"
-                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 20px rgba(13,110,253,0.2)';"
-                    onmouseout="this.style.transform='none'; this.style.boxShadow='0 .125rem .25rem rgba(0,0,0,.075)';">
+                    style="width: 100%; max-width: 350px;">
                     <i class="fa-solid fa-check-circle"></i> Ajukan Sewa
-                </button>
+                </a>
             </div>
         </div>
 
@@ -259,7 +260,7 @@
                     'kursi' => 'fa-solid fa-chair',
                 ];
 
-                $getIcon = function($name) use ($facilityIcons) {
+                $getIcon = function ($name) use ($facilityIcons) {
                     $lowerName = strtolower($name);
                     foreach ($facilityIcons as $keyword => $icon) {
                         if (str_contains($lowerName, $keyword)) {
@@ -269,13 +270,14 @@
                     return 'fa-solid fa-circle-check';
                 };
             @endphp
-            
+
             <h6 class="fw-bold text-dark mb-3">Fasilitas Umum (Kos)</h6>
             <div class="row gy-3 mb-4">
                 @if ($kos->facilities && count($kos->facilities) > 0)
                     @foreach ($kos->facilities as $f)
                         <div class="col-6 col-md-3 text-muted d-flex align-items-center">
-                            <div class="d-flex justify-content-center align-items-center bg-light rounded-circle me-3" style="width: 36px; height: 36px;">
+                            <div class="d-flex justify-content-center align-items-center bg-light rounded-circle me-3"
+                                style="width: 36px; height: 36px;">
                                 <i class="{{ $getIcon($f) }} text-primary" style="font-size: 1rem;"></i>
                             </div>
                             <span class="fw-medium icon-text">{{ $f }}</span>
@@ -290,18 +292,19 @@
             <div class="row gy-3 mb-4">
                 @php
                     $roomFacilities = [];
-                    foreach($kos->rooms as $room) {
+                    foreach ($kos->rooms as $room) {
                         if (is_array($room->facilities)) {
                             $roomFacilities = array_merge($roomFacilities, $room->facilities);
                         }
                     }
                     $roomFacilities = array_unique($roomFacilities);
                 @endphp
-                
+
                 @if (count($roomFacilities) > 0)
                     @foreach ($roomFacilities as $f)
                         <div class="col-6 col-md-3 text-muted d-flex align-items-center">
-                            <div class="d-flex justify-content-center align-items-center bg-light rounded-circle me-3" style="width: 36px; height: 36px;">
+                            <div class="d-flex justify-content-center align-items-center bg-light rounded-circle me-3"
+                                style="width: 36px; height: 36px;">
                                 <i class="{{ $getIcon($f) }} text-primary" style="font-size: 1rem;"></i>
                             </div>
                             <span class="fw-medium icon-text">{{ $f }}</span>

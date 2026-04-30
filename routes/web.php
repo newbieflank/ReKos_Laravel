@@ -33,11 +33,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/ajukan-owner', [RoleRequestController::class, 'store'])->name('role.request');
     Route::post('/app-review', [AppReviewController::class, 'store'])->name('app.review.store');
-    
+
     Route::get('/riwayat', [HistoryController::class, 'index'])->name('user.history');
     Route::post('/riwayat/review', [HistoryController::class, 'storeReview'])->name('user.history.review');
 
     Route::get('/payment/create', [PaymentController::class, 'create'])->name('payments.create');
+    Route::get('/payment/pembayaran', [PaymentController::class, 'payment'])->name('payments.pembayaran');
+    Route::get('/payment/konfirmasi', [PaymentController::class, 'confirmation'])->name('payments.konfirmasi');
+    Route::get('/payments/success', [PaymentController::class, 'success'])
+        ->name('payments.success');
     Route::post('/payment/store', [PaymentController::class, 'store'])->name('payments.store');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
