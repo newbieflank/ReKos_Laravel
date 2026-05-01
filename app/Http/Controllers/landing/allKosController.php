@@ -11,12 +11,35 @@ class allKosController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $rooms = Room::with('boardingHouse')
-            ->where('available', true) // opsional: hanya yang tersedia
-            ->latest()
-            ->get();
+        $query = Room::with('boardingHouse')->where('available', true);
+
+        if ($request->filled('harga')) {
+            $harga = $request->harga;
+            if ($harga == '1000001') {
+                $query->where('monthly_price', '>', 1000000);
+            } else {
+                $lower = $harga == '100000' ? 0 : $harga - 100000;
+                $query->whereBetween('monthly_price', [$lower, $harga]);
+            }
+        }
+
+        if ($request->filled('area')) {
+            $area = $request->area;
+            $query->whereHas('boardingHouse', function($q) use ($area) {
+                $q->where('alamat', 'like', '%' . $area . '%');
+            });
+        }
+
+        if ($request->filled('tipe')) {
+            $tipe = $request->tipe;
+            $query->whereHas('boardingHouse', function($q) use ($tipe) {
+                $q->where('boarding_house_type', $tipe);
+            });
+        }
+
+        $rooms = $query->latest()->get();
 
         return view('landing.index_all_kos', compact('rooms'));
     }

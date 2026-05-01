@@ -17,7 +17,23 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     $rooms = \App\Models\Room::with('boardingHouse')->where('available', true)->take(12)->get();
     $reviews = \App\Models\AppReview::with('user')->latest()->take(12)->get();
-    return view('welcome', compact('rooms', 'reviews'));
+
+    $allAlamat = \App\Models\BoardingHouse::pluck('alamat');
+    $areas = [];
+    foreach($allAlamat as $al) {
+        if(!$al) continue;
+        $parts = array_map('trim', explode(',', $al));
+        if (count($parts) >= 6 && strtolower($parts[count($parts) - 5]) === 'bondowoso') {
+            $kelurahan = $parts[count($parts) - 6];
+            $areas[$kelurahan] = true;
+        } elseif (count($parts) > 1) {
+            $areas[$parts[1]] = true;
+        }
+    }
+    $areas = array_keys($areas);
+    sort($areas);
+
+    return view('welcome', compact('rooms', 'reviews', 'areas'));
 })->name('home');
 
 Route::get('/kos-terbaik', [kosTerbaikController::class, 'index'])->name('kosterbaik.index');

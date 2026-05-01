@@ -27,6 +27,8 @@ class BoardingHouse extends Model
         'description',
         'house_rule',
         'rating',
+        'main_image',
+        'other_images',
     ];
 
     protected function casts(): array

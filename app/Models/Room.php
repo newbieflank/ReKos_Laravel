@@ -23,6 +23,8 @@ class Room extends Model
         'monthly_price',
         'monthly_expense',
         'available',
+        'main_image',
+        'other_images',
     ];
 
     protected function casts(): array

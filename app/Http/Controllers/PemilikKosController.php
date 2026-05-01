@@ -276,7 +276,7 @@ class PemilikKosController extends Controller
         }
 
         $otherImages = [];
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 2; $i++) {
             if ($request->hasFile("other_image_$i")) {
                 $file = $request->file("other_image_$i");
                 $filename = "foto_kamar_tambahan_{$i}_" . time() . '.' . $file->getClientOriginalExtension();
@@ -285,6 +285,18 @@ class PemilikKosController extends Controller
             } else {
                 $otherImages[$i-1] = null;
             }
+        }
+        
+        if ($request->hasFile("other_image_3")) {
+            $other3Paths = [];
+            foreach ($request->file('other_image_3') as $idx => $file) {
+                $filename = "foto_kamar_tambahan_3_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $filename);
+                $other3Paths[] = 'image/boarding_house_' . $id . '/' . $filename;
+            }
+            $otherImages[2] = $other3Paths;
+        } else {
+            $otherImages[2] = null;
         }
         $room->other_images = json_encode($otherImages);    $room->save();
 
@@ -334,9 +346,9 @@ class PemilikKosController extends Controller
             $oldImages[2] ?? null,
         ];
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 2; $i++) {
             if ($request->hasFile("other_image_$i")) {
-                if (!empty($otherImages[$i-1]) && file_exists(public_path($otherImages[$i-1]))) {
+                if (!empty($otherImages[$i-1]) && is_string($otherImages[$i-1]) && file_exists(public_path($otherImages[$i-1]))) {
                     @unlink(public_path($otherImages[$i-1]));
                 }
                 $file = $request->file("other_image_$i");
@@ -344,6 +356,25 @@ class PemilikKosController extends Controller
                 $file->move($path, $filename);
                 $otherImages[$i-1] = 'image/boarding_house_' . $boardingHouseId . '/' . $filename;
             }
+        }
+        
+        if ($request->hasFile("other_image_3")) {
+            if (!empty($otherImages[2])) {
+                if (is_array($otherImages[2])) {
+                    foreach ($otherImages[2] as $oldImg) {
+                        if (file_exists(public_path($oldImg))) @unlink(public_path($oldImg));
+                    }
+                } else {
+                    if (file_exists(public_path($otherImages[2]))) @unlink(public_path($otherImages[2]));
+                }
+            }
+            $other3Paths = [];
+            foreach ($request->file('other_image_3') as $idx => $file) {
+                $filename = "foto_kamar_tambahan_3_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $filename);
+                $other3Paths[] = 'image/boarding_house_' . $boardingHouseId . '/' . $filename;
+            }
+            $otherImages[2] = $other3Paths;
         }
         $data['other_images'] = json_encode($otherImages);
 
@@ -474,7 +505,7 @@ class PemilikKosController extends Controller
         }
 
         $otherImages = [];
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 2; $i++) {
             if ($request->hasFile("other_image_$i")) {
                 $file = $request->file("other_image_$i");
                 $filename = "foto_kost_tambahan_{$i}_" . time() . '.' . $file->getClientOriginalExtension();
@@ -483,6 +514,18 @@ class PemilikKosController extends Controller
             } else {
                 $otherImages[$i-1] = null;
             }
+        }
+        
+        if ($request->hasFile("other_image_3")) {
+            $other3Paths = [];
+            foreach ($request->file('other_image_3') as $idx => $file) {
+                $filename = "foto_kost_tambahan_3_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $filename);
+                $other3Paths[] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+            }
+            $otherImages[2] = $other3Paths;
+        } else {
+            $otherImages[2] = null;
         }
         $kost->other_images = json_encode($otherImages);
         $kost->save();
@@ -533,9 +576,9 @@ class PemilikKosController extends Controller
             $oldImages[2] ?? null,
         ];
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 2; $i++) {
             if ($request->hasFile("other_image_$i")) {
-                if (!empty($otherImages[$i-1]) && file_exists(public_path($otherImages[$i-1]))) {
+                if (!empty($otherImages[$i-1]) && is_string($otherImages[$i-1]) && file_exists(public_path($otherImages[$i-1]))) {
                     @unlink(public_path($otherImages[$i-1]));
                 }
                 $file = $request->file("other_image_$i");
@@ -543,6 +586,25 @@ class PemilikKosController extends Controller
                 $file->move($path, $filename);
                 $otherImages[$i-1] = 'image/boarding_house_' . $kost->id . '/' . $filename;
             }
+        }
+        
+        if ($request->hasFile("other_image_3")) {
+            if (!empty($otherImages[2])) {
+                if (is_array($otherImages[2])) {
+                    foreach ($otherImages[2] as $oldImg) {
+                        if (file_exists(public_path($oldImg))) @unlink(public_path($oldImg));
+                    }
+                } else {
+                    if (file_exists(public_path($otherImages[2]))) @unlink(public_path($otherImages[2]));
+                }
+            }
+            $other3Paths = [];
+            foreach ($request->file('other_image_3') as $idx => $file) {
+                $filename = "foto_kost_tambahan_3_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $filename);
+                $other3Paths[] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+            }
+            $otherImages[2] = $other3Paths;
         }
         $data['other_images'] = json_encode($otherImages);
 
