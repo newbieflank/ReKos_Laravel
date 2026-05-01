@@ -22,3 +22,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Uploaded images (local only, not pushed to GitHub)
+/public/image/
