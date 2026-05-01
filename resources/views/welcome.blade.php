@@ -60,7 +60,7 @@
 @endpush
 
 @section('content')
-    <div class="container mt-5">
+    <div id="hero" class="container mt-5">
         <div class="row align-items-center p-4 p-md-5 mx-1">
             <div class="col-lg-6 mb-4 mb-lg-0">
                 <h1 class="fw-bold display-5 mb-3" style="color: #1A202C;">
@@ -75,11 +75,11 @@
                 </button>
                 <div class="d-flex gap-5">
                     <div>
-                        <h3 class="fw-bold text-primary mb-0">100+</h3>
+                        <h3 class="fw-bold text-primary mb-0">{{ $totalPengguna }}+</h3>
                         <span class="text-muted small">Pengguna</span>
                     </div>
                     <div>
-                        <h3 class="fw-bold text-primary mb-0">100+</h3>
+                        <h3 class="fw-bold text-primary mb-0">{{ $totalKost }}+</h3>
                         <span class="text-muted small">Kost-kostan</span>
                     </div>
                 </div>
@@ -165,7 +165,7 @@
         </div>
     </div>
 
-    <section class="section-biru" style="padding-top: 100px; padding-bottom: 60px;">
+    <section id="rekomendasi" class="section-biru" style="padding-top: 100px; padding-bottom: 60px;">
         <div class="container">
             <div class="text-center mb-5">
                 <h6 class="text-uppercase fw-bold text-light mb-1" style="letter-spacing: 1px;">REKOMENDASI</h6>
@@ -275,7 +275,7 @@
         </div>
     </section>
 
-    <section class="py-5 bg-white">
+    <section id="kostan" class="py-5 bg-white">
         <div class="container py-4">
             <div class="mb-4">
                 <h3 class="fw-bold text-dark mb-2">Kost-Kost yang ada di Bondowoso</h3>
@@ -432,7 +432,7 @@
         </div>
     </div>
 
-    <section id="service" class="py-5 bg-white">
+    <section id="rating" class="py-5 bg-white">
         <div class="container">
             <div class="text-center mb-5">
                 <h6 class="fw-bold text-primary mb-1">Ulasam</h6>

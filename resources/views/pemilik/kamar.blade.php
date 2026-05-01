@@ -376,66 +376,6 @@
                         </div>
                     </div>
 
-                    <!-- Modal Detail Kamar (Dinamis) -->
-                    <div class="modal fade" id="detailKamarModal{{ $room->id }}" tabindex="-1"
-                        aria-labelledby="detailKamarModalLabel{{ $room->id }}" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-lg">
-                            <div class="modal-content modal-content-custom shadow-lg">
-                                <div class="modal-header border-0 pb-0 px-4 pt-4">
-                                    <h5 class="modal-title text-primary fw-bold"
-                                        id="detailKamarModalLabel{{ $room->id }}">Detail {{ $room->room_name }}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body px-4 py-4">
-                                    <div class="row mb-5">
-                                        <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                            <h5 class="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
-                                                Status: {{ $room->available ? 'Tersedia' : 'Terisi' }} <span
-                                                    class="status-dot {{ $room->available ? 'tersedia' : 'terisi' }}"></span>
-                                            </h5>
-                                            <p class="text-muted small fw-bold mb-0" style="letter-spacing: 1px;">
-                                                TIPE : <span class="text-dark">{{ strtoupper($room->room_type) }}</span>
-                                            </p>
-                                        </div>
-                                        <div class="col-12 col-md-6 text-md-end">
-                                            <p class="text-muted small fw-bold mb-1" style="letter-spacing: 0.5px;">
-                                                UKURAN : <span class="text-dark">{{ $room->room_size }} Meter</span>
-                                            </p>
-                                            <p class="text-muted small fw-bold mb-0" style="letter-spacing: 0.5px;">
-                                                HARGA : <span class="text-dark">Rp
-                                                    {{ number_format($room->monthly_price, 0, ',', '.') }}/Bulan</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="mb-4">
-                                        <div class="section-title mb-3">FASILITAS KAMAR</div>
-                                        <div class="row g-3">
-                                            @if (is_array($room->facilities) && count($room->facilities) > 0)
-                                                @foreach ($room->facilities as $fac)
-                                                    <div class="col-12 col-sm-6 col-md-4">
-                                                        <div class="facility-box"><i
-                                                                class="fa-solid fa-check text-primary"></i>
-                                                            {{ $fac }}</div>
-                                                    </div>
-                                                @endforeach
-                                            @else
-                                                <div class="col-12">
-                                                    <p class="text-muted small">Tidak ada fasilitas.</p>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <a href="{{ route('pemilik.kamar.edit', ['id' => $kost->id, 'room_id' => $room->id]) }}"
-                                        class="btn-update-status text-decoration-none d-flex justify-content-center align-items-center gap-2">
-                                        Edit Kamar <i class="fa-solid fa-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
                 </div>
             @empty
                 <div class="col-12">
@@ -502,6 +442,70 @@
             </div>
         </div>
     </div>
+
+    <!-- Modals -->
+    @push('modals')
+    @foreach($rooms as $room)
+        <div class="modal fade" id="detailKamarModal{{ $room->id }}" tabindex="-1"
+            aria-labelledby="detailKamarModalLabel{{ $room->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content modal-content-custom shadow-lg">
+                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                        <h5 class="modal-title text-primary fw-bold"
+                            id="detailKamarModalLabel{{ $room->id }}">Detail {{ $room->room_name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body px-4 py-4">
+                        <div class="row mb-5">
+                            <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                <h5 class="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                                    Status: {{ $room->available ? 'Tersedia' : 'Terisi' }} <span
+                                        class="status-dot {{ $room->available ? 'tersedia' : 'terisi' }}"></span>
+                                </h5>
+                                <p class="text-muted small fw-bold mb-0" style="letter-spacing: 1px;">
+                                    TIPE : <span class="text-dark">{{ strtoupper($room->room_type) }}</span>
+                                </p>
+                            </div>
+                            <div class="col-12 col-md-6 text-md-end">
+                                <p class="text-muted small fw-bold mb-1" style="letter-spacing: 0.5px;">
+                                    UKURAN : <span class="text-dark">{{ $room->room_size }} Meter</span>
+                                </p>
+                                <p class="text-muted small fw-bold mb-0" style="letter-spacing: 0.5px;">
+                                    HARGA : <span class="text-dark">Rp
+                                        {{ number_format($room->monthly_price, 0, ',', '.') }}/Bulan</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="section-title mb-3">FASILITAS KAMAR</div>
+                            <div class="row g-3">
+                                @if (is_array($room->facilities) && count($room->facilities) > 0)
+                                    @foreach ($room->facilities as $fac)
+                                        <div class="col-12 col-sm-6 col-md-4">
+                                            <div class="facility-box"><i
+                                                    class="fa-solid fa-check text-primary"></i>
+                                                {{ $fac }}</div>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="col-12">
+                                        <p class="text-muted small">Tidak ada fasilitas.</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <a href="{{ route('pemilik.kamar.edit', ['id' => $kost->id, 'room_id' => $room->id]) }}"
+                            class="btn-update-status text-decoration-none d-flex justify-content-center align-items-center gap-2">
+                            Edit Kamar <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+    @endpush
+
 @endsection
 
 @push('scripts')

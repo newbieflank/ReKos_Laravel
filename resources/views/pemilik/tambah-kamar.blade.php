@@ -368,7 +368,7 @@
 
                     <div class="d-flex justify-content-between align-items-center mt-5">
                         <a href="{{ route('pemilik.kamar', $kost->id) }}" class="btn-outline-custom text-decoration-none">Batal</a>
-                        <button type="button" class="btn-primary-custom" onclick="goToStep(2)">Lanjut <i
+                        <button type="button" class="btn-primary-custom" onclick="nextStep(1)">Lanjut <i
                                 class="fa-solid fa-arrow-right ms-2"></i></button>
                     </div>
                 </div>
@@ -387,32 +387,36 @@
                             <label for="fac_ac" class="facility-card"><i class="fa-solid fa-snowflake"></i><span>AC</span></label>
                         </div>
                         <div class="col-6 col-md-3">
-                            <input type="checkbox" name="facilities[]" value="WIFI" id="fac_wifi" class="facility-check">
-                            <label for="fac_wifi" class="facility-card"><i class="fa-solid fa-wifi"></i><span>WIFI</span></label>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <input type="checkbox" name="facilities[]" value="Kamar Mandi" id="fac_km" class="facility-check">
-                            <label for="fac_km" class="facility-card"><i class="fa-solid fa-bath"></i><span>Kamar Mandi</span></label>
+                            <input type="checkbox" name="facilities[]" value="Kipas Angin" id="fac_fan" class="facility-check">
+                            <label for="fac_fan" class="facility-card"><i class="fa-solid fa-fan"></i><span>Kipas Angin</span></label>
                         </div>
                         <div class="col-6 col-md-3">
                             <input type="checkbox" name="facilities[]" value="TV" id="fac_tv" class="facility-check">
                             <label for="fac_tv" class="facility-card"><i class="fa-solid fa-tv"></i><span>TV</span></label>
                         </div>
                         <div class="col-6 col-md-3">
-                            <input type="checkbox" name="facilities[]" value="Kursi" id="fac_kursi" class="facility-check">
-                            <label for="fac_kursi" class="facility-card"><i class="fa-solid fa-chair"></i><span>Kursi</span></label>
+                            <input type="checkbox" name="facilities[]" value="Stop Kontak" id="fac_stopkontak" class="facility-check">
+                            <label for="fac_stopkontak" class="facility-card"><i class="fa-solid fa-plug"></i><span>Stop Kontak</span></label>
                         </div>
                         <div class="col-6 col-md-3">
-                            <input type="checkbox" name="facilities[]" value="Lemari" id="fac_lemari" class="facility-check">
-                            <label for="fac_lemari" class="facility-card"><i class="fa-solid fa-door-closed"></i><span>Lemari</span></label>
+                            <input type="checkbox" name="facilities[]" value="Kasur" id="fac_kasur" class="facility-check">
+                            <label for="fac_kasur" class="facility-card"><i class="fa-solid fa-bed"></i><span>Kasur</span></label>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <input type="checkbox" name="facilities[]" value="Lemari Pakaian" id="fac_lemari" class="facility-check">
+                            <label for="fac_lemari" class="facility-card"><i class="fa-solid fa-box-archive"></i><span>Lemari Pakaian</span></label>
                         </div>
                         <div class="col-6 col-md-3">
                             <input type="checkbox" name="facilities[]" value="Meja" id="fac_meja" class="facility-check">
                             <label for="fac_meja" class="facility-card"><i class="fa-solid fa-table"></i><span>Meja</span></label>
                         </div>
                         <div class="col-6 col-md-3">
-                            <input type="checkbox" name="facilities[]" value="Lampu" id="fac_lampu" class="facility-check">
-                            <label for="fac_lampu" class="facility-card"><i class="fa-solid fa-lightbulb"></i><span>Lampu</span></label>
+                            <input type="checkbox" name="facilities[]" value="Kursi" id="fac_kursi" class="facility-check">
+                            <label for="fac_kursi" class="facility-card"><i class="fa-solid fa-chair"></i><span>Kursi</span></label>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <input type="checkbox" name="facilities[]" value="Bantal & Guling" id="fac_bantal" class="facility-check">
+                            <label for="fac_bantal" class="facility-card"><i class="fa-solid fa-moon"></i><span>Bantal & Guling</span></label>
                         </div>
                     </div>
 
@@ -507,7 +511,7 @@
                             <div class="d-flex justify-content-end align-items-center mt-5 gap-3 pt-4 border-top">
                                 <button type="button" class="btn-outline-custom bg-light rounded-3 px-4 py-2"
                                     onclick="goToStep(2)"><i class="fa-solid fa-arrow-left me-2"></i> Kembali</button>
-                                <button type="button" class="btn-primary-custom px-5 py-2 shadow-sm" onclick="goToStep(4)">Lanjut <i
+                                <button type="button" class="btn-primary-custom px-5 py-2 shadow-sm" onclick="nextStep(3)">Lanjut <i
                                         class="fa-solid fa-arrow-right ms-2"></i></button>
                             </div>
                         </div>
@@ -571,7 +575,7 @@
                     <div class="d-flex justify-content-end align-items-center mt-5 gap-3">
                         <button type="button" class="btn-outline-custom bg-light rounded-3 px-4"
                             onclick="goToStep(3)"><i class="fa-solid fa-arrow-left me-2"></i> Kembali</button>
-                        <button type="button" class="btn-primary-custom" onclick="goToStep(5)">Lanjut <i
+                        <button type="button" class="btn-primary-custom" onclick="nextStep(4)">Lanjut <i
                                 class="fa-solid fa-arrow-right ms-2"></i></button>
                     </div>
                 </div>
@@ -761,6 +765,39 @@
             function formatRupiah(number) {
                 if(!number) return "Rp 0";
                 return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+            }
+
+            function validateStep(step) {
+                const stepDiv = document.getElementById('step-' + step);
+                if(!stepDiv) return true;
+                const inputs = stepDiv.querySelectorAll('input, select, textarea');
+                for (let input of inputs) {
+                    if (input.hasAttribute('required') && !input.checkValidity()) {
+                        input.reportValidity();
+                        return false;
+                    }
+                }
+
+                if (step === 4) {
+                    const mainImage = document.getElementById('file_main');
+                    if (mainImage && mainImage.files.length === 0) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Foto Utama Wajib Diisi',
+                            text: 'Silakan unggah foto utama kamar terlebih dahulu.',
+                            confirmButtonColor: '#0d6efd'
+                        });
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            function nextStep(currentStep) {
+                if (validateStep(currentStep)) {
+                    goToStep(currentStep + 1);
+                }
             }
 
             function goToStep(step) {

@@ -11,16 +11,16 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto fw-medium">
                 <li class="nav-item px-2">
-                    <a class="nav-link" href="{{ route('home') }}">Home</a>
+                    <a class="nav-link" href="{{ route('home') }}#hero">Home</a>
                 </li>
                 <li class="nav-item px-2">
-                    <a class="nav-link" href="{{ url('/#kostan') }}">Kost-an</a>
+                    <a class="nav-link" href="{{ route('home') }}#rekomendasi">Kost-an</a>
                 </li>
                 <li class="nav-item px-2">
-                    <a class="nav-link" href="{{ url('/#service') }}">Service</a>
+                    <a class="nav-link" href="{{ route('home') }}#rating">Rating</a>
                 </li>
                 <li class="nav-item px-2">
-                    <a class="nav-link" href="{{ url('/#contact') }}">Contact</a>
+                    <a class="nav-link" href="{{ route('home') }}#contact">Contact</a>
                 </li>
             </ul>
 
@@ -87,3 +87,25 @@
         </div>
     </div>
 </nav>
+
+<script>
+    document.querySelectorAll('a.nav-link[href*="#"]').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            const hashIndex = href.indexOf('#');
+            if (hashIndex === -1) return;
+
+            const hash = href.substring(hashIndex + 1);
+            const target = document.getElementById(hash);
+
+            // Jika section ada di halaman ini, scroll tanpa hash
+            if (target) {
+                e.preventDefault();
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Hapus hash dari URL
+                history.replaceState(null, '', window.location.pathname);
+            }
+            // Jika tidak ada (halaman lain), biarkan navigasi biasa terjadi
+        });
+    });
+</script>
