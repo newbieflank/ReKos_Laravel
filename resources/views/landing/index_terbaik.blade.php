@@ -86,17 +86,32 @@
                                 @endif
                                 <div class="card-body px-2 pb-1 pt-3 text-start">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
+                                        <div>
+                                            <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
+                                            <div class="d-flex align-items-center mt-1">
+                                                <i class="fas fa-star text-warning" style="font-size: 0.75rem;"></i>
+                                                <span class="ms-1 small fw-medium">{{ number_format($room->boardingHouse->rating ?? 0, 1) }}</span>
+                                            </div>
+                                        </div>
                                         <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1"
                                             style="font-size: 0.7rem;">{{ $room->room_type }}</span>
                                     </div>
-                                    <p class="text-muted small mb-1"><i class="fas fa-house text-secondary me-1"></i> {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }}</p>
+                                    @php
+                                        $typeMap = ['male' => 'Putra', 'female' => 'Putri', 'mixed' => 'Campur'];
+                                        $typeLabel = $typeMap[$room->boardingHouse->boarding_house_type] ?? ucfirst($room->boardingHouse->boarding_house_type);
+                                    @endphp
+                                    <p class="text-muted small mb-1"><i class="fas fa-house text-secondary me-1"></i> {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }} <span class="ms-1 fw-bold text-primary" style="font-size: 0.7rem;">({{ $typeLabel }})</span></p>
                                     @php
                                         $alamat = $room->boardingHouse->alamat ?? '';
-                                        $alamatParts = explode(',', $alamat);
-                                        $area = count($alamatParts) > 1 ? trim($alamatParts[1]) : (str_word_count($alamat) > 0 ? strtok($alamat, " ") : 'Bondowoso');
+                                        $alamatParts = array_map('trim', explode(',', $alamat));
+                                        $area = 'Bondowoso';
+                                        if (count($alamatParts) >= 6 && strtolower($alamatParts[count($alamatParts) - 5]) === 'bondowoso') {
+                                            $area = $alamatParts[count($alamatParts) - 6];
+                                        } elseif (count($alamatParts) > 1) {
+                                            $area = $alamatParts[1];
+                                        }
                                     @endphp
-                                    <p class="text-dark small mb-1 fw-medium"><i class="fas fa-map text-success me-1"></i> {{ Str::limit($area, 20) }}</p>
+                                    <p class="text-dark small mb-1 fw-medium"><i class="fas fa-map text-success me-1"></i> Area {{ Str::limit($area, 20) }}</p>
                                     <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> {{ Str::limit($alamat, 25) }}</p>
 
                                     @if($room->available)

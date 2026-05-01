@@ -230,7 +230,7 @@
                 </div>
                 <div class="col-12 col-md-6">
                     <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
-                        <input type="file" name="other_image_3" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-4')">
+                        <input type="file" name="other_image_3[]" id="file_other_3" multiple class="d-none" accept="image/*" onchange="appendImages(this, 'preview-4')">
                         <div id="preview-4" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
                             <i class="fa-solid fa-image mb-2 fs-3 text-secondary"></i>
                             <h6 class="fw-bold text-dark mb-1">Foto Lainnya</h6>
@@ -261,6 +261,61 @@
             }
             reader.readAsDataURL(input.files[0]);
         }
+    }
+
+    var dtOther3 = new DataTransfer();
+    function appendImages(input, previewId) {
+        if (input.files && input.files.length > 0) {
+            for(let i = 0; i < input.files.length; i++) {
+                dtOther3.items.add(input.files[i]);
+            }
+            input.files = dtOther3.files;
+            renderMiniPreviews(previewId);
+        }
+    }
+    function renderMiniPreviews(previewId) {
+        var container = document.getElementById(previewId);
+        container.innerHTML = '';
+        container.classList.remove('flex-column', 'align-items-center', 'justify-content-center');
+        container.classList.add('flex-row', 'flex-wrap', 'gap-2', 'p-2', 'align-items-start', 'overflow-y-auto');
+
+        if(dtOther3.files.length === 0) {
+            container.classList.add('flex-column', 'align-items-center', 'justify-content-center');
+            container.classList.remove('flex-row', 'flex-wrap', 'gap-2', 'p-2', 'align-items-start', 'overflow-y-auto');
+            container.innerHTML = '<i class="fa-solid fa-image mb-2 fs-3 text-secondary"></i><h6 class="fw-bold text-dark mb-1">Foto Lainnya</h6><p class="small text-muted mb-0">Klik untuk tambah</p>';
+            return;
+        }
+
+        for (let i = 0; i < dtOther3.files.length; i++) {
+            let file = dtOther3.files[i];
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let div = document.createElement('div');
+                div.style.width = '70px';
+                div.style.height = '70px';
+                div.className = 'position-relative';
+                div.innerHTML = '<img src="' + e.target.result + '" class="w-100 h-100 object-fit-cover rounded border">' +
+                                '<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle p-0 d-flex align-items-center justify-content-center" style="width:18px;height:18px;transform:translate(30%, -30%);" onclick="event.preventDefault(); event.stopPropagation(); removeImg(' + i + ', \'' + previewId + '\')"><i class="fa-solid fa-times" style="font-size:9px;"></i></button>';
+                container.appendChild(div);
+            }
+            reader.readAsDataURL(file);
+        }
+        
+        let addBtn = document.createElement('div');
+        addBtn.style.width = '70px';
+        addBtn.style.height = '70px';
+        addBtn.className = 'd-flex flex-column align-items-center justify-content-center rounded border border-dashed text-primary bg-light';
+        addBtn.innerHTML = '<i class="fa-solid fa-plus mb-1"></i><span style="font-size:0.6rem;">Tambah</span>';
+        container.appendChild(addBtn);
+    }
+    function removeImg(index, previewId) {
+        var dtNew = new DataTransfer();
+        for(let i = 0; i < dtOther3.files.length; i++) {
+            if(i !== index) dtNew.items.add(dtOther3.files[i]);
+        }
+        dtOther3 = dtNew;
+        document.getElementById('file_other_3').files = dtOther3.files;
+        renderMiniPreviews(previewId);
     }
     function updateCount(input, textId) {
         var count = input.files ? input.files.length : 0;
