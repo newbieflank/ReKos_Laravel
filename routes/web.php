@@ -33,7 +33,10 @@ Route::get('/', function () {
     $areas = array_keys($areas);
     sort($areas);
 
-    return view('welcome', compact('rooms', 'reviews', 'areas'));
+    $totalPengguna = \App\Models\User::count();
+    $totalKost = \App\Models\BoardingHouse::count();
+
+    return view('welcome', compact('rooms', 'reviews', 'areas', 'totalPengguna', 'totalKost'));
 })->name('home');
 
 Route::get('/kos-terbaik', [kosTerbaikController::class, 'index'])->name('kosterbaik.index');

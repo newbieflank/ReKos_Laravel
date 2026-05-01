@@ -219,7 +219,7 @@
         <h3 class="fw-bold text-dark mb-1 mt-2">Edit Properti Kost</h3>
         <p class="text-secondary small mb-4">Perbarui detail properti Anda.</p>
 
-        <form action="{{ route('pemilik.kost.update', $kost->id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('pemilik.kost.update', $kost->id) }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm(this)">
             @csrf
             @method('PUT')
 
@@ -324,32 +324,19 @@
                     <h5 class="fw-bold mb-0">Fasilitas Kost</h5>
                 </div>
 
-                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-5 g-3">
+                <p class="text-muted small mb-3"><i class="fa-solid fa-circle-info text-primary me-1"></i> Centang
+                    fasilitas yang tersedia di kost Anda.</p>
+
+                {{-- Fasilitas Umum Dasar --}}
+                <h6 class="fw-semibold text-dark mb-3 mt-2"><i
+                        class="fa-solid fa-house-chimney-window text-primary me-2"></i>Fasilitas Umum Dasar</h6>
+                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-5 g-3 mb-4">
                     <div class="col">
-                        <input type="checkbox" name="facilities[]" value="Free WiFi" id="f_wifi"
-                            class="facility-check" {{ in_array('Free WiFi', $kost->facilities ?? []) ? 'checked' : '' }}>
-                        <label for="f_wifi" class="facility-card"><i class="fa-solid fa-wifi"></i><span>Free
-                                WiFi</span></label>
-                    </div>
-                    <div class="col">
-                        <input type="checkbox" name="facilities[]" value="Laundry" id="f_laundry"
-                            class="facility-check" {{ in_array('Laundry', $kost->facilities ?? []) ? 'checked' : '' }}>
-                        <label for="f_laundry" class="facility-card"><i
-                                class="fa-solid fa-shirt"></i><span>Laundry</span></label>
-                    </div>
-                    <div class="col">
-                        <input type="checkbox" name="facilities[]" value="Parkir Luas" id="f_parkir"
+                        <input type="checkbox" name="facilities[]" value="Area Parkir" id="f_parkir"
                             class="facility-check"
-                            {{ in_array('Parkir Luas', $kost->facilities ?? []) ? 'checked' : '' }}>
-                        <label for="f_parkir" class="facility-card"><i class="fa-solid fa-car"></i><span>Parkir
-                                Luas</span></label>
-                    </div>
-                    <div class="col">
-                        <input type="checkbox" name="facilities[]" value="Keamanan 24j" id="f_keamanan"
-                            class="facility-check"
-                            {{ in_array('Keamanan 24j', $kost->facilities ?? []) ? 'checked' : '' }}>
-                        <label for="f_keamanan" class="facility-card"><i
-                                class="fa-solid fa-shield-halved"></i><span>Keamanan 24j</span></label>
+                            {{ in_array('Area Parkir', $kost->facilities ?? []) ? 'checked' : '' }}>
+                        <label for="f_parkir" class="facility-card"><i class="fa-solid fa-car"></i><span>Area
+                                Parkir</span></label>
                     </div>
                     <div class="col">
                         <input type="checkbox" name="facilities[]" value="Dapur Bersama" id="f_dapur"
@@ -359,55 +346,109 @@
                                 Bersama</span></label>
                     </div>
                     <div class="col">
-                        <input type="checkbox" name="facilities[]" value="Full AC" id="f_ac"
-                            class="facility-check" {{ in_array('Full AC', $kost->facilities ?? []) ? 'checked' : '' }}>
-                        <label for="f_ac" class="facility-card"><i class="fa-solid fa-snowflake"></i><span>Full
-                                AC</span></label>
-                    </div>
-                    <div class="col">
-                        <input type="checkbox" name="facilities[]" value="Room Service" id="f_roomservice"
+                        <input type="checkbox" name="facilities[]" value="Kamar Mandi Luar" id="f_km_luar"
                             class="facility-check"
-                            {{ in_array('Room Service', $kost->facilities ?? []) ? 'checked' : '' }}>
-                        <label for="f_roomservice" class="facility-card"><i
-                                class="fa-solid fa-bell-concierge"></i><span>Room Service</span></label>
+                            {{ in_array('Kamar Mandi Luar', $kost->facilities ?? []) ? 'checked' : '' }}>
+                        <label for="f_km_luar" class="facility-card"><i class="fa-solid fa-shower"></i><span>Kamar Mandi
+                                Luar</span></label>
                     </div>
                     <div class="col">
-                        <input type="checkbox" name="facilities[]" value="Gym Area" id="f_gym"
-                            class="facility-check" {{ in_array('Gym Area', $kost->facilities ?? []) ? 'checked' : '' }}>
-                        <label for="f_gym" class="facility-card"><i class="fa-solid fa-dumbbell"></i><span>Gym
-                                Area</span></label>
+                        <input type="checkbox" name="facilities[]" value="Area Jemur" id="f_jemur"
+                            class="facility-check" {{ in_array('Area Jemur', $kost->facilities ?? []) ? 'checked' : '' }}>
+                        <label for="f_jemur" class="facility-card"><i class="fa-solid fa-wind"></i><span>Area Jemur
+                                Pakaian</span></label>
                     </div>
                     <div class="col">
-                        <input type="checkbox" name="facilities[]" value="Kolam Renang" id="f_kolam"
+                        <input type="checkbox" name="facilities[]" value="Wi-Fi" id="f_wifi" class="facility-check"
+                            {{ in_array('Wi-Fi', $kost->facilities ?? []) ? 'checked' : '' }}>
+                        <label for="f_wifi" class="facility-card"><i class="fa-solid fa-wifi"></i><span>Wi-Fi /
+                                Internet</span></label>
+                    </div>
+                </div>
+
+                {{-- Fasilitas Keamanan --}}
+                <h6 class="fw-semibold text-dark mb-3"><i class="fa-solid fa-shield-halved text-danger me-2"></i>Fasilitas
+                    Keamanan</h6>
+                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-5 g-3 mb-4">
+                    <div class="col">
+                        <input type="checkbox" name="facilities[]" value="CCTV" id="f_cctv" class="facility-check"
+                            {{ in_array('CCTV', $kost->facilities ?? []) ? 'checked' : '' }}>
+                        <label for="f_cctv" class="facility-card"><i
+                                class="fa-solid fa-camera"></i><span>CCTV</span></label>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" name="facilities[]" value="Penjaga Kost" id="f_satpam"
                             class="facility-check"
-                            {{ in_array('Kolam Renang', $kost->facilities ?? []) ? 'checked' : '' }}>
-                        <label for="f_kolam" class="facility-card"><i class="fa-solid fa-water-ladder"></i><span>Kolam
-                                Renang</span></label>
+                            {{ in_array('Penjaga Kost', $kost->facilities ?? []) ? 'checked' : '' }}>
+                        <label for="f_satpam" class="facility-card"><i
+                                class="fa-solid fa-user-shield"></i><span>Satpam</span></label>
+                    </div>
+                </div>
+
+                {{-- Fasilitas Kenyamanan & Ekstra --}}
+                <h6 class="fw-semibold text-dark mb-3"><i class="fa-solid fa-star text-warning me-2"></i>Fasilitas
+                    Kenyamanan & Ekstra</h6>
+                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-5 g-3">
+                    <div class="col">
+                        <input type="checkbox" name="facilities[]" value="Ruang Tamu" id="f_ruangtamu"
+                            class="facility-check" {{ in_array('Ruang Tamu', $kost->facilities ?? []) ? 'checked' : '' }}>
+                        <label for="f_ruangtamu" class="facility-card"><i
+                                class="fa-solid fa-couch"></i><span>Ruang Tamu</span></label>
                     </div>
                     <div class="col">
-                        <input type="checkbox" name="facilities[]" value="Lainnya" id="f_lainnya"
-                            class="facility-check" {{ in_array('Lainnya', $kost->facilities ?? []) ? 'checked' : '' }}>
-                        <label for="f_lainnya" class="facility-card"><i
-                                class="fa-solid fa-ellipsis"></i><span>Lainnya</span></label>
+                        <input type="checkbox" name="facilities[]" value="Peralatan Elektronik" id="f_elektronik"
+                            class="facility-check"
+                            {{ in_array('Peralatan Elektronik', $kost->facilities ?? []) ? 'checked' : '' }}>
+                        <label for="f_elektronik" class="facility-card"><i class="fa-solid fa-plug"></i><span>Peralatan
+                                Elektronik</span></label>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" name="facilities[]" value="Mesin Cuci" id="f_mesin_cuci"
+                            class="facility-check" {{ in_array('Mesin Cuci', $kost->facilities ?? []) ? 'checked' : '' }}>
+                        <label for="f_mesin_cuci" class="facility-card"><i
+                                class="fa-solid fa-jug-detergent"></i><span>Mesin Cuci</span></label>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" name="facilities[]" value="Kulkas" id="f_kulkas" class="facility-check"
+                            {{ in_array('Kulkas', $kost->facilities ?? []) ? 'checked' : '' }}>
+                        <label for="f_kulkas" class="facility-card"><i
+                                class="fa-solid fa-temperature-low"></i><span>Kulkas</span></label>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" name="facilities[]" value="Ruang Belajar" id="f_belajar"
+                            class="facility-check"
+                            {{ in_array('Ruang Belajar', $kost->facilities ?? []) ? 'checked' : '' }}>
+                        <label for="f_belajar" class="facility-card"><i class="fa-solid fa-book-open"></i><span>Rak
+                                Buku</span></label>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" name="facilities[]" value="Mushola" id="f_mushola"
+                            class="facility-check" {{ in_array('Mushola', $kost->facilities ?? []) ? 'checked' : '' }}>
+                        <label for="f_mushola" class="facility-card"><i
+                                class="fa-solid fa-place-of-worship"></i><span>Mushola</span></label>
                     </div>
                 </div>
             </div>
-            
+
             <div class="form-section-card mt-4">
                 <div class="section-title-wrap">
                     <div class="section-icon-box"><i class="fa-regular fa-image"></i></div>
                     <h5 class="fw-bold mb-0">Galeri Foto Kost</h5>
                 </div>
-                
+
                 <div class="row g-4">
                     <div class="col-12 col-md-6">
                         <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
-                            <input type="file" name="main_image" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-1')">
-                            <div id="preview-1" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
-                                @if($kost->main_image)
-                                    <img src="{{ asset($kost->main_image) }}" class="w-100 h-100 object-fit-cover rounded" alt="Main Image">
+                            <input type="file" name="main_image" class="d-none" accept="image/*"
+                                onchange="previewImage(this, 'preview-1')">
+                            <div id="preview-1"
+                                class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                @if ($kost->main_image)
+                                    <img src="{{ asset($kost->main_image) }}"
+                                        class="w-100 h-100 object-fit-cover rounded" alt="Main Image">
                                 @else
-                                    <div class="bg-white shadow-sm p-3 rounded-circle mb-3 text-primary"><i class="fa-solid fa-cloud-arrow-up fs-4"></i></div>
+                                    <div class="bg-white shadow-sm p-3 rounded-circle mb-3 text-primary"><i
+                                            class="fa-solid fa-cloud-arrow-up fs-4"></i></div>
                                     <h6 class="fw-bold text-dark mb-1">Foto Utama Kost</h6>
                                     <p class="small text-muted mb-0">Klik untuk mengganti</p>
                                 @endif
@@ -415,7 +456,7 @@
                         </label>
                     </div>
 
-                    @php 
+                    @php
                         $otherImages = $kost->other_images ? json_decode($kost->other_images, true) : [];
                         $img2 = isset($otherImages[0]) ? $otherImages[0] : null;
                         $img3 = isset($otherImages[1]) ? $otherImages[1] : null;
@@ -424,10 +465,13 @@
 
                     <div class="col-12 col-md-6">
                         <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
-                            <input type="file" name="other_image_1" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-2')">
-                            <div id="preview-2" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
-                                @if($img2)
-                                    <img src="{{ asset($img2) }}" class="w-100 h-100 object-fit-cover rounded" alt="Foto Tampak Depan">
+                            <input type="file" name="other_image_1" class="d-none" accept="image/*"
+                                onchange="previewImage(this, 'preview-2')">
+                            <div id="preview-2"
+                                class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                @if ($img2)
+                                    <img src="{{ asset($img2) }}" class="w-100 h-100 object-fit-cover rounded"
+                                        alt="Foto Tampak Depan">
                                 @else
                                     <i class="fa-solid fa-building mb-2 fs-3 text-secondary"></i>
                                     <h6 class="fw-bold text-dark mb-1">Foto Tampak Depan</h6>
@@ -438,10 +482,13 @@
                     </div>
                     <div class="col-12 col-md-6">
                         <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
-                            <input type="file" name="other_image_2" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-3')">
-                            <div id="preview-3" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
-                                @if($img3)
-                                    <img src="{{ asset($img3) }}" class="w-100 h-100 object-fit-cover rounded" alt="Foto Fasilitas Bersama">
+                            <input type="file" name="other_image_2" class="d-none" accept="image/*"
+                                onchange="previewImage(this, 'preview-3')">
+                            <div id="preview-3"
+                                class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                @if ($img3)
+                                    <img src="{{ asset($img3) }}" class="w-100 h-100 object-fit-cover rounded"
+                                        alt="Foto Fasilitas Bersama">
                                 @else
                                     <i class="fa-solid fa-couch mb-2 fs-3 text-secondary"></i>
                                     <h6 class="fw-bold text-dark mb-1">Foto Fasilitas Bersama</h6>
@@ -452,12 +499,15 @@
                     </div>
                     <div class="col-12 col-md-6">
                         <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
-                            <input type="file" name="other_image_3[]" id="file_other_3" multiple class="d-none" accept="image/*" onchange="appendImages(this, 'preview-4')">
-                            <div id="preview-4" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
-                                @if($img4)
+                            <input type="file" name="other_image_3[]" id="file_other_3" multiple class="d-none"
+                                accept="image/*" onchange="appendImages(this, 'preview-4')">
+                            <div id="preview-4"
+                                class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                @if ($img4)
                                     @php $preview4 = is_array($img4) ? (count($img4) > 0 ? $img4[0] : null) : $img4; @endphp
-                                    @if($preview4)
-                                        <img src="{{ asset($preview4) }}" class="w-100 h-100 object-fit-cover rounded" alt="Foto Lainnya">
+                                    @if ($preview4)
+                                        <img src="{{ asset($preview4) }}" class="w-100 h-100 object-fit-cover rounded"
+                                            alt="Foto Lainnya">
                                     @else
                                         <i class="fa-solid fa-image mb-2 fs-3 text-secondary"></i>
                                         <h6 class="fw-bold text-dark mb-1">Foto Lainnya</h6>
@@ -472,8 +522,10 @@
                         </label>
                     </div>
                 </div>
-                
-                <p class="text-muted small mt-3"><i class="fa-solid fa-circle-info me-1"></i> Rekomendasi ukuran foto minimal 1280x720 pixel dalam format JPG atau PNG. Mengunggah foto baru akan menimpa foto lama jika diisi.</p>
+
+                <p class="text-muted small mt-3"><i class="fa-solid fa-circle-info me-1"></i> Rekomendasi ukuran foto
+                    minimal 1280x720 pixel dalam format JPG atau PNG. Mengunggah foto baru akan menimpa foto lama jika
+                    diisi.</p>
             </div>
 
 
@@ -493,32 +545,36 @@
                     var reader = new FileReader();
                     reader.onload = function(e) {
                         var container = document.getElementById(previewId);
-                        container.innerHTML = '<img src="' + e.target.result + '" class="w-100 h-100 object-fit-cover rounded" alt="Preview">';
+                        container.innerHTML = '<img src="' + e.target.result +
+                            '" class="w-100 h-100 object-fit-cover rounded" alt="Preview">';
                     }
                     reader.readAsDataURL(input.files[0]);
                 }
             }
 
             var dtOther3 = new DataTransfer();
+
             function appendImages(input, previewId) {
                 if (input.files && input.files.length > 0) {
-                    for(let i = 0; i < input.files.length; i++) {
+                    for (let i = 0; i < input.files.length; i++) {
                         dtOther3.items.add(input.files[i]);
                     }
                     input.files = dtOther3.files;
                     renderMiniPreviews(previewId);
                 }
             }
+
             function renderMiniPreviews(previewId) {
                 var container = document.getElementById(previewId);
                 container.innerHTML = '';
                 container.classList.remove('flex-column', 'align-items-center', 'justify-content-center');
                 container.classList.add('flex-row', 'flex-wrap', 'gap-2', 'p-2', 'align-items-start', 'overflow-y-auto');
 
-                if(dtOther3.files.length === 0) {
+                if (dtOther3.files.length === 0) {
                     container.classList.add('flex-column', 'align-items-center', 'justify-content-center');
                     container.classList.remove('flex-row', 'flex-wrap', 'gap-2', 'p-2', 'align-items-start', 'overflow-y-auto');
-                    container.innerHTML = '<i class="fa-solid fa-image mb-2 fs-3 text-secondary"></i><h6 class="fw-bold text-dark mb-1">Foto Lainnya</h6><p class="small text-muted mb-0">Klik untuk tambah</p>';
+                    container.innerHTML =
+                        '<i class="fa-solid fa-image mb-2 fs-3 text-secondary"></i><h6 class="fw-bold text-dark mb-1">Foto Lainnya</h6><p class="small text-muted mb-0">Klik untuk tambah</p>';
                     return;
                 }
 
@@ -530,29 +586,35 @@
                         div.style.width = '70px';
                         div.style.height = '70px';
                         div.className = 'position-relative';
-                        div.innerHTML = '<img src="' + e.target.result + '" class="w-100 h-100 object-fit-cover rounded border">' +
-                                        '<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle p-0 d-flex align-items-center justify-content-center" style="width:18px;height:18px;transform:translate(30%, -30%);" onclick="event.preventDefault(); event.stopPropagation(); removeImg(' + i + ', \'' + previewId + '\')"><i class="fa-solid fa-times" style="font-size:9px;"></i></button>';
+                        div.innerHTML = '<img src="' + e.target.result +
+                            '" class="w-100 h-100 object-fit-cover rounded border">' +
+                            '<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle p-0 d-flex align-items-center justify-content-center" style="width:18px;height:18px;transform:translate(30%, -30%);" onclick="event.preventDefault(); event.stopPropagation(); removeImg(' +
+                            i + ', \'' + previewId +
+                            '\')"><i class="fa-solid fa-times" style="font-size:9px;"></i></button>';
                         container.appendChild(div);
                     }
                     reader.readAsDataURL(file);
                 }
-                
+
                 let addBtn = document.createElement('div');
                 addBtn.style.width = '70px';
                 addBtn.style.height = '70px';
-                addBtn.className = 'd-flex flex-column align-items-center justify-content-center rounded border border-dashed text-primary bg-light';
+                addBtn.className =
+                    'd-flex flex-column align-items-center justify-content-center rounded border border-dashed text-primary bg-light';
                 addBtn.innerHTML = '<i class="fa-solid fa-plus mb-1"></i><span style="font-size:0.6rem;">Tambah</span>';
                 container.appendChild(addBtn);
             }
+
             function removeImg(index, previewId) {
                 var dtNew = new DataTransfer();
-                for(let i = 0; i < dtOther3.files.length; i++) {
-                    if(i !== index) dtNew.items.add(dtOther3.files[i]);
+                for (let i = 0; i < dtOther3.files.length; i++) {
+                    if (i !== index) dtNew.items.add(dtOther3.files[i]);
                 }
                 dtOther3 = dtNew;
                 document.getElementById('file_other_3').files = dtOther3.files;
                 renderMiniPreviews(previewId);
             }
+
             function updateCount(input, textId) {
                 var count = input.files ? input.files.length : 0;
                 document.getElementById(textId).innerText = count + ' file dipilih';
@@ -608,6 +670,17 @@
             });
 
             updateAddress(defaultLat, defaultLng);
+
+            function validateForm(form) {
+                const inputs = form.querySelectorAll('input[required]:not(.d-none), textarea[required]:not(.d-none), select[required]:not(.d-none)');
+                for(let input of inputs) {
+                    if(!input.checkValidity()) {
+                        input.reportValidity();
+                        return false;
+                    }
+                }
+                return true;
+            }
         </script>
     @endpush
 @endsection
