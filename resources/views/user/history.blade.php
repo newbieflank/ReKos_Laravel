@@ -16,18 +16,24 @@
                     <div class="d-flex align-items-center mb-3 mb-md-0 w-100">
                         <!-- Image -->
                         <div class="flex-shrink-0 me-3">
-                            <a href="{{ route('detail', $history->room->boardingHouse->id ?? 0) }}">
-                                <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" 
-                                    class="rounded-3 object-fit-cover" 
-                                    style="width: 100px; height: 100px; background-color: #333;"
-                                    alt="Kost Image">
+                            <a href="{{ route('detail', ['id' => $history->room->boardingHouse->id ?? 0, 'room_id' => $history->room->id ?? 0]) }}">
+                                @if(isset($history->room) && $history->room->main_image)
+                                    <img src="{{ asset($history->room->main_image) }}" 
+                                        class="rounded-3 object-fit-cover shadow-sm" 
+                                        style="width: 100px; height: 100px;"
+                                        alt="Kamar Kost">
+                                @else
+                                    <div class="rounded-3 d-flex align-items-center justify-content-center bg-light text-muted border shadow-sm" style="width: 100px; height: 100px;">
+                                        <i class="fa-solid fa-bed fs-3"></i>
+                                    </div>
+                                @endif
                             </a>
                         </div>
                         
                         <!-- Details -->
                         <div class="w-100">
                             <div class="d-flex justify-content-between align-items-start mb-1">
-                                <a href="{{ route('detail', $history->room->boardingHouse->id ?? 0) }}" class="text-decoration-none text-dark">
+                                <a href="{{ route('detail', ['id' => $history->room->boardingHouse->id ?? 0, 'room_id' => $history->room->id ?? 0]) }}" class="text-decoration-none text-dark">
                                     <h5 class="fw-bold mb-0 text-dark hover-primary" style="font-size: 1.1rem; transition: color 0.2s;">{{ $history->room->boardingHouse->boarding_house_name ?? 'Nama Kost Tidak Diketahui' }}</h5>
                                 </a>
                                 <div class="d-md-none">

@@ -21,7 +21,16 @@ class KosController extends Controller
         // Untuk rating dan jumlah review
         $reviewsCount = $kos->reviews()->count();
         $rating = $reviewsCount > 0 ? $kos->reviews()->avg('rating') : 0;
+        
+        $roomId = request('room_id');
+        $selectedRoom = null;
+        if ($roomId) {
+            $selectedRoom = $kos->rooms->where('id', $roomId)->first();
+        }
+        if (!$selectedRoom) {
+            $selectedRoom = $kos->rooms->first();
+        }
 
-        return view('kos.detailkos', compact('kos', 'hargaHarian', 'hargaMingguan', 'hargaBulanan', 'rating', 'reviewsCount', 'sisaKamar', 'totalKamar'));
+        return view('kos.detailkos', compact('kos', 'hargaHarian', 'hargaMingguan', 'hargaBulanan', 'rating', 'reviewsCount', 'sisaKamar', 'totalKamar', 'selectedRoom'));
     }
 }

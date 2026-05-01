@@ -323,7 +323,7 @@
             </div>
         </div>
 
-        <form id="tambahKamarForm" action="{{ route('pemilik.kamar.simpan', $kost->id) }}" method="POST">
+        <form id="tambahKamarForm" action="{{ route('pemilik.kamar.simpan', $kost->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div id="step-1">
@@ -524,23 +524,45 @@
                     </div>
 
                     <div class="row g-4">
-                        <div class="col-12 col-md-8">
-                            <div class="upload-box upload-main">
-                                <div class="bg-white shadow-sm p-3 rounded-circle mb-3 text-primary"><i
-                                        class="fa-solid fa-cloud-arrow-up fs-4"></i></div>
-                                <h6 class="fw-bold text-dark mb-1">Unggah Foto Utama</h6>
-                                <p class="small text-muted">Seret gambar atau klik untuk memilih</p>
-                            </div>
+                        <div class="col-12 col-md-6">
+                            <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                                <input type="file" name="main_image" id="file_main" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-1')">
+                                <div id="preview-1" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                    <div class="bg-white shadow-sm p-3 rounded-circle mb-3 text-primary"><i class="fa-solid fa-cloud-arrow-up fs-4"></i></div>
+                                    <h6 class="fw-bold text-dark mb-1">Foto Utama Kamar</h6>
+                                    <p class="small text-muted mb-0">Wajib diisi</p>
+                                </div>
+                            </label>
                         </div>
-                        <div class="col-12 col-md-4 d-flex flex-column gap-4">
-                            <div class="upload-box upload-small h-50">
-                                <i class="fa-solid fa-camera mb-2 fs-5"></i>
-                                <span class="small fw-bold">Tambah Detail</span>
-                            </div>
-                            <div class="upload-box upload-small h-50">
-                                <i class="fa-solid fa-camera mb-2 fs-5"></i>
-                                <span class="small fw-bold">Tambah Fasilitas</span>
-                            </div>
+                        <div class="col-12 col-md-6">
+                            <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                                <input type="file" name="other_image_1" id="file_other_1" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-2')">
+                                <div id="preview-2" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                    <i class="fa-solid fa-bath mb-2 fs-3 text-secondary"></i>
+                                    <h6 class="fw-bold text-dark mb-1">Foto Kamar Mandi</h6>
+                                    <p class="small text-muted mb-0">Opsional</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                                <input type="file" name="other_image_2" id="file_other_2" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-3')">
+                                <div id="preview-3" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                    <i class="fa-solid fa-couch mb-2 fs-3 text-secondary"></i>
+                                    <h6 class="fw-bold text-dark mb-1">Foto Fasilitas</h6>
+                                    <p class="small text-muted mb-0">Opsional</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                                <input type="file" name="other_image_3" id="file_other_3" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-4')">
+                                <div id="preview-4" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                    <i class="fa-solid fa-image mb-2 fs-3 text-secondary"></i>
+                                    <h6 class="fw-bold text-dark mb-1">Foto Lainnya</h6>
+                                    <p class="small text-muted mb-0">Opsional</p>
+                                </div>
+                            </label>
                         </div>
                     </div>
                     <p class="text-muted small mt-3"><i class="fa-regular fa-circle-info me-1"></i> Rekomendasi ukuran
@@ -602,29 +624,10 @@
                                         style="width:32px; height:32px;"><i class="fa-regular fa-image"></i></div>
                                     <h5 class="fw-bold mb-0 text-dark">Galeri Foto</h5>
                                 </div>
-                                <span class="badge bg-primary bg-opacity-10 text-primary">4 File Diunggah</span>
+                                <span class="badge bg-primary bg-opacity-10 text-primary" id="summary_images_count">0 File Diunggah</span>
                             </div>
-                            <div class="row g-2">
-                                <div class="col-3">
-                                    <div class="bg-light rounded-3"
-                                        style="height: 60px; background-image: url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200&q=80'); background-size: cover; background-position: center;">
-                                    </div>
-                                </div>
-                                <div class="col-3">
-                                    <div class="bg-light rounded-3"
-                                        style="height: 60px; background-image: url('https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=200&q=80'); background-size: cover; background-position: center;">
-                                    </div>
-                                </div>
-                                <div class="col-3">
-                                    <div class="bg-light rounded-3"
-                                        style="height: 60px; background-image: url('https://images.unsplash.com/photo-1560448204-603b3fc33ddc?w=200&q=80'); background-size: cover; background-position: center;">
-                                    </div>
-                                </div>
-                                <div class="col-3">
-                                    <div class="bg-light rounded-3"
-                                        style="height: 60px; background-image: url('https://images.unsplash.com/photo-1540518614846-7eded433c457?w=200&q=80'); background-size: cover; background-position: center;">
-                                    </div>
-                                </div>
+                            <div class="row g-2" id="summary_images_container">
+                                <!-- Previews will be injected here via JS -->
                             </div>
                         </div>
                     </div>
@@ -685,6 +688,21 @@
 
     @push('scripts')
         <script>
+            function previewImage(input, previewId) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var container = document.getElementById(previewId);
+                        container.innerHTML = '<img src="' + e.target.result + '" class="w-100 h-100 object-fit-cover rounded" alt="Preview">';
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+            function updateCount(input, textId) {
+                var count = input.files ? input.files.length : 0;
+                document.getElementById(textId).innerText = count + ' file dipilih';
+            }
+
             function formatRupiah(number) {
                 if(!number) return "Rp 0";
                 return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
@@ -720,6 +738,28 @@
                             facilitiesDiv.innerHTML += `<span class="badge-facility"><i class="fa-solid fa-check text-primary"></i> ${cb.value}</span>`;
                         });
                     }
+
+                    const imagesContainer = document.getElementById('summary_images_container');
+                    imagesContainer.innerHTML = '';
+                    let fileCount = 0;
+                    ['file_main', 'file_other_1', 'file_other_2', 'file_other_3'].forEach(id => {
+                        const input = document.getElementById(id);
+                        if (input && input.files && input.files[0]) {
+                            fileCount++;
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                imagesContainer.innerHTML += `
+                                    <div class="col-3">
+                                        <div class="bg-light rounded-3"
+                                            style="height: 60px; background-image: url('${e.target.result}'); background-size: cover; background-position: center;">
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                            reader.readAsDataURL(input.files[0]);
+                        }
+                    });
+                    document.getElementById('summary_images_count').innerText = fileCount + ' File Diunggah';
                 }
 
                 for (let i = 1; i <= 5; i++) {

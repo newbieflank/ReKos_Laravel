@@ -46,7 +46,6 @@ class PemilikKosController extends Controller
                 ->unique()
                 ->values();
 
-            // Total pengeluaran bulan ini = jumlah dari (Estimasi Pengeluaran Bulanan) kamar yang disewa di bulan ini
             $expense = \App\Models\Room::whereIn('id', $occupiedRoomIdsThisMonth)->sum('monthly_expense');
             $chartExpense[] = $expense ?: 0;
         }
@@ -152,7 +151,6 @@ class PemilikKosController extends Controller
             'institution' => 'nullable|string',
         ]);
 
-        // Update User Details
         $userDetail = \App\Models\UserDetail::firstOrCreate(['user_id' => $data['tenant_id']]);
         $userDetail->update([
             'gender' => $data['gender'] ?? 'unknown',
@@ -161,11 +159,9 @@ class PemilikKosController extends Controller
             'institution' => $data['institution'] ?? null,
         ]);
 
-        // Hitung duration (dalam hari) otomatis dari rental_type
         $durationMap = ['daily' => 1, 'weekly' => 7, 'monthly' => 30];
         $duration = $durationMap[$data['rental_type']] ?? 1;
 
-        // Create Tenant relation
         \App\Models\Tenant::create([
             'tenant_id' => $data['tenant_id'],
             'room_id' => $data['room_id'],
@@ -177,7 +173,6 @@ class PemilikKosController extends Controller
             'status' => $data['status_sewa'],
         ]);
 
-        // Update room availability
         if ($data['status_sewa'] === 'active') {
             $room = \App\Models\Room::find($data['room_id']);
             if ($room) {
@@ -217,13 +212,11 @@ class PemilikKosController extends Controller
             'total_price'  => 'nullable|numeric',
         ]);
 
-        // Kembalikan kamar lama menjadi available jika pindah kamar atau terminated
         $oldRoomId = $tenant->room_id;
         $newStatus = $data['status'];
 
         $tenant->update($data);
 
-        // Update ketersediaan kamar
         if ($oldRoomId != $data['room_id']) {
             \App\Models\Room::find($oldRoomId)?->update(['available' => true]);
         }
@@ -266,7 +259,35 @@ class PemilikKosController extends Controller
             $data['available'] = true;
         }
 
-        \App\Models\Room::create($data);
+        $room = \App\Models\Room::create($data);
+
+        // Upload files
+        $path = public_path('image/boarding_house_' . $id);
+        if (!file_exists($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        if ($request->hasFile('main_image')) {
+            $file = $request->file('main_image');
+            $filename = 'foto_kamar_utama_' . $room->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $filename);
+            $room->main_image = 'image/boarding_house_' . $id . '/' . $filename;
+            $room->save();
+        }
+
+        $otherImages = [];
+        for ($i = 1; $i <= 3; $i++) {
+            if ($request->hasFile("other_image_$i")) {
+                $file = $request->file("other_image_$i");
+                $filename = "foto_kamar_tambahan_{$i}_" . time() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $filename);
+                $otherImages[$i-1] = 'image/boarding_house_' . $id . '/' . $filename;
+            } else {
+                $otherImages[$i-1] = null;
+            }
+        }
+        $room->other_images = json_encode($otherImages);    $room->save();
+
         return redirect()->route('pemilik.kamar', $id)->with('success', 'Data kamar baru berhasil ditambahkan!');
     }
 
@@ -281,6 +302,7 @@ class PemilikKosController extends Controller
     {
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
         $room = \App\Models\Room::where('boarding_house_id', $id)->findOrFail($roomId);
+        $boardingHouseId = $id;
 
         $data = $request->all();
         if (!$request->has('available')) {
@@ -288,6 +310,42 @@ class PemilikKosController extends Controller
         } else {
             $data['available'] = true;
         }
+
+        // Upload files
+        $path = public_path('image/boarding_house_' . $id);
+        if (!file_exists($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        if ($request->hasFile('main_image')) {
+            if ($room->main_image && file_exists(public_path($room->main_image))) {
+                @unlink(public_path($room->main_image));
+            }
+            $file = $request->file('main_image');
+            $filename = 'foto_kamar_utama_' . $room->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $filename);
+            $data['main_image'] = 'image/boarding_house_' . $id . '/' . $filename;
+        }
+
+        $oldImages = $room->other_images ? json_decode($room->other_images, true) : [];
+        $otherImages = [
+            $oldImages[0] ?? null,
+            $oldImages[1] ?? null,
+            $oldImages[2] ?? null,
+        ];
+
+        for ($i = 1; $i <= 3; $i++) {
+            if ($request->hasFile("other_image_$i")) {
+                if (!empty($otherImages[$i-1]) && file_exists(public_path($otherImages[$i-1]))) {
+                    @unlink(public_path($otherImages[$i-1]));
+                }
+                $file = $request->file("other_image_$i");
+                $filename = "foto_kamar_tambahan_{$i}_" . time() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $filename);
+                $otherImages[$i-1] = 'image/boarding_house_' . $boardingHouseId . '/' . $filename;
+            }
+        }
+        $data['other_images'] = json_encode($otherImages);
 
         $room->update($data);
         return redirect()->route('pemilik.kamar', $id)->with('success', 'Data kamar berhasil diperbarui!');
@@ -297,6 +355,19 @@ class PemilikKosController extends Controller
     {
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
         $room = \App\Models\Room::where('boarding_house_id', $id)->findOrFail($roomId);
+        
+        if ($room->main_image && file_exists(public_path($room->main_image))) {
+            @unlink(public_path($room->main_image));
+        }
+        if ($room->other_images) {
+            $otherImages = json_decode($room->other_images, true) ?? [];
+            foreach ($otherImages as $img) {
+                if ($img && file_exists(public_path($img))) {
+                    @unlink(public_path($img));
+                }
+            }
+        }
+        
         $room->delete();
         return redirect()->route('pemilik.kamar', $id)->with('success', 'Data kamar berhasil dihapus!');
     }
@@ -308,7 +379,6 @@ class PemilikKosController extends Controller
 
         $newRoom = $room->replicate();
 
-        // Buat nama khusus misalnya angkanya nambah atau tambah nomor baru
         if (preg_match('/(.*?)\s*(\d+)$/', $room->room_name, $matches)) {
             $baseName = rtrim($matches[1]);
             $number = intval($matches[2]) + 1;
@@ -329,7 +399,7 @@ class PemilikKosController extends Controller
             $newRoom->room_name = $checkName;
         }
 
-        $newRoom->available = true; // Kamar baru default tersedia
+        $newRoom->available = true; 
         $newRoom->save();
 
         return redirect()->route('pemilik.kamar', $id)->with('success', 'Data kamar berhasil diduplikasi menjadi: ' . $newRoom->room_name);
@@ -337,7 +407,7 @@ class PemilikKosController extends Controller
 
     public function kost(Request $request)
     {
-        $filter = $request->query('filter'); // null, 'tersedia', 'penuh'
+        $filter = $request->query('filter'); 
 
         $query = \App\Models\BoardingHouse::withCount([
             'rooms',
@@ -353,7 +423,6 @@ class PemilikKosController extends Controller
 
         $kosts = $query->get();
 
-        // Statistik Okupansi Keseluruhan (dari semua properti)
         $totalRooms = \App\Models\Room::whereHas('boardingHouse', function ($q) {
             $q->where('owner_id', auth()->id());
         })->count();
@@ -379,7 +448,6 @@ class PemilikKosController extends Controller
         $data['latitude'] = $request->latitude ?? 0.0;
         $data['longitude'] = $request->longitude ?? 0.0;
 
-        // Pengecekan defensif jika form dari browser cache masih mengirimkan bahasa Indonesia atau "on"
         $type = strtolower($request->boarding_house_type ?? '');
         if (in_array($type, ['putra', 'male'])) {
             $data['boarding_house_type'] = 'male';
@@ -389,7 +457,35 @@ class PemilikKosController extends Controller
             $data['boarding_house_type'] = 'mixed';
         }
 
-        \App\Models\BoardingHouse::create($data);
+        $kost = \App\Models\BoardingHouse::create($data);
+
+        // Upload files
+        $path = public_path('image/boarding_house_' . $kost->id);
+        if (!file_exists($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        if ($request->hasFile('main_image')) {
+            $file = $request->file('main_image');
+            $filename = 'foto_kost_utama_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $filename);
+            $kost->main_image = 'image/boarding_house_' . $kost->id . '/' . $filename;
+            $kost->save();
+        }
+
+        $otherImages = [];
+        for ($i = 1; $i <= 3; $i++) {
+            if ($request->hasFile("other_image_$i")) {
+                $file = $request->file("other_image_$i");
+                $filename = "foto_kost_tambahan_{$i}_" . time() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $filename);
+                $otherImages[$i-1] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+            } else {
+                $otherImages[$i-1] = null;
+            }
+        }
+        $kost->other_images = json_encode($otherImages);
+        $kost->save();
 
         return redirect()->route('pemilik.kost')->with('success', 'Data Properti Kost berhasil ditambahkan!');
     }
@@ -414,6 +510,42 @@ class PemilikKosController extends Controller
             $data['boarding_house_type'] = 'mixed';
         }
 
+        // Upload files
+        $path = public_path('image/boarding_house_' . $kost->id);
+        if (!file_exists($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        if ($request->hasFile('main_image')) {
+            if ($kost->main_image && file_exists(public_path($kost->main_image))) {
+                @unlink(public_path($kost->main_image));
+            }
+            $file = $request->file('main_image');
+            $filename = 'foto_kost_utama_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $filename);
+            $data['main_image'] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+        }
+
+        $oldImages = $kost->other_images ? json_decode($kost->other_images, true) : [];
+        $otherImages = [
+            $oldImages[0] ?? null,
+            $oldImages[1] ?? null,
+            $oldImages[2] ?? null,
+        ];
+
+        for ($i = 1; $i <= 3; $i++) {
+            if ($request->hasFile("other_image_$i")) {
+                if (!empty($otherImages[$i-1]) && file_exists(public_path($otherImages[$i-1]))) {
+                    @unlink(public_path($otherImages[$i-1]));
+                }
+                $file = $request->file("other_image_$i");
+                $filename = "foto_kost_tambahan_{$i}_" . time() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $filename);
+                $otherImages[$i-1] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+            }
+        }
+        $data['other_images'] = json_encode($otherImages);
+
         $kost->update($data);
         return redirect()->route('pemilik.kost')->with('success', 'Data Properti Kost berhasil diperbarui!');
     }
@@ -421,6 +553,12 @@ class PemilikKosController extends Controller
     public function hapusKost($id)
     {
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
+        
+        $path = public_path('image/boarding_house_' . $kost->id);
+        if (file_exists($path)) {
+            \Illuminate\Support\Facades\File::deleteDirectory($path);
+        }
+        
         $kost->delete();
         return redirect()->route('pemilik.kost')->with('success', 'Data Properti Kost berhasil dihapus!');
     }

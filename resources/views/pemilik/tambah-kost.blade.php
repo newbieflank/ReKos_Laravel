@@ -54,7 +54,7 @@
     <h3 class="fw-bold text-dark mb-1 mt-2">Tambah Properti Kost</h3>
     <p class="text-secondary small mb-4">Lengkapi detail properti Anda untuk mulai mengelola hunian dengan standar eksklusif The Curated Estate.</p>
 
-    <form action="{{ route('pemilik.kost.simpan') }}" method="POST">
+    <form action="{{ route('pemilik.kost.simpan') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="row g-4">
@@ -191,7 +191,56 @@
                 </div>
             </div>
         </div>
-
+        <div class="form-section-card">
+            <div class="section-title-wrap">
+                <div class="section-icon-box"><i class="fa-regular fa-image"></i></div>
+                <h5 class="fw-bold mb-0">Galeri Foto Kost</h5>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-12 col-md-6">
+                    <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                        <input type="file" name="main_image" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-1')">
+                        <div id="preview-1" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                            <div class="bg-white shadow-sm p-3 rounded-circle mb-3 text-primary"><i class="fa-solid fa-cloud-arrow-up fs-4"></i></div>
+                            <h6 class="fw-bold text-dark mb-1">Foto Utama Kost</h6>
+                            <p class="small text-muted mb-0">Wajib diisi</p>
+                        </div>
+                    </label>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                        <input type="file" name="other_image_1" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-2')">
+                        <div id="preview-2" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                            <i class="fa-solid fa-building mb-2 fs-3 text-secondary"></i>
+                            <h6 class="fw-bold text-dark mb-1">Foto Tampak Depan</h6>
+                            <p class="small text-muted mb-0">Opsional</p>
+                        </div>
+                    </label>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                        <input type="file" name="other_image_2" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-3')">
+                        <div id="preview-3" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                            <i class="fa-solid fa-couch mb-2 fs-3 text-secondary"></i>
+                            <h6 class="fw-bold text-dark mb-1">Foto Fasilitas Bersama</h6>
+                            <p class="small text-muted mb-0">Opsional</p>
+                        </div>
+                    </label>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                        <input type="file" name="other_image_3" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-4')">
+                        <div id="preview-4" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                            <i class="fa-solid fa-image mb-2 fs-3 text-secondary"></i>
+                            <h6 class="fw-bold text-dark mb-1">Foto Lainnya</h6>
+                            <p class="small text-muted mb-0">Opsional</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <p class="text-muted small mt-3"><i class="fa-solid fa-circle-info me-1"></i> Rekomendasi ukuran foto minimal 1280x720 pixel dalam format JPG atau PNG.</p>
+        </div>
 
         <div class="d-flex justify-content-end align-items-center gap-3 mt-2">
             <a href="{{ route('pemilik.kost') }}" class="btn-cancel">Batal</a>
@@ -203,6 +252,21 @@
 
 @push('scripts')
 <script>
+    function previewImage(input, previewId) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var container = document.getElementById(previewId);
+                container.innerHTML = '<img src="' + e.target.result + '" class="w-100 h-100 object-fit-cover rounded" alt="Preview">';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    function updateCount(input, textId) {
+        var count = input.files ? input.files.length : 0;
+        document.getElementById(textId).innerText = count + ' file dipilih';
+    }
+
     // Inisialisasi peta Leaflet (OpenStreetMap, gratis tanpa API key)
     const defaultLat = -7.9107;
     const defaultLng = 113.8204;

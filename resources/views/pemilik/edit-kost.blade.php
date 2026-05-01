@@ -219,7 +219,7 @@
         <h3 class="fw-bold text-dark mb-1 mt-2">Edit Properti Kost</h3>
         <p class="text-secondary small mb-4">Perbarui detail properti Anda.</p>
 
-        <form action="{{ route('pemilik.kost.update', $kost->id) }}" method="POST">
+        <form action="{{ route('pemilik.kost.update', $kost->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -392,6 +392,82 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="form-section-card mt-4">
+                <div class="section-title-wrap">
+                    <div class="section-icon-box"><i class="fa-regular fa-image"></i></div>
+                    <h5 class="fw-bold mb-0">Galeri Foto Kost</h5>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-12 col-md-6">
+                        <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                            <input type="file" name="main_image" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-1')">
+                            <div id="preview-1" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                @if($kost->main_image)
+                                    <img src="{{ asset($kost->main_image) }}" class="w-100 h-100 object-fit-cover rounded" alt="Main Image">
+                                @else
+                                    <div class="bg-white shadow-sm p-3 rounded-circle mb-3 text-primary"><i class="fa-solid fa-cloud-arrow-up fs-4"></i></div>
+                                    <h6 class="fw-bold text-dark mb-1">Foto Utama Kost</h6>
+                                    <p class="small text-muted mb-0">Klik untuk mengganti</p>
+                                @endif
+                            </div>
+                        </label>
+                    </div>
+
+                    @php 
+                        $otherImages = $kost->other_images ? json_decode($kost->other_images, true) : [];
+                        $img2 = isset($otherImages[0]) ? $otherImages[0] : null;
+                        $img3 = isset($otherImages[1]) ? $otherImages[1] : null;
+                        $img4 = isset($otherImages[2]) ? $otherImages[2] : null;
+                    @endphp
+
+                    <div class="col-12 col-md-6">
+                        <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                            <input type="file" name="other_image_1" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-2')">
+                            <div id="preview-2" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                @if($img2)
+                                    <img src="{{ asset($img2) }}" class="w-100 h-100 object-fit-cover rounded" alt="Foto Tampak Depan">
+                                @else
+                                    <i class="fa-solid fa-building mb-2 fs-3 text-secondary"></i>
+                                    <h6 class="fw-bold text-dark mb-1">Foto Tampak Depan</h6>
+                                    <p class="small text-muted mb-0">Klik untuk menambahkan</p>
+                                @endif
+                            </div>
+                        </label>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                            <input type="file" name="other_image_2" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-3')">
+                            <div id="preview-3" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                @if($img3)
+                                    <img src="{{ asset($img3) }}" class="w-100 h-100 object-fit-cover rounded" alt="Foto Fasilitas Bersama">
+                                @else
+                                    <i class="fa-solid fa-couch mb-2 fs-3 text-secondary"></i>
+                                    <h6 class="fw-bold text-dark mb-1">Foto Fasilitas Bersama</h6>
+                                    <p class="small text-muted mb-0">Klik untuk menambahkan</p>
+                                @endif
+                            </div>
+                        </label>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                            <input type="file" name="other_image_3" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-4')">
+                            <div id="preview-4" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                @if($img4)
+                                    <img src="{{ asset($img4) }}" class="w-100 h-100 object-fit-cover rounded" alt="Foto Lainnya">
+                                @else
+                                    <i class="fa-solid fa-image mb-2 fs-3 text-secondary"></i>
+                                    <h6 class="fw-bold text-dark mb-1">Foto Lainnya</h6>
+                                    <p class="small text-muted mb-0">Klik untuk menambahkan</p>
+                                @endif
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <p class="text-muted small mt-3"><i class="fa-solid fa-circle-info me-1"></i> Rekomendasi ukuran foto minimal 1280x720 pixel dalam format JPG atau PNG. Mengunggah foto baru akan menimpa foto lama jika diisi.</p>
+            </div>
 
 
             <div class="d-flex justify-content-end align-items-center gap-3 mt-2">
@@ -405,6 +481,21 @@
 
     @push('scripts')
         <script>
+            function previewImage(input, previewId) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var container = document.getElementById(previewId);
+                        container.innerHTML = '<img src="' + e.target.result + '" class="w-100 h-100 object-fit-cover rounded" alt="Preview">';
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+            function updateCount(input, textId) {
+                var count = input.files ? input.files.length : 0;
+                document.getElementById(textId).innerText = count + ' file dipilih';
+            }
+
             const defaultLat = {{ $kost->latitude }};
             const defaultLng = {{ $kost->longitude }};
 
