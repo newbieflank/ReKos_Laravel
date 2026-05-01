@@ -156,22 +156,29 @@
                     <div class="swiper-wrapper">
                         @foreach ($rooms as $room)
                             <div class="swiper-slide">
-                                <a href="{{ route('detail', $room->boardingHouse->id) }}" class="text-decoration-none">
+                                <a href="{{ route('detail', ['id' => $room->boardingHouse->id, 'room_id' => $room->id]) }}" class="text-decoration-none">
                                     <div class="card card-kost h-100 p-2 border-0 shadow-sm">
-                                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                                            class="card-img-top rounded-3" alt="Kamar">
+                                        @if($room->main_image)
+                                            <img src="{{ asset($room->main_image) }}" class="card-img-top rounded-3 object-fit-cover" style="height: 180px;" alt="Kamar">
+                                        @else
+                                            <div class="card-img-top rounded-3 d-flex align-items-center justify-content-center bg-light text-muted" style="height: 180px;">
+                                                <i class="fa-solid fa-bed fs-2"></i>
+                                            </div>
+                                        @endif
                                         <div class="card-body px-2 pb-1 pt-3 text-start">
                                             <div class="d-flex justify-content-between align-items-start mb-2">
                                                 <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
                                                 <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1"
                                                     style="font-size: 0.7rem;">{{ $room->room_type }}</span>
                                             </div>
-                                            <p class="text-muted small mb-1"><i
-                                                    class="fas fa-house text-secondary me-1"></i>
-                                                {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }}</p>
-                                            <p class="text-muted small mb-2"><i
-                                                    class="fas fa-map-marker-alt text-danger me-1"></i>
-                                                {{ Str::limit($room->boardingHouse->alamat, 25) }}</p>
+                                            <p class="text-muted small mb-1"><i class="fas fa-house text-secondary me-1"></i> {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }}</p>
+                                            @php
+                                                $alamat = $room->boardingHouse->alamat ?? '';
+                                                $alamatParts = explode(',', $alamat);
+                                                $area = count($alamatParts) > 1 ? trim($alamatParts[1]) : (str_word_count($alamat) > 0 ? strtok($alamat, " ") : 'Bondowoso');
+                                            @endphp
+                                            <p class="text-dark small mb-1 fw-medium"><i class="fas fa-map text-success me-1"></i> {{ Str::limit($area, 20) }}</p>
+                                            <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> {{ Str::limit($alamat, 25) }}</p>
 
                                             @if ($room->available)
                                                 <span
@@ -229,22 +236,29 @@
                     <div class="swiper-wrapper">
                         @foreach ($rooms as $room)
                             <div class="swiper-slide">
-                                <a href="{{ route('detail', $room->boardingHouse->id) }}" class="text-decoration-none">
+                                <a href="{{ route('detail', ['id' => $room->boardingHouse->id, 'room_id' => $room->id]) }}" class="text-decoration-none">
                                     <div class="card card-kost h-100 p-2 border shadow-sm">
-                                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                                            class="card-img-top rounded-3" alt="Kamar">
+                                        @if($room->main_image)
+                                            <img src="{{ asset($room->main_image) }}" class="card-img-top rounded-3 object-fit-cover" style="height: 180px;" alt="Kamar">
+                                        @else
+                                            <div class="card-img-top rounded-3 d-flex align-items-center justify-content-center bg-light text-muted" style="height: 180px;">
+                                                <i class="fa-solid fa-bed fs-2"></i>
+                                            </div>
+                                        @endif
                                         <div class="card-body px-2 pb-1 pt-3 text-start">
                                             <div class="d-flex justify-content-between align-items-start mb-2">
                                                 <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
                                                 <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1"
                                                     style="font-size: 0.7rem;">{{ $room->room_type }}</span>
                                             </div>
-                                            <p class="text-muted small mb-1"><i
-                                                    class="fas fa-house text-secondary me-1"></i>
-                                                {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }}</p>
-                                            <p class="text-muted small mb-2"><i
-                                                    class="fas fa-map-marker-alt text-danger me-1"></i>
-                                                {{ Str::limit($room->boardingHouse->alamat, 25) }}</p>
+                                            <p class="text-muted small mb-1"><i class="fas fa-house text-secondary me-1"></i> {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }}</p>
+                                            @php
+                                                $alamat = $room->boardingHouse->alamat ?? '';
+                                                $alamatParts = explode(',', $alamat);
+                                                $area = count($alamatParts) > 1 ? trim($alamatParts[1]) : (str_word_count($alamat) > 0 ? strtok($alamat, " ") : 'Bondowoso');
+                                            @endphp
+                                            <p class="text-dark small mb-1 fw-medium"><i class="fas fa-map text-success me-1"></i> {{ Str::limit($area, 20) }}</p>
+                                            <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> {{ Str::limit($alamat, 25) }}</p>
 
                                             @if ($room->available)
                                                 <span

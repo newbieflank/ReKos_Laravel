@@ -324,7 +324,7 @@
         </div>
 
         <form id="tambahKamarForm" action="{{ route('pemilik.kamar.update', ['id' => $kost->id, 'room_id' => $room->id]) }}"
-            method="POST">
+            method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -550,27 +550,74 @@
                     </div>
 
                     <div class="row g-4">
-                        <div class="col-12 col-md-8">
-                            <div class="upload-box upload-main">
-                                <div class="bg-white shadow-sm p-3 rounded-circle mb-3 text-primary"><i
-                                        class="fa-solid fa-cloud-arrow-up fs-4"></i></div>
-                                <h6 class="fw-bold text-dark mb-1">Unggah Foto Utama</h6>
-                                <p class="small text-muted">Seret gambar atau klik untuk memilih</p>
-                            </div>
+                        <div class="col-12 col-md-6">
+                            <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                                <input type="file" name="main_image" id="file_main" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-1')">
+                                <div id="preview-1" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                    @if($room->main_image)
+                                        <img src="{{ asset($room->main_image) }}" class="w-100 h-100 object-fit-cover rounded" alt="Main Image">
+                                    @else
+                                        <div class="bg-white shadow-sm p-3 rounded-circle mb-3 text-primary"><i class="fa-solid fa-cloud-arrow-up fs-4"></i></div>
+                                        <h6 class="fw-bold text-dark mb-1">Foto Utama Kamar</h6>
+                                        <p class="small text-muted mb-0">Klik untuk mengganti</p>
+                                    @endif
+                                </div>
+                            </label>
                         </div>
-                        <div class="col-12 col-md-4 d-flex flex-column gap-4">
-                            <div class="upload-box upload-small h-50">
-                                <i class="fa-solid fa-camera mb-2 fs-5"></i>
-                                <span class="small fw-bold">Tambah Detail</span>
-                            </div>
-                            <div class="upload-box upload-small h-50">
-                                <i class="fa-solid fa-camera mb-2 fs-5"></i>
-                                <span class="small fw-bold">Tambah Fasilitas</span>
-                            </div>
+                        
+                        @php 
+                            $otherImages = $room->other_images ? json_decode($room->other_images, true) : [];
+                            $img2 = isset($otherImages[0]) ? $otherImages[0] : null;
+                            $img3 = isset($otherImages[1]) ? $otherImages[1] : null;
+                            $img4 = isset($otherImages[2]) ? $otherImages[2] : null;
+                        @endphp
+
+                        <div class="col-12 col-md-6">
+                            <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                                <input type="file" name="other_image_1" id="file_other_1" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-2')">
+                                <div id="preview-2" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                    @if($img2)
+                                        <img src="{{ asset($img2) }}" class="w-100 h-100 object-fit-cover rounded" alt="Foto Kamar Mandi">
+                                    @else
+                                        <i class="fa-solid fa-bath mb-2 fs-3 text-secondary"></i>
+                                        <h6 class="fw-bold text-dark mb-1">Foto Kamar Mandi</h6>
+                                        <p class="small text-muted mb-0">Klik untuk menambahkan</p>
+                                    @endif
+                                </div>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                                <input type="file" name="other_image_2" id="file_other_2" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-3')">
+                                <div id="preview-3" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                    @if($img3)
+                                        <img src="{{ asset($img3) }}" class="w-100 h-100 object-fit-cover rounded" alt="Foto Fasilitas">
+                                    @else
+                                        <i class="fa-solid fa-couch mb-2 fs-3 text-secondary"></i>
+                                        <h6 class="fw-bold text-dark mb-1">Foto Fasilitas</h6>
+                                        <p class="small text-muted mb-0">Klik untuk menambahkan</p>
+                                    @endif
+                                </div>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                                <input type="file" name="other_image_3" id="file_other_3" class="d-none" accept="image/*" onchange="previewImage(this, 'preview-4')">
+                                <div id="preview-4" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
+                                    @if($img4)
+                                        <img src="{{ asset($img4) }}" class="w-100 h-100 object-fit-cover rounded" alt="Foto Lainnya">
+                                    @else
+                                        <i class="fa-solid fa-image mb-2 fs-3 text-secondary"></i>
+                                        <h6 class="fw-bold text-dark mb-1">Foto Lainnya</h6>
+                                        <p class="small text-muted mb-0">Klik untuk menambahkan</p>
+                                    @endif
+                                </div>
+                            </label>
                         </div>
                     </div>
+                    
                     <p class="text-muted small mt-3"><i class="fa-regular fa-circle-info me-1"></i> Rekomendasi ukuran
-                        foto minimal 1280x720 pixel dalam format JPG atau PNG.</p>
+                        foto minimal 1280x720 pixel dalam format JPG atau PNG. Mengunggah foto baru akan menimpa foto lama jika diisi.</p>
 
                     <div class="d-flex justify-content-end align-items-center mt-5 gap-3">
                         <button type="button" class="btn-outline-custom bg-light rounded-3 px-4"
@@ -628,29 +675,10 @@
                                         style="width:32px; height:32px;"><i class="fa-regular fa-image"></i></div>
                                     <h5 class="fw-bold mb-0 text-dark">Galeri Foto</h5>
                                 </div>
-                                <span class="badge bg-primary bg-opacity-10 text-primary">4 File Diunggah</span>
+                                <span class="badge bg-primary bg-opacity-10 text-primary" id="summary_images_count">0 File Diunggah</span>
                             </div>
-                            <div class="row g-2">
-                                <div class="col-3">
-                                    <div class="bg-light rounded-3"
-                                        style="height: 60px; background-image: url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200&q=80'); background-size: cover; background-position: center;">
-                                    </div>
-                                </div>
-                                <div class="col-3">
-                                    <div class="bg-light rounded-3"
-                                        style="height: 60px; background-image: url('https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=200&q=80'); background-size: cover; background-position: center;">
-                                    </div>
-                                </div>
-                                <div class="col-3">
-                                    <div class="bg-light rounded-3"
-                                        style="height: 60px; background-image: url('https://images.unsplash.com/photo-1560448204-603b3fc33ddc?w=200&q=80'); background-size: cover; background-position: center;">
-                                    </div>
-                                </div>
-                                <div class="col-3">
-                                    <div class="bg-light rounded-3"
-                                        style="height: 60px; background-image: url('https://images.unsplash.com/photo-1540518614846-7eded433c457?w=200&q=80'); background-size: cover; background-position: center;">
-                                    </div>
-                                </div>
+                            <div class="row g-2" id="summary_images_container">
+                                <!-- Previews will be injected here via JS -->
                             </div>
                         </div>
                     </div>
@@ -712,6 +740,21 @@
 
     @push('scripts')
         <script>
+            function previewImage(input, previewId) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var container = document.getElementById(previewId);
+                        container.innerHTML = '<img src="' + e.target.result + '" class="w-100 h-100 object-fit-cover rounded" alt="Preview">';
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+            function updateCount(input, textId) {
+                var count = input.files ? input.files.length : 0;
+                document.getElementById(textId).innerText = count + ' file dipilih';
+            }
+
             function formatRupiah(number) {
                 if (!number) return "Rp 0";
                 return new Intl.NumberFormat('id-ID', {
@@ -758,6 +801,42 @@
                                 `<span class="badge-facility"><i class="fa-solid fa-check text-primary"></i> ${cb.value}</span>`;
                         });
                     }
+
+                    const imagesContainer = document.getElementById('summary_images_container');
+                    imagesContainer.innerHTML = '';
+                    let fileCount = 0;
+                    ['file_main', 'file_other_1', 'file_other_2', 'file_other_3'].forEach(id => {
+                        const input = document.getElementById(id);
+                        if (input && input.files && input.files[0]) {
+                            fileCount++;
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                imagesContainer.innerHTML += `
+                                    <div class="col-3">
+                                        <div class="bg-light rounded-3"
+                                            style="height: 60px; background-image: url('${e.target.result}'); background-size: cover; background-position: center;">
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                            reader.readAsDataURL(input.files[0]);
+                        } else {
+                            // Cek jika ada preview lama dari database
+                            const previewContainer = document.getElementById('preview-' + id.replace('file_main', '1').replace('file_other_1', '2').replace('file_other_2', '3').replace('file_other_3', '4'));
+                            const img = previewContainer.querySelector('img');
+                            if(img) {
+                                fileCount++;
+                                imagesContainer.innerHTML += `
+                                    <div class="col-3">
+                                        <div class="bg-light rounded-3"
+                                            style="height: 60px; background-image: url('${img.src}'); background-size: cover; background-position: center;">
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        }
+                    });
+                    document.getElementById('summary_images_count').innerText = fileCount + ' File';
                 }
 
                 for (let i = 1; i <= 5; i++) {
