@@ -5,13 +5,12 @@
 @section('content')
     <div class="mb-4">
         <h3 class="text-primary fw-bold mb-1">Dashboard</h3>
-        <p class="text-secondary small">Selamat datang kembali, Pemilik. Berikut status kost Anda hari ini.</p>
     </div>
 
     <div class="row g-4 mb-4">
         <div class="col-12 col-md-4">
             <div class="card card-custom p-4 h-100">
-                <p class="text-muted small fw-bold mb-2">TOTAL PENDAPATAN (1 THN)</p>
+                <p class="text-muted small fw-bold mb-2">TOTAL PENDAPATAN (1 Tahun)</p>
                 <h2 class="text-primary fw-bold mb-3">Rp {{ number_format($totalIncome, 0, ',', '.') }}</h2>
                 <i class="fa-solid fa-money-bill-wave card-bg-icon text-primary"></i>
             </div>
@@ -19,7 +18,7 @@
 
         <div class="col-12 col-md-4">
             <div class="card card-custom p-4 h-100">
-                <p class="text-muted small fw-bold mb-2">TOTAL PENGELUARAN (1 THN)</p>
+                <p class="text-muted small fw-bold mb-2">TOTAL PENGELUARAN (1 Tahun)</p>
                 <h2 class="text-dark fw-bold mb-3">Rp {{ number_format($totalExpense, 0, ',', '.') }}</h2>
                 <i class="fa-solid fa-credit-card card-bg-icon text-secondary"></i>
             </div>
@@ -29,7 +28,7 @@
             <div class="card card-custom p-4 h-100 text-white" style="background-color: #4a85f6;">
                 <p class="small fw-bold mb-2 text-white-50">GUEST RATING</p>
                 <div class="d-flex align-items-end gap-2 mb-2">
-                    @if($totalReviews == 0)
+                    @if ($totalReviews == 0)
                         <h2 class="fw-bold mb-0">0 / 0</h2>
                         <span class="mb-1 text-white-50">Rate</span>
                     @else
@@ -41,8 +40,8 @@
                     @php
                         $ratingInt = round($avgRating);
                     @endphp
-                    @for($i = 1; $i <= 5; $i++)
-                        @if($i <= $ratingInt)
+                    @for ($i = 1; $i <= 5; $i++)
+                        @if ($i <= $ratingInt)
                             <i class="fa-solid fa-star"></i>
                         @else
                             <i class="fa-regular fa-star"></i>
@@ -59,12 +58,13 @@
             <div class="card card-custom p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h5 class="fw-bold mb-1">Statistik Keuangan</h5>
-                        <p class="text-muted small mb-0">Annual performance overview of revenue and expenses.</p>
+                        <h5 class="fw-bold mb-1">Grafik Keuangan</h5>
                     </div>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-light border btn-sm text-muted">{{ $currentYear - 1 }}</button>
-                        <button type="button" class="btn btn-primary btn-sm">{{ $currentYear }}</button>
+                        @foreach ($availableYears as $year)
+                            <a href="{{ route('pemilik.dashboard', ['year' => $year]) }}"
+                                class="btn {{ $year == $currentYear ? 'btn-primary' : 'btn-light border text-muted' }} btn-sm">{{ $year }}</a>
+                        @endforeach
                     </div>
                 </div>
 
