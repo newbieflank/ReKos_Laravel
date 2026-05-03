@@ -438,7 +438,7 @@
 
                 <div class="row g-4">
                     <div class="col-12 col-md-6">
-                        <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                        <label class="upload-box upload-small w-100 position-relative" style="min-height: 200px; cursor: pointer;">
                             <input type="file" name="main_image" class="d-none" accept="image/*"
                                 onchange="previewImage(this, 'preview-1')">
                             <div id="preview-1"
@@ -446,6 +446,7 @@
                                 @if ($kost->main_image)
                                     <img src="{{ asset($kost->main_image) }}"
                                         class="w-100 h-100 object-fit-cover rounded" alt="Main Image">
+                                    <button type="button" class="btn btn-sm btn-danger position-absolute rounded-circle p-0 d-flex align-items-center justify-content-center" style="width:24px;height:24px;top:10px;right:10px;z-index:10;" onclick="event.preventDefault(); event.stopPropagation(); removeSingleImg(this, 'preview-1')"><i class="fa-solid fa-times" style="font-size:12px;"></i></button>
                                 @else
                                     <div class="bg-white shadow-sm p-3 rounded-circle mb-3 text-primary"><i
                                             class="fa-solid fa-cloud-arrow-up fs-4"></i></div>
@@ -464,7 +465,7 @@
                     @endphp
 
                     <div class="col-12 col-md-6">
-                        <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                        <label class="upload-box upload-small w-100 position-relative" style="min-height: 200px; cursor: pointer;">
                             <input type="file" name="other_image_1" class="d-none" accept="image/*"
                                 onchange="previewImage(this, 'preview-2')">
                             <div id="preview-2"
@@ -472,6 +473,7 @@
                                 @if ($img2)
                                     <img src="{{ asset($img2) }}" class="w-100 h-100 object-fit-cover rounded"
                                         alt="Foto Tampak Depan">
+                                    <button type="button" class="btn btn-sm btn-danger position-absolute rounded-circle p-0 d-flex align-items-center justify-content-center" style="width:24px;height:24px;top:10px;right:10px;z-index:10;" onclick="event.preventDefault(); event.stopPropagation(); removeSingleImg(this, 'preview-2')"><i class="fa-solid fa-times" style="font-size:12px;"></i></button>
                                 @else
                                     <i class="fa-solid fa-building mb-2 fs-3 text-secondary"></i>
                                     <h6 class="fw-bold text-dark mb-1">Foto Tampak Depan</h6>
@@ -481,14 +483,21 @@
                         </label>
                     </div>
                     <div class="col-12 col-md-6">
-                        <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
-                            <input type="file" name="other_image_2" class="d-none" accept="image/*"
-                                onchange="previewImage(this, 'preview-3')">
+                        <label class="upload-box upload-small w-100 position-relative" style="min-height: 200px; cursor: pointer;">
+                            <input type="file" name="other_image_2[]" id="file_other_2" multiple class="d-none" accept="image/*"
+                                onchange="appendImages(this, 'preview-3', 'file_other_2')">
                             <div id="preview-3"
                                 class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
                                 @if ($img3)
-                                    <img src="{{ asset($img3) }}" class="w-100 h-100 object-fit-cover rounded"
-                                        alt="Foto Fasilitas Bersama">
+                                    @php $preview3 = is_array($img3) ? (count($img3) > 0 ? $img3[0] : null) : $img3; @endphp
+                                    @if ($preview3)
+                                        <img src="{{ asset($preview3) }}" class="w-100 h-100 object-fit-cover rounded"
+                                            alt="Foto Fasilitas Bersama">
+                                    @else
+                                        <i class="fa-solid fa-couch mb-2 fs-3 text-secondary"></i>
+                                        <h6 class="fw-bold text-dark mb-1">Foto Fasilitas Bersama</h6>
+                                        <span class="text-muted" style="font-size: 0.75rem;">Maks 2MB</span>
+                                    @endif
                                 @else
                                     <i class="fa-solid fa-couch mb-2 fs-3 text-secondary"></i>
                                     <h6 class="fw-bold text-dark mb-1">Foto Fasilitas Bersama</h6>
@@ -498,9 +507,9 @@
                         </label>
                     </div>
                     <div class="col-12 col-md-6">
-                        <label class="upload-box upload-small w-100" style="min-height: 200px; cursor: pointer;">
+                        <label class="upload-box upload-small w-100 position-relative" style="min-height: 200px; cursor: pointer;">
                             <input type="file" name="other_image_3[]" id="file_other_3" multiple class="d-none"
-                                accept="image/*" onchange="appendImages(this, 'preview-4')">
+                                accept="image/*" onchange="appendImages(this, 'preview-4', 'file_other_3')">
                             <div id="preview-4"
                                 class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-3 text-center">
                                 @if ($img4)
@@ -546,40 +555,80 @@
                     reader.onload = function(e) {
                         var container = document.getElementById(previewId);
                         container.innerHTML = '<img src="' + e.target.result +
-                            '" class="w-100 h-100 object-fit-cover rounded" alt="Preview">';
+                            '" class="w-100 h-100 object-fit-cover rounded" alt="Preview">' +
+                            '<button type="button" class="btn btn-sm btn-danger position-absolute rounded-circle p-0 d-flex align-items-center justify-content-center" style="width:24px;height:24px;top:10px;right:10px;z-index:10;" onclick="event.preventDefault(); event.stopPropagation(); removeSingleImg(this, \'' + previewId + '\')"><i class="fa-solid fa-times" style="font-size:12px;"></i></button>';
                     }
                     reader.readAsDataURL(input.files[0]);
                 }
             }
 
-            var dtOther3 = new DataTransfer();
+            function removeSingleImg(btn, previewId) {
+                let container = document.getElementById(previewId);
+                let input = container.parentElement.querySelector('input[type="file"]');
+                input.value = '';
+                
+                let defaultHtml = '';
+                if(previewId === 'preview-1') {
+                    defaultHtml = '<div class="bg-white shadow-sm p-3 rounded-circle mb-3 text-primary"><i class="fa-solid fa-cloud-arrow-up fs-4"></i></div><h6 class="fw-bold text-dark mb-1">Foto Utama Kost</h6><p class="small text-muted mb-0">Klik untuk mengganti</p>';
+                    // If we have an existing image input field (which acts like a flag) we might need to handle it.
+                    // Here we will just add a hidden input to signify removal if needed.
+                    if(!document.getElementById('remove_main_image')) {
+                        container.insertAdjacentHTML('beforeend', '<input type="hidden" name="remove_main_image" id="remove_main_image" value="1">');
+                    }
+                } else if(previewId === 'preview-2') {
+                    defaultHtml = '<i class="fa-solid fa-building mb-2 fs-3 text-secondary"></i><h6 class="fw-bold text-dark mb-1">Foto Tampak Depan</h6><p class="small text-muted mb-0">Klik untuk menambahkan</p>';
+                    if(!document.getElementById('remove_other_image_1')) {
+                        container.insertAdjacentHTML('beforeend', '<input type="hidden" name="remove_other_image_1" id="remove_other_image_1" value="1">');
+                    }
+                } else if(previewId === 'preview-3') {
+                    defaultHtml = '<i class="fa-solid fa-couch mb-2 fs-3 text-secondary"></i><h6 class="fw-bold text-dark mb-1">Foto Fasilitas Bersama</h6><p class="small text-muted mb-0">Klik untuk menambahkan</p>';
+                    if(!document.getElementById('remove_other_image_2')) {
+                        container.insertAdjacentHTML('beforeend', '<input type="hidden" name="remove_other_image_2" id="remove_other_image_2" value="1">');
+                    }
+                }
+                container.innerHTML = defaultHtml;
+            }
 
-            function appendImages(input, previewId) {
+            var dataTransfers = {
+                'preview-3': new DataTransfer(),
+                'preview-4': new DataTransfer()
+            };
+
+            function appendImages(input, previewId, inputId) {
                 if (input.files && input.files.length > 0) {
                     for (let i = 0; i < input.files.length; i++) {
-                        dtOther3.items.add(input.files[i]);
+                        dataTransfers[previewId].items.add(input.files[i]);
                     }
-                    input.files = dtOther3.files;
-                    renderMiniPreviews(previewId);
+                    input.files = dataTransfers[previewId].files;
+                    renderMiniPreviews(previewId, inputId);
                 }
             }
 
-            function renderMiniPreviews(previewId) {
+            function renderMiniPreviews(previewId, inputId) {
                 var container = document.getElementById(previewId);
+                var dt = dataTransfers[previewId];
                 container.innerHTML = '';
                 container.classList.remove('flex-column', 'align-items-center', 'justify-content-center');
                 container.classList.add('flex-row', 'flex-wrap', 'gap-2', 'p-2', 'align-items-start', 'overflow-y-auto');
 
-                if (dtOther3.files.length === 0) {
+                if (dt.files.length === 0) {
                     container.classList.add('flex-column', 'align-items-center', 'justify-content-center');
                     container.classList.remove('flex-row', 'flex-wrap', 'gap-2', 'p-2', 'align-items-start', 'overflow-y-auto');
-                    container.innerHTML =
-                        '<i class="fa-solid fa-image mb-2 fs-3 text-secondary"></i><h6 class="fw-bold text-dark mb-1">Foto Lainnya</h6><p class="small text-muted mb-0">Klik untuk tambah</p>';
+                    let defHtml = '';
+                    if(previewId === 'preview-3') {
+                        defHtml = '<i class="fa-solid fa-couch mb-2 fs-3 text-secondary"></i><h6 class="fw-bold text-dark mb-1">Foto Fasilitas Bersama</h6><p class="small text-muted mb-0">Klik untuk menambahkan</p>';
+                        if(!document.getElementById('remove_other_image_2')) {
+                            defHtml += '<input type="hidden" name="remove_other_image_2" id="remove_other_image_2" value="1">';
+                        }
+                    } else if(previewId === 'preview-4') {
+                        defHtml = '<i class="fa-solid fa-image mb-2 fs-3 text-secondary"></i><h6 class="fw-bold text-dark mb-1">Foto Lainnya</h6><p class="small text-muted mb-0">Klik untuk menambahkan</p>';
+                    }
+                    container.innerHTML = defHtml;
                     return;
                 }
 
-                for (let i = 0; i < dtOther3.files.length; i++) {
-                    let file = dtOther3.files[i];
+                for (let i = 0; i < dt.files.length; i++) {
+                    let file = dt.files[i];
                     let reader = new FileReader();
                     reader.onload = function(e) {
                         let div = document.createElement('div');
@@ -588,8 +637,8 @@
                         div.className = 'position-relative';
                         div.innerHTML = '<img src="' + e.target.result +
                             '" class="w-100 h-100 object-fit-cover rounded border">' +
-                            '<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle p-0 d-flex align-items-center justify-content-center" style="width:18px;height:18px;transform:translate(30%, -30%);" onclick="event.preventDefault(); event.stopPropagation(); removeImg(' +
-                            i + ', \'' + previewId +
+                            '<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle p-0 d-flex align-items-center justify-content-center" style="width:18px;height:18px;transform:translate(30%, -30%); z-index:10;" onclick="event.preventDefault(); event.stopPropagation(); removeImg(' +
+                            i + ', \'' + previewId + '\', \'' + inputId +
                             '\')"><i class="fa-solid fa-times" style="font-size:9px;"></i></button>';
                         container.appendChild(div);
                     }
@@ -603,16 +652,21 @@
                     'd-flex flex-column align-items-center justify-content-center rounded border border-dashed text-primary bg-light';
                 addBtn.innerHTML = '<i class="fa-solid fa-plus mb-1"></i><span style="font-size:0.6rem;">Tambah</span>';
                 container.appendChild(addBtn);
+                
+                if(previewId === 'preview-3' && !document.getElementById('remove_other_image_2')) {
+                    container.insertAdjacentHTML('beforeend', '<input type="hidden" name="remove_other_image_2" id="remove_other_image_2" value="1">');
+                }
             }
 
-            function removeImg(index, previewId) {
+            function removeImg(index, previewId, inputId) {
                 var dtNew = new DataTransfer();
-                for (let i = 0; i < dtOther3.files.length; i++) {
-                    if (i !== index) dtNew.items.add(dtOther3.files[i]);
+                var dt = dataTransfers[previewId];
+                for (let i = 0; i < dt.files.length; i++) {
+                    if (i !== index) dtNew.items.add(dt.files[i]);
                 }
-                dtOther3 = dtNew;
-                document.getElementById('file_other_3').files = dtOther3.files;
-                renderMiniPreviews(previewId);
+                dataTransfers[previewId] = dtNew;
+                document.getElementById(inputId).files = dataTransfers[previewId].files;
+                renderMiniPreviews(previewId, inputId);
             }
 
             function updateCount(input, textId) {

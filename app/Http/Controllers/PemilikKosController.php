@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class PemilikKosController extends Controller
 {
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         $ownerId = auth()->id();
 
@@ -20,7 +20,23 @@ class PemilikKosController extends Controller
         $chartIncome = [];
         $chartExpense = [];
 
-        $currentYear = date('Y');
+        $availableYears = Tenant::whereIn('room_id', $roomIds)
+            ->whereNotNull('start_date')
+            ->selectRaw('YEAR(start_date) as year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->toArray();
+            
+        if (empty($availableYears)) {
+            $availableYears = [date('Y')];
+        }
+        
+        // Ensure max 2 years are shown
+        $availableYears = array_slice($availableYears, 0, 2);
+        sort($availableYears);
+
+        $currentYear = $request->query('year', date('Y'));
         for ($month = 1; $month <= 12; $month++) {
             $startOfMonth = \Carbon\Carbon::create($currentYear, $month, 1)->startOfMonth();
             $endOfMonth = \Carbon\Carbon::create($currentYear, $month, 1)->endOfMonth();
@@ -71,6 +87,7 @@ class PemilikKosController extends Controller
             'totalIncome',
             'totalExpense',
             'currentYear',
+            'availableYears',
             'avgRating',
             'totalReviews',
             'totalRooms',
@@ -98,6 +115,7 @@ class PemilikKosController extends Controller
     {
         $ownerId = auth()->id();
         $statusFilter = $request->query('status');
+        $search = $request->query('search');
 
         $roomIds = Room::whereHas('boardingHouse', function ($q) use ($ownerId) {
             $q->where('owner_id', $ownerId);
@@ -109,6 +127,15 @@ class PemilikKosController extends Controller
             }])
             ->latest();
 
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->whereHas('user', function($q2) use ($search) {
+                    $q2->where('name', 'LIKE', '%' . $search . '%');
+                })->orWhereHas('room', function($q3) use ($search) {
+                    $q3->where('room_name', 'LIKE', '%' . $search . '%');
+                });
+            });
+        }
 
         if ($statusFilter && in_array($statusFilter, ['active', 'pending', 'complete', 'cancelled'])) {
             $query->where('status', $statusFilter);
@@ -116,7 +143,7 @@ class PemilikKosController extends Controller
 
         $tenants = $query->paginate(15)->withQueryString();
 
-        return view('pemilik.penyewa', compact('tenants', 'statusFilter'));
+        return view('pemilik.penyewa', compact('tenants', 'statusFilter', 'search'));
     }
 
     public function tambahPenyewa(Request $request)
@@ -276,15 +303,25 @@ class PemilikKosController extends Controller
         }
 
         $otherImages = [];
-        for ($i = 1; $i <= 2; $i++) {
-            if ($request->hasFile("other_image_$i")) {
-                $file = $request->file("other_image_$i");
-                $filename = "foto_kamar_tambahan_{$i}_" . time() . '.' . $file->getClientOriginalExtension();
+        if ($request->hasFile("other_image_1")) {
+            $file = $request->file("other_image_1");
+            $filename = "foto_kamar_tambahan_1_" . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $filename);
+            $otherImages[0] = 'image/boarding_house_' . $id . '/' . $filename;
+        } else {
+            $otherImages[0] = null;
+        }
+
+        if ($request->hasFile("other_image_2")) {
+            $other2Paths = [];
+            foreach ($request->file('other_image_2') as $idx => $file) {
+                $filename = "foto_kamar_tambahan_2_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
                 $file->move($path, $filename);
-                $otherImages[$i-1] = 'image/boarding_house_' . $id . '/' . $filename;
-            } else {
-                $otherImages[$i-1] = null;
+                $other2Paths[] = 'image/boarding_house_' . $id . '/' . $filename;
             }
+            $otherImages[1] = $other2Paths;
+        } else {
+            $otherImages[1] = null;
         }
         
         if ($request->hasFile("other_image_3")) {
@@ -329,6 +366,13 @@ class PemilikKosController extends Controller
             mkdir($path, 0777, true);
         }
 
+        if ($request->has('remove_main_image')) {
+            if ($room->main_image && file_exists(public_path($room->main_image))) {
+                @unlink(public_path($room->main_image));
+            }
+            $data['main_image'] = null;
+        }
+
         if ($request->hasFile('main_image')) {
             if ($room->main_image && file_exists(public_path($room->main_image))) {
                 @unlink(public_path($room->main_image));
@@ -346,16 +390,53 @@ class PemilikKosController extends Controller
             $oldImages[2] ?? null,
         ];
 
-        for ($i = 1; $i <= 2; $i++) {
-            if ($request->hasFile("other_image_$i")) {
-                if (!empty($otherImages[$i-1]) && is_string($otherImages[$i-1]) && file_exists(public_path($otherImages[$i-1]))) {
-                    @unlink(public_path($otherImages[$i-1]));
-                }
-                $file = $request->file("other_image_$i");
-                $filename = "foto_kamar_tambahan_{$i}_" . time() . '.' . $file->getClientOriginalExtension();
-                $file->move($path, $filename);
-                $otherImages[$i-1] = 'image/boarding_house_' . $boardingHouseId . '/' . $filename;
+        if ($request->has("remove_other_image_1")) {
+            if (!empty($otherImages[0]) && is_string($otherImages[0]) && file_exists(public_path($otherImages[0]))) {
+                @unlink(public_path($otherImages[0]));
             }
+            $otherImages[0] = null;
+        }
+
+        if ($request->hasFile("other_image_1")) {
+            if (!empty($otherImages[0]) && is_string($otherImages[0]) && file_exists(public_path($otherImages[0]))) {
+                @unlink(public_path($otherImages[0]));
+            }
+            $file = $request->file("other_image_1");
+            $filename = "foto_kamar_tambahan_1_" . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $filename);
+            $otherImages[0] = 'image/boarding_house_' . $boardingHouseId . '/' . $filename;
+        }
+
+        if ($request->has("remove_other_image_2")) {
+            if (!empty($otherImages[1])) {
+                if (is_array($otherImages[1])) {
+                    foreach ($otherImages[1] as $oldImg) {
+                        if (file_exists(public_path($oldImg))) @unlink(public_path($oldImg));
+                    }
+                } else {
+                    if (file_exists(public_path($otherImages[1]))) @unlink(public_path($otherImages[1]));
+                }
+            }
+            $otherImages[1] = null;
+        }
+        
+        if ($request->hasFile("other_image_2")) {
+            if (!empty($otherImages[1])) {
+                if (is_array($otherImages[1])) {
+                    foreach ($otherImages[1] as $oldImg) {
+                        if (file_exists(public_path($oldImg))) @unlink(public_path($oldImg));
+                    }
+                } else {
+                    if (file_exists(public_path($otherImages[1]))) @unlink(public_path($otherImages[1]));
+                }
+            }
+            $other2Paths = [];
+            foreach ($request->file('other_image_2') as $idx => $file) {
+                $filename = "foto_kamar_tambahan_2_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $filename);
+                $other2Paths[] = 'image/boarding_house_' . $boardingHouseId . '/' . $filename;
+            }
+            $otherImages[1] = $other2Paths;
         }
         
         if ($request->hasFile("other_image_3")) {
@@ -505,15 +586,25 @@ class PemilikKosController extends Controller
         }
 
         $otherImages = [];
-        for ($i = 1; $i <= 2; $i++) {
-            if ($request->hasFile("other_image_$i")) {
-                $file = $request->file("other_image_$i");
-                $filename = "foto_kost_tambahan_{$i}_" . time() . '.' . $file->getClientOriginalExtension();
+        if ($request->hasFile("other_image_1")) {
+            $file = $request->file("other_image_1");
+            $filename = "foto_kost_tambahan_1_" . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $filename);
+            $otherImages[0] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+        } else {
+            $otherImages[0] = null;
+        }
+
+        if ($request->hasFile("other_image_2")) {
+            $other2Paths = [];
+            foreach ($request->file('other_image_2') as $idx => $file) {
+                $filename = "foto_kost_tambahan_2_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
                 $file->move($path, $filename);
-                $otherImages[$i-1] = 'image/boarding_house_' . $kost->id . '/' . $filename;
-            } else {
-                $otherImages[$i-1] = null;
+                $other2Paths[] = 'image/boarding_house_' . $kost->id . '/' . $filename;
             }
+            $otherImages[1] = $other2Paths;
+        } else {
+            $otherImages[1] = null;
         }
         
         if ($request->hasFile("other_image_3")) {
@@ -559,6 +650,13 @@ class PemilikKosController extends Controller
             mkdir($path, 0777, true);
         }
 
+        if ($request->has('remove_main_image')) {
+            if ($kost->main_image && file_exists(public_path($kost->main_image))) {
+                @unlink(public_path($kost->main_image));
+            }
+            $data['main_image'] = null;
+        }
+
         if ($request->hasFile('main_image')) {
             if ($kost->main_image && file_exists(public_path($kost->main_image))) {
                 @unlink(public_path($kost->main_image));
@@ -576,16 +674,53 @@ class PemilikKosController extends Controller
             $oldImages[2] ?? null,
         ];
 
-        for ($i = 1; $i <= 2; $i++) {
-            if ($request->hasFile("other_image_$i")) {
-                if (!empty($otherImages[$i-1]) && is_string($otherImages[$i-1]) && file_exists(public_path($otherImages[$i-1]))) {
-                    @unlink(public_path($otherImages[$i-1]));
-                }
-                $file = $request->file("other_image_$i");
-                $filename = "foto_kost_tambahan_{$i}_" . time() . '.' . $file->getClientOriginalExtension();
-                $file->move($path, $filename);
-                $otherImages[$i-1] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+        if ($request->has("remove_other_image_1")) {
+            if (!empty($otherImages[0]) && is_string($otherImages[0]) && file_exists(public_path($otherImages[0]))) {
+                @unlink(public_path($otherImages[0]));
             }
+            $otherImages[0] = null;
+        }
+
+        if ($request->hasFile("other_image_1")) {
+            if (!empty($otherImages[0]) && is_string($otherImages[0]) && file_exists(public_path($otherImages[0]))) {
+                @unlink(public_path($otherImages[0]));
+            }
+            $file = $request->file("other_image_1");
+            $filename = "foto_kost_tambahan_1_" . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $filename);
+            $otherImages[0] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+        }
+
+        if ($request->has("remove_other_image_2")) {
+            if (!empty($otherImages[1])) {
+                if (is_array($otherImages[1])) {
+                    foreach ($otherImages[1] as $oldImg) {
+                        if (file_exists(public_path($oldImg))) @unlink(public_path($oldImg));
+                    }
+                } else {
+                    if (file_exists(public_path($otherImages[1]))) @unlink(public_path($otherImages[1]));
+                }
+            }
+            $otherImages[1] = null;
+        }
+        
+        if ($request->hasFile("other_image_2")) {
+            if (!empty($otherImages[1])) {
+                if (is_array($otherImages[1])) {
+                    foreach ($otherImages[1] as $oldImg) {
+                        if (file_exists(public_path($oldImg))) @unlink(public_path($oldImg));
+                    }
+                } else {
+                    if (file_exists(public_path($otherImages[1]))) @unlink(public_path($otherImages[1]));
+                }
+            }
+            $other2Paths = [];
+            foreach ($request->file('other_image_2') as $idx => $file) {
+                $filename = "foto_kost_tambahan_2_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $filename);
+                $other2Paths[] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+            }
+            $otherImages[1] = $other2Paths;
         }
         
         if ($request->hasFile("other_image_3")) {
@@ -634,7 +769,6 @@ class PemilikKosController extends Controller
             'expense_date' => 'required|date'
         ]);
 
-        // Pastikan kamar tersebut milik user yang login
         $room = \App\Models\Room::whereHas('boardingHouse', function ($q) {
             $q->where('owner_id', auth()->id());
         })->findOrFail($request->room_id);

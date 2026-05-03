@@ -273,7 +273,7 @@
     </style>
 
     <div class="container-fluid-custom">
-        <a href="{{ route('pemilik.kost') }}" class="btn btn-light border btn-sm mb-3 text-muted"><i
+        <a href="{{ route('pemilik.kost') }}" class="btn btn-primary btn-sm mb-3 text-white"><i
                 class="fa-solid fa-arrow-left me-1"></i> Kembali ke Daftar Kost</a>
         <div class="mb-4">
             <h3 class="text-dark fw-bold mb-1">Daftar Kamar - {{ $kost->boarding_house_name }}</h3>
@@ -345,11 +345,7 @@
                             <span class="status-dot {{ $room->available ? 'tersedia' : 'terisi' }}"
                                 title="{{ $room->available ? 'Tersedia' : 'Terisi' }}"></span>
                             <div class="d-flex gap-2">
-                                @if ($room->available)
-                                    <a href="{{ route('pemilik.penyewa.tambah', ['room_id' => $room->id]) }}"
-                                        class="action-btn btn-add text-decoration-none" title="Tambah Penyewa"><i
-                                            class="fa-solid fa-plus"></i></a>
-                                @endif
+
                                 <a href="{{ route('pemilik.kamar.edit', ['id' => $kost->id, 'room_id' => $room->id]) }}"
                                     class="action-btn btn-edit text-decoration-none" title="Edit Data"><i
                                         class="fa-solid fa-pen"></i></a>

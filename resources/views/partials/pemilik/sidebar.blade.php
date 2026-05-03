@@ -3,7 +3,7 @@
     <div class="d-flex align-items-center justify-content-between px-4 flex-shrink-0"
         style="height: 64px; border-bottom: 1px solid #f3f4f6;">
         <a href="{{ route('home') }}" class="d-flex align-items-center gap-2 text-decoration-none fw-bold fs-5">
-            <i class="fa-solid fa-hurricane text-primary"></i>
+            <img src="{{ asset('images/logo.svg') }}" alt="RE-KOST Logo" style="width: 32px; height: 32px;">
             <span class="text-dark fs-6" style="letter-spacing: 2px;">RE-KOST</span>
         </a>
 
