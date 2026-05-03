@@ -234,7 +234,6 @@
         <div class="top-action-bar">
             <div>
                 <h3 class="text-primary fw-bold mb-1">Daftar Penyewa</h3>
-                <p class="text-secondary small mb-0">Kelola penyewa, data hunian, dan status sewa Anda.</p>
             </div>
             <div class="d-flex flex-wrap align-items-center gap-3">
                 <form action="{{ route('pemilik.penyewa') }}" method="GET" class="search-wrapper m-0">

@@ -131,7 +131,7 @@
 
             $fotoBangunan = $mainKost;
             $fotoTampakDepan = !empty($otherKost[0]) ? asset($otherKost[0]) : null;
-            $fotoFasilitasKost = !empty($otherKost[1]) ? asset($otherKost[1]) : null;
+            $fotoFasilitasKost = !empty($otherKost[1]) ? $otherKost[1] : null;
             $fotoLainnyaKost = !empty($otherKost[2]) ? $otherKost[2] : null;
 
             $firstRoom = isset($selectedRoom) && $selectedRoom ? $selectedRoom : $kos->rooms->first();
@@ -139,7 +139,7 @@
 
             $otherKamar = $firstRoom && $firstRoom->other_images ? json_decode($firstRoom->other_images, true) : [];
             $fotoKamarMandi = !empty($otherKamar[0]) ? asset($otherKamar[0]) : null;
-            $fotoFasilitasKamar = !empty($otherKamar[1]) ? asset($otherKamar[1]) : null;
+            $fotoFasilitasKamar = !empty($otherKamar[1]) ? $otherKamar[1] : null;
             $fotoLainnyaKamar = !empty($otherKamar[2]) ? $otherKamar[2] : null;
         @endphp
 
@@ -543,34 +543,60 @@
 
                     <div class="mb-5">
                         <h5 class="fw-bold mb-3 heading-text"><i class="fa-solid fa-couch text-primary me-2"></i> Foto
-                            Fasilitas Umum</h5>
+                            Fasilitas Umum (Kos)</h5>
                         <div class="row g-3">
                             @if ($fotoFasilitasKost)
-                                <div class="col-12 col-md-6">
-                                    <div class="position-relative h-100">
-                                        <img src="{{ $fotoFasilitasKost }}"
-                                            class="w-100 rounded object-fit-cover shadow-sm" style="height: 300px;"
-                                            alt="Fasilitas Kost">
-                                        <span
-                                            class="position-absolute bottom-0 start-0 m-2 badge bg-dark bg-opacity-75">Fasilitas
-                                            Kost</span>
+                                @if (is_array($fotoFasilitasKost))
+                                    @foreach ($fotoFasilitasKost as $img)
+                                        <div class="col-12 col-md-6">
+                                            <div class="position-relative h-100">
+                                                <img src="{{ asset($img) }}"
+                                                    class="w-100 rounded object-fit-cover shadow-sm" style="height: 300px;"
+                                                    alt="Fasilitas Kost">
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="col-12 col-md-6">
+                                        <div class="position-relative h-100">
+                                            <img src="{{ asset($fotoFasilitasKost) }}"
+                                                class="w-100 rounded object-fit-cover shadow-sm" style="height: 300px;"
+                                                alt="Fasilitas Kost">
+                                        </div>
                                     </div>
-                                </div>
+                                @endif
+                            @else
+                                <div class="col-12 text-muted fst-italic">Belum ada foto fasilitas umum diunggah.</div>
                             @endif
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <h5 class="fw-bold mb-3 heading-text"><i class="fa-solid fa-bed text-primary me-2"></i> Foto
+                            Fasilitas Dalam Kamar</h5>
+                        <div class="row g-3">
                             @if ($fotoFasilitasKamar)
-                                <div class="col-12 col-md-6">
-                                    <div class="position-relative h-100">
-                                        <img src="{{ $fotoFasilitasKamar }}"
-                                            class="w-100 rounded object-fit-cover shadow-sm" style="height: 300px;"
-                                            alt="Fasilitas Kamar">
-                                        <span
-                                            class="position-absolute bottom-0 start-0 m-2 badge bg-dark bg-opacity-75">Fasilitas
-                                            Dalam Kamar</span>
+                                @if (is_array($fotoFasilitasKamar))
+                                    @foreach ($fotoFasilitasKamar as $img)
+                                        <div class="col-12 col-md-6">
+                                            <div class="position-relative h-100">
+                                                <img src="{{ asset($img) }}"
+                                                    class="w-100 rounded object-fit-cover shadow-sm" style="height: 300px;"
+                                                    alt="Fasilitas Kamar">
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="col-12 col-md-6">
+                                        <div class="position-relative h-100">
+                                            <img src="{{ asset($fotoFasilitasKamar) }}"
+                                                class="w-100 rounded object-fit-cover shadow-sm" style="height: 300px;"
+                                                alt="Fasilitas Kamar">
+                                        </div>
                                     </div>
-                                </div>
-                            @endif
-                            @if (!$fotoFasilitasKost && !$fotoFasilitasKamar)
-                                <div class="col-12 text-muted fst-italic">Belum ada foto fasilitas diunggah.</div>
+                                @endif
+                            @else
+                                <div class="col-12 text-muted fst-italic">Belum ada foto fasilitas dalam kamar diunggah.</div>
                             @endif
                         </div>
                     </div>

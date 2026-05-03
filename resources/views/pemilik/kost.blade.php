@@ -160,7 +160,7 @@
     <div class="container-fluid-custom">
         <div class="mb-4">
             <h3 class="text-primary fw-bold mb-1">Daftar Kost</h3>
-            <p class="text-secondary small">Kelola daftar properti kost Anda, pantau okupansi, dan detail lokasi.</p>
+            <p class="text-secondary small">Kelola daftar Kost anda DISINI.</p>
         </div>
 
         @if (session('success'))
