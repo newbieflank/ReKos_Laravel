@@ -12,6 +12,7 @@ use App\Http\Controllers\PemilikKosController;
 use App\Http\Controllers\AppReviewController;
 use App\Http\Controllers\RoleRequestController;
 use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\GoogleController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -20,8 +21,8 @@ Route::get('/', function () {
 
     $allAlamat = \App\Models\BoardingHouse::pluck('alamat');
     $areas = [];
-    foreach($allAlamat as $al) {
-        if(!$al) continue;
+    foreach ($allAlamat as $al) {
+        if (!$al) continue;
         $parts = array_map('trim', explode(',', $al));
         if (count($parts) >= 6 && strtolower($parts[count($parts) - 5]) === 'bondowoso') {
             $kelurahan = $parts[count($parts) - 6];
@@ -39,6 +40,8 @@ Route::get('/', function () {
     return view('welcome', compact('rooms', 'reviews', 'areas', 'totalPengguna', 'totalKost'));
 })->name('home');
 
+Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 Route::get('/kos-terbaik', [kosTerbaikController::class, 'index'])->name('kosterbaik.index');
 Route::get('/all-kos', [allKosController::class, 'index'])->name('allkos.index');
 

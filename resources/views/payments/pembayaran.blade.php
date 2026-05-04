@@ -563,7 +563,8 @@
                     <div class="summary-title">Ringkasan Pesanan</div>
                     <div class="order-room-box">
                         <div class="room-thumb">
-                            <img src="">
+                            <img src="{{ asset($kos->main_image) }}"
+                                style="width: 64px; height: 64px; border-radius: 10px;" alt="Foto Kamar Utama">
                         </div>
                         <div class="room-info">
                             <div class="room-name">{{ $kos->boardingHouse->boarding_house_name }} - {{ $kos->room_name }}
@@ -612,12 +613,19 @@
         }
 
         function selectOption(element) {
-            document.querySelectorAll('.pay-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelectorAll('.pay-option, .ewallet-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
 
             element.classList.add('selected');
+            let label = "";
+            const labelElement = element.querySelector('.pay-option-label');
 
-            const label = element.querySelector('.pay-option-label').innerText;
-
+            if (labelElement) {
+                label = labelElement.innerText;
+            } else {
+                label = element.querySelector('span:last-child').innerText;
+            }
             document.getElementById('selectedPaymentMethod').value = label;
         }
     </script>

@@ -140,7 +140,7 @@
                         <hr class="flex-grow-1">
                     </div>
 
-                    <a href="#" class="btn w-100 py-3 d-flex align-items-center justify-content-center gap-2"
+                    <a href="{{ route('google.login') }}" class="btn w-100 py-3 d-flex align-items-center justify-content-center gap-2"
                         style="border-radius:10px; border:1.5px solid #3f7ae0;">
                         <img src="{{ asset('images/GoogleLogo.svg') }}" width="20">
                         <span class="fw-semibold text-dark">Sign Up With Google</span>

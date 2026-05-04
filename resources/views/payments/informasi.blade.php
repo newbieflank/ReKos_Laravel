@@ -401,7 +401,10 @@
                 <div>
                     <div class="card">
                         <div class="property-header">
-                            <div class="property-img" style="background-image: url('');"></div>
+                            <div class="property-img">
+                                <img src="{{ asset($kos->main_image) }}"
+                                    style="width: 130px; height: 90px; border-radius: 10px;" alt="Foto Kamar Utama">
+                            </div>
                             <div class="property-info">
                                 <div style="display:flex; align-items:center; gap:8px;">
                                     <span class="property-badge">{{ $kos->boardingHouse->boarding_house_type }}</span>
@@ -664,7 +667,7 @@
                     if (diffDays % interval !== 0) {
                         alert(
                             `Untuk durasi ${document.querySelector('.duration-tab.active').innerText}, tanggal disesuaikan ke kelipatan ${interval} hari terdekat.`
-                            );
+                        );
                     }
                 }
             }
