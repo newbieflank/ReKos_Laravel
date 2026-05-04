@@ -7,21 +7,28 @@ use App\Models\BoardingHouse;
 
 class KosController extends Controller
 {
-    public function showDetail($id)
+    public function showDetail(Request $request, $id)
     {
-        $kos = BoardingHouse::with(['rooms', 'reviews'])->findOrFail($id);
-        
+        $roomId = $request->query('room_id');
+        $kos = BoardingHouse::with(['rooms' => function ($query) use ($roomId) {
+            $query->where('id', $roomId);
+        }, 'reviews'])
+            ->whereHas('rooms', function ($query) use ($roomId) {
+                $query->where('id', $roomId);
+            })
+            ->findOrFail($id);
+
         $hargaHarian = $kos->rooms()->min('daily_price') ?? 0;
         $hargaMingguan = $kos->rooms()->min('weekly_price') ?? 0;
         $hargaBulanan = $kos->rooms()->min('monthly_price') ?? 0;
-        
+
         $sisaKamar = $kos->rooms->where('available', true)->count();
         $totalKamar = $kos->rooms->count();
-        
+
         // Untuk rating dan jumlah review
         $reviewsCount = $kos->reviews()->count();
         $rating = $reviewsCount > 0 ? $kos->reviews()->avg('rating') : 0;
-        
+
         $roomId = request('room_id');
         $selectedRoom = null;
         if ($roomId) {

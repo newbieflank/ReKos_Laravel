@@ -283,7 +283,7 @@
                     @endif
                 </div>
 
-                <a href="{{ route('payments.create', $kos->id) }}"
+                <a href="{{ route('payments.create', $kos->rooms->first()->id) }}"
                     class="btn btn-primary btn-lg fw-bold rounded-pill shadow-sm ms-md-auto d-flex align-items-center justify-content-center gap-2"
                     style="width: 100%; max-width: 350px;">
                     <i class="fa-solid fa-check-circle"></i> Ajukan Sewa
@@ -316,57 +316,57 @@
             @php
                 $facilityIcons = [
                     // Kost - Umum Dasar
-                    'area parkir'          => 'fa-solid fa-car',
-                    'parkir'               => 'fa-solid fa-square-parking',
-                    'mobil'                => 'fa-solid fa-car',
-                    'motor'                => 'fa-solid fa-motorcycle',
-                    'dapur'                => 'fa-solid fa-kitchen-set',
-                    'kompor'               => 'fa-solid fa-fire-burner',
-                    'kamar mandi luar'     => 'fa-solid fa-shower',
-                    'kamar mandi'          => 'fa-solid fa-bath',
-                    'km luar'              => 'fa-solid fa-shower',
-                    'wc'                   => 'fa-solid fa-toilet',
-                    'area jemur'           => 'fa-solid fa-wind',
-                    'jemur'                => 'fa-solid fa-wind',
-                    'wi-fi'                => 'fa-solid fa-wifi',
-                    'wifi'                 => 'fa-solid fa-wifi',
-                    'internet'             => 'fa-solid fa-wifi',
+                    'area parkir' => 'fa-solid fa-car',
+                    'parkir' => 'fa-solid fa-square-parking',
+                    'mobil' => 'fa-solid fa-car',
+                    'motor' => 'fa-solid fa-motorcycle',
+                    'dapur' => 'fa-solid fa-kitchen-set',
+                    'kompor' => 'fa-solid fa-fire-burner',
+                    'kamar mandi luar' => 'fa-solid fa-shower',
+                    'kamar mandi' => 'fa-solid fa-bath',
+                    'km luar' => 'fa-solid fa-shower',
+                    'wc' => 'fa-solid fa-toilet',
+                    'area jemur' => 'fa-solid fa-wind',
+                    'jemur' => 'fa-solid fa-wind',
+                    'wi-fi' => 'fa-solid fa-wifi',
+                    'wifi' => 'fa-solid fa-wifi',
+                    'internet' => 'fa-solid fa-wifi',
                     // Kost - Keamanan
-                    'cctv'                 => 'fa-solid fa-camera',
-                    'penjaga kost'         => 'fa-solid fa-user-shield',
-                    'penjaga'              => 'fa-solid fa-user-shield',
-                    'satpam'               => 'fa-solid fa-user-shield',
-                    'keamanan'             => 'fa-solid fa-shield-halved',
-                    'kunci'                => 'fa-solid fa-key',
+                    'cctv' => 'fa-solid fa-camera',
+                    'penjaga kost' => 'fa-solid fa-user-shield',
+                    'penjaga' => 'fa-solid fa-user-shield',
+                    'satpam' => 'fa-solid fa-user-shield',
+                    'keamanan' => 'fa-solid fa-shield-halved',
+                    'kunci' => 'fa-solid fa-key',
                     // Kost - Kenyamanan & Ekstra
-                    'ruang tamu'           => 'fa-solid fa-couch',
+                    'ruang tamu' => 'fa-solid fa-couch',
                     'peralatan elektronik' => 'fa-solid fa-plug',
-                    'mesin cuci'           => 'fa-solid fa-jug-detergent',
-                    'kulkas'               => 'fa-solid fa-temperature-low',
-                    'rak buku'             => 'fa-solid fa-book-open',
-                    'ruang belajar'        => 'fa-solid fa-book-open',
-                    'mushola'              => 'fa-solid fa-place-of-worship',
-                    'musholla'             => 'fa-solid fa-place-of-worship',
-                    'masjid'               => 'fa-solid fa-mosque',
+                    'mesin cuci' => 'fa-solid fa-jug-detergent',
+                    'kulkas' => 'fa-solid fa-temperature-low',
+                    'rak buku' => 'fa-solid fa-book-open',
+                    'ruang belajar' => 'fa-solid fa-book-open',
+                    'mushola' => 'fa-solid fa-place-of-worship',
+                    'musholla' => 'fa-solid fa-place-of-worship',
+                    'masjid' => 'fa-solid fa-mosque',
                     // Kamar
-                    'ac'                   => 'fa-solid fa-snowflake',
-                    'kipas angin'          => 'fa-solid fa-fan',
-                    'kipas'                => 'fa-solid fa-fan',
-                    'tv'                   => 'fa-solid fa-tv',
-                    'televisi'             => 'fa-solid fa-tv',
-                    'stop kontak'          => 'fa-solid fa-plug',
-                    'kasur'                => 'fa-solid fa-bed',
-                    'bed'                  => 'fa-solid fa-bed',
-                    'lemari pakaian'       => 'fa-solid fa-box-archive',
-                    'lemari'               => 'fa-solid fa-box-archive',
-                    'meja'                 => 'fa-solid fa-table',
-                    'kursi'                => 'fa-solid fa-chair',
-                    'bantal'               => 'fa-solid fa-moon',
-                    'guling'               => 'fa-solid fa-moon',
-                    'lampu'                => 'fa-solid fa-lightbulb',
+                    'ac' => 'fa-solid fa-snowflake',
+                    'kipas angin' => 'fa-solid fa-fan',
+                    'kipas' => 'fa-solid fa-fan',
+                    'tv' => 'fa-solid fa-tv',
+                    'televisi' => 'fa-solid fa-tv',
+                    'stop kontak' => 'fa-solid fa-plug',
+                    'kasur' => 'fa-solid fa-bed',
+                    'bed' => 'fa-solid fa-bed',
+                    'lemari pakaian' => 'fa-solid fa-box-archive',
+                    'lemari' => 'fa-solid fa-box-archive',
+                    'meja' => 'fa-solid fa-table',
+                    'kursi' => 'fa-solid fa-chair',
+                    'bantal' => 'fa-solid fa-moon',
+                    'guling' => 'fa-solid fa-moon',
+                    'lampu' => 'fa-solid fa-lightbulb',
                     // Lainnya
-                    '24 jam'               => 'fa-regular fa-clock',
-                    'air'                  => 'fa-solid fa-faucet-drip',
+                    '24 jam' => 'fa-regular fa-clock',
+                    'air' => 'fa-solid fa-faucet-drip',
                 ];
 
                 $getIcon = function ($name) use ($facilityIcons) {
@@ -551,8 +551,8 @@
                                         <div class="col-12 col-md-6">
                                             <div class="position-relative h-100">
                                                 <img src="{{ asset($img) }}"
-                                                    class="w-100 rounded object-fit-cover shadow-sm" style="height: 300px;"
-                                                    alt="Fasilitas Kost">
+                                                    class="w-100 rounded object-fit-cover shadow-sm"
+                                                    style="height: 300px;" alt="Fasilitas Kost">
                                             </div>
                                         </div>
                                     @endforeach
@@ -560,8 +560,8 @@
                                     <div class="col-12 col-md-6">
                                         <div class="position-relative h-100">
                                             <img src="{{ asset($fotoFasilitasKost) }}"
-                                                class="w-100 rounded object-fit-cover shadow-sm" style="height: 300px;"
-                                                alt="Fasilitas Kost">
+                                                class="w-100 rounded object-fit-cover shadow-sm"
+                                                style="height: 300px;" alt="Fasilitas Kost">
                                         </div>
                                     </div>
                                 @endif
@@ -581,8 +581,8 @@
                                         <div class="col-12 col-md-6">
                                             <div class="position-relative h-100">
                                                 <img src="{{ asset($img) }}"
-                                                    class="w-100 rounded object-fit-cover shadow-sm" style="height: 300px;"
-                                                    alt="Fasilitas Kamar">
+                                                    class="w-100 rounded object-fit-cover shadow-sm"
+                                                    style="height: 300px;" alt="Fasilitas Kamar">
                                             </div>
                                         </div>
                                     @endforeach
@@ -590,13 +590,14 @@
                                     <div class="col-12 col-md-6">
                                         <div class="position-relative h-100">
                                             <img src="{{ asset($fotoFasilitasKamar) }}"
-                                                class="w-100 rounded object-fit-cover shadow-sm" style="height: 300px;"
-                                                alt="Fasilitas Kamar">
+                                                class="w-100 rounded object-fit-cover shadow-sm"
+                                                style="height: 300px;" alt="Fasilitas Kamar">
                                         </div>
                                     </div>
                                 @endif
                             @else
-                                <div class="col-12 text-muted fst-italic">Belum ada foto fasilitas dalam kamar diunggah.</div>
+                                <div class="col-12 text-muted fst-italic">Belum ada foto fasilitas dalam kamar
+                                    diunggah.</div>
                             @endif
                         </div>
                     </div>

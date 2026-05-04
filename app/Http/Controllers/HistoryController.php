@@ -12,15 +12,17 @@ class HistoryController extends Controller
 {
     public function index()
     {
-        $histories = Tenant::with(['room.boardingHouse'])
+        $histories = Tenant::with(['room.boardingHouse', 'payments'])
             ->where('tenant_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get();
-            
+
+        // dd($histories);
+
         $reviews = BoardingHouseReview::where('tenant_id', Auth::id())
             ->get()
             ->keyBy('boarding_house_id');
-            
+
         return view('user.history', compact('histories', 'reviews'));
     }
 
@@ -46,7 +48,7 @@ class HistoryController extends Controller
             'rating' => $request->rating,
             'review' => $request->review,
         ]);
-        
+
         // Update average rating on boarding house
         $avgRating = BoardingHouseReview::where('boarding_house_id', $request->boarding_house_id)->avg('rating');
         BoardingHouse::where('id', $request->boarding_house_id)->update(['rating' => $avgRating]);
