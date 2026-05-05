@@ -353,6 +353,14 @@ class PemilikKosController extends Controller
         $room = \App\Models\Room::where('boarding_house_id', $id)->findOrFail($roomId);
         $boardingHouseId = $id;
 
+        $checkImageUsed = function($imagePath, $rId) {
+            if (!$imagePath) return false;
+            return \App\Models\Room::where('id', '!=', $rId)->where(function($q) use ($imagePath) {
+                $q->where('main_image', $imagePath)
+                  ->orWhere('other_images', 'LIKE', '%"'. $imagePath .'"%');
+            })->exists();
+        };
+
         $data = $request->all();
         if (!$request->has('available')) {
             $data['available'] = false;
@@ -368,14 +376,18 @@ class PemilikKosController extends Controller
 
         if ($request->has('remove_main_image')) {
             if ($room->main_image && file_exists(public_path($room->main_image))) {
-                @unlink(public_path($room->main_image));
+                if (!$checkImageUsed($room->main_image, $room->id)) {
+                    @unlink(public_path($room->main_image));
+                }
             }
             $data['main_image'] = null;
         }
 
         if ($request->hasFile('main_image')) {
             if ($room->main_image && file_exists(public_path($room->main_image))) {
-                @unlink(public_path($room->main_image));
+                if (!$checkImageUsed($room->main_image, $room->id)) {
+                    @unlink(public_path($room->main_image));
+                }
             }
             $file = $request->file('main_image');
             $filename = 'foto_kamar_utama_' . $room->id . '_' . time() . '.' . $file->getClientOriginalExtension();
@@ -392,14 +404,18 @@ class PemilikKosController extends Controller
 
         if ($request->has("remove_other_image_1")) {
             if (!empty($otherImages[0]) && is_string($otherImages[0]) && file_exists(public_path($otherImages[0]))) {
-                @unlink(public_path($otherImages[0]));
+                if (!$checkImageUsed($otherImages[0], $room->id)) {
+                    @unlink(public_path($otherImages[0]));
+                }
             }
             $otherImages[0] = null;
         }
 
         if ($request->hasFile("other_image_1")) {
             if (!empty($otherImages[0]) && is_string($otherImages[0]) && file_exists(public_path($otherImages[0]))) {
-                @unlink(public_path($otherImages[0]));
+                if (!$checkImageUsed($otherImages[0], $room->id)) {
+                    @unlink(public_path($otherImages[0]));
+                }
             }
             $file = $request->file("other_image_1");
             $filename = "foto_kamar_tambahan_1_" . time() . '.' . $file->getClientOriginalExtension();
@@ -411,10 +427,14 @@ class PemilikKosController extends Controller
             if (!empty($otherImages[1])) {
                 if (is_array($otherImages[1])) {
                     foreach ($otherImages[1] as $oldImg) {
-                        if (file_exists(public_path($oldImg))) @unlink(public_path($oldImg));
+                        if (file_exists(public_path($oldImg))) {
+                            if (!$checkImageUsed($oldImg, $room->id)) @unlink(public_path($oldImg));
+                        }
                     }
                 } else {
-                    if (file_exists(public_path($otherImages[1]))) @unlink(public_path($otherImages[1]));
+                    if (file_exists(public_path($otherImages[1]))) {
+                        if (!$checkImageUsed($otherImages[1], $room->id)) @unlink(public_path($otherImages[1]));
+                    }
                 }
             }
             $otherImages[1] = null;
@@ -424,10 +444,14 @@ class PemilikKosController extends Controller
             if (!empty($otherImages[1])) {
                 if (is_array($otherImages[1])) {
                     foreach ($otherImages[1] as $oldImg) {
-                        if (file_exists(public_path($oldImg))) @unlink(public_path($oldImg));
+                        if (file_exists(public_path($oldImg))) {
+                            if (!$checkImageUsed($oldImg, $room->id)) @unlink(public_path($oldImg));
+                        }
                     }
                 } else {
-                    if (file_exists(public_path($otherImages[1]))) @unlink(public_path($otherImages[1]));
+                    if (file_exists(public_path($otherImages[1]))) {
+                        if (!$checkImageUsed($otherImages[1], $room->id)) @unlink(public_path($otherImages[1]));
+                    }
                 }
             }
             $other2Paths = [];
@@ -443,10 +467,14 @@ class PemilikKosController extends Controller
             if (!empty($otherImages[2])) {
                 if (is_array($otherImages[2])) {
                     foreach ($otherImages[2] as $oldImg) {
-                        if (file_exists(public_path($oldImg))) @unlink(public_path($oldImg));
+                        if (file_exists(public_path($oldImg))) {
+                            if (!$checkImageUsed($oldImg, $room->id)) @unlink(public_path($oldImg));
+                        }
                     }
                 } else {
-                    if (file_exists(public_path($otherImages[2]))) @unlink(public_path($otherImages[2]));
+                    if (file_exists(public_path($otherImages[2]))) {
+                        if (!$checkImageUsed($otherImages[2], $room->id)) @unlink(public_path($otherImages[2]));
+                    }
                 }
             }
             $other3Paths = [];
@@ -468,14 +496,41 @@ class PemilikKosController extends Controller
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
         $room = \App\Models\Room::where('boarding_house_id', $id)->findOrFail($roomId);
         
+        $checkImageUsed = function($imagePath, $rId) {
+            if (!$imagePath) return false;
+            return \App\Models\Room::where('id', '!=', $rId)->where(function($q) use ($imagePath) {
+                $q->where('main_image', $imagePath)
+                  ->orWhere('other_images', 'LIKE', '%"'. $imagePath .'"%');
+            })->exists();
+        };
+
         if ($room->main_image && file_exists(public_path($room->main_image))) {
-            @unlink(public_path($room->main_image));
+            if (!$checkImageUsed($room->main_image, $room->id)) {
+                @unlink(public_path($room->main_image));
+            }
         }
+        
         if ($room->other_images) {
             $otherImages = json_decode($room->other_images, true) ?? [];
-            foreach ($otherImages as $img) {
+            
+            $collectImages = function($items) use (&$collectImages) {
+                $result = [];
+                foreach ($items as $item) {
+                    if (is_array($item)) {
+                        $result = array_merge($result, $collectImages($item));
+                    } elseif (is_string($item) && $item) {
+                        $result[] = $item;
+                    }
+                }
+                return $result;
+            };
+            
+            $flatImages = $collectImages($otherImages);
+            foreach ($flatImages as $img) {
                 if ($img && file_exists(public_path($img))) {
-                    @unlink(public_path($img));
+                    if (!$checkImageUsed($img, $room->id)) {
+                        @unlink(public_path($img));
+                    }
                 }
             }
         }
@@ -484,37 +539,43 @@ class PemilikKosController extends Controller
         return redirect()->route('pemilik.kamar', $id)->with('success', 'Data kamar berhasil dihapus!');
     }
 
-    public function duplicateKamar($id, $roomId)
+    public function duplicateKamar(Request $request, $id, $roomId)
     {
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
         $room = \App\Models\Room::where('boarding_house_id', $id)->findOrFail($roomId);
 
-        $newRoom = $room->replicate();
+        $quantity = max(1, (int) $request->input('quantity', 1));
 
-        if (preg_match('/(.*?)\s*(\d+)$/', $room->room_name, $matches)) {
-            $baseName = rtrim($matches[1]);
-            $number = intval($matches[2]) + 1;
-            $checkName = $baseName . ' ' . $number;
-            while (\App\Models\Room::where('boarding_house_id', $id)->where('room_name', $checkName)->exists()) {
-                $number++;
+        for ($i = 0; $i < $quantity; $i++) {
+            $newRoom = $room->replicate();
+
+            if (preg_match('/(.*?)\s*(\d+)$/', $room->room_name, $matches)) {
+                $baseName = rtrim($matches[1]);
+                $number = intval($matches[2]) + 1;
                 $checkName = $baseName . ' ' . $number;
-            }
-            $newRoom->room_name = $checkName;
-        } else {
-            $baseName = trim($room->room_name);
-            $number = 2;
-            $checkName = $baseName . ' ' . $number;
-            while (\App\Models\Room::where('boarding_house_id', $id)->where('room_name', $checkName)->exists()) {
-                $number++;
+                while (\App\Models\Room::where('boarding_house_id', $id)->where('room_name', $checkName)->exists()) {
+                    $number++;
+                    $checkName = $baseName . ' ' . $number;
+                }
+                $newRoom->room_name = $checkName;
+                $room->room_name = $checkName;
+            } else {
+                $baseName = trim($room->room_name);
+                $number = 2;
                 $checkName = $baseName . ' ' . $number;
+                while (\App\Models\Room::where('boarding_house_id', $id)->where('room_name', $checkName)->exists()) {
+                    $number++;
+                    $checkName = $baseName . ' ' . $number;
+                }
+                $newRoom->room_name = $checkName;
+                $room->room_name = $checkName;
             }
-            $newRoom->room_name = $checkName;
+
+            $newRoom->available = true; 
+            $newRoom->save();
         }
 
-        $newRoom->available = true; 
-        $newRoom->save();
-
-        return redirect()->route('pemilik.kamar', $id)->with('success', 'Data kamar berhasil diduplikasi menjadi: ' . $newRoom->room_name);
+        return redirect()->route('pemilik.kamar', $id)->with('success', 'Data kamar berhasil diduplikasi sebanyak ' . $quantity . ' kali.');
     }
 
     public function kost(Request $request)
