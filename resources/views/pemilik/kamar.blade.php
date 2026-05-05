@@ -352,7 +352,7 @@
                                 <form
                                     action="{{ route('pemilik.kamar.duplicate', ['id' => $kost->id, 'room_id' => $room->id]) }}"
                                     method="POST" class="m-0"
-                                    onsubmit="event.preventDefault(); Swal.fire({ title: 'Duplikasi Kamar?', text: 'Kamar ini akan diduplikasi dengan fasilitas dan harga yang sama.', icon: 'question', showCancelButton: true, confirmButtonColor: '#0d6efd', cancelButtonColor: '#6c757d', confirmButtonText: 'Ya, Duplikasi!', cancelButtonText: 'Batal' }).then((result) => { if (result.isConfirmed) this.submit(); });">
+                                    onsubmit="event.preventDefault(); Swal.fire({ title: 'Duplikasi Kamar?', text: 'Masukkan jumlah kamar yang ingin diduplikasi:', icon: 'question', input: 'number', inputAttributes: { min: 1, step: 1 }, inputValue: 1, showCancelButton: true, confirmButtonColor: '#0d6efd', cancelButtonColor: '#6c757d', confirmButtonText: 'Duplikasi', cancelButtonText: 'Batal', inputValidator: (value) => { if (!value || value < 1) { return 'Jumlah harus minimal 1!' } } }).then((result) => { if (result.isConfirmed) { let input = document.createElement('input'); input.type = 'hidden'; input.name = 'quantity'; input.value = result.value; this.appendChild(input); this.submit(); } });">
                                     @csrf
                                     <button type="submit" class="action-btn btn-edit border-0" title="Duplikasi Kamar">
                                         <i class="fa-solid fa-copy"></i>
