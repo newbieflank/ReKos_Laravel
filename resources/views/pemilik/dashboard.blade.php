@@ -8,7 +8,7 @@
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-6 col-lg-3">
             <div class="card card-custom p-4 h-100">
                 <p class="text-muted small fw-bold mb-2">TOTAL PENDAPATAN (1 Tahun)</p>
                 <h2 class="text-primary fw-bold mb-3">Rp {{ number_format($totalIncome, 0, ',', '.') }}</h2>
@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-6 col-lg-3">
             <div class="card card-custom p-4 h-100">
                 <p class="text-muted small fw-bold mb-2">TOTAL PENGELUARAN (1 Tahun)</p>
                 <h2 class="text-dark fw-bold mb-3">Rp {{ number_format($totalExpense, 0, ',', '.') }}</h2>
@@ -24,7 +24,23 @@
             </div>
         </div>
 
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card card-custom p-4 h-100">
+                <p class="text-muted small fw-bold mb-2">KAMAR TERLARIS</p>
+                @if($bestSellingRoom)
+                    <h4 class="text-success fw-bold mb-1 text-truncate" title="{{ $bestSellingRoom->boardingHouse->name ?? '' }} - {{ $bestSellingRoom->room_name }}">
+                        {{ $bestSellingRoom->room_name }}
+                    </h4>
+                    <span class="small text-muted">{{ $bestSellingRoom->tenants_count }} kali ditempati</span>
+                @else
+                    <h4 class="text-muted fw-bold mb-1">Belum Ada</h4>
+                    <span class="small text-muted">-</span>
+                @endif
+                <i class="fa-solid fa-bed card-bg-icon text-success"></i>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
             <div class="card card-custom p-4 h-100 text-white" style="background-color: #4a85f6;">
                 <p class="small fw-bold mb-2 text-white-50">GUEST RATING</p>
                 <div class="d-flex align-items-end gap-2 mb-2">
@@ -53,9 +69,9 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card card-custom p-4">
+    <div class="row g-4">
+        <div class="col-12 col-lg-8">
+            <div class="card card-custom p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h5 class="fw-bold mb-1">Grafik Keuangan</h5>
@@ -70,6 +86,27 @@
 
                 <div style="height: 350px;">
                     <canvas id="keuanganChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="card card-custom p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h5 class="fw-bold mb-1">Grafik Kamar Terlaris</h5>
+                        <p class="text-muted small mb-0">Berdasarkan total pesanan</p>
+                    </div>
+                </div>
+                <div style="height: 350px;" class="d-flex justify-content-center align-items-center">
+                    @if(count($chartRoomNames) > 0)
+                        <canvas id="kamarTerlarisChart"></canvas>
+                    @else
+                        <div class="text-center text-muted">
+                            <i class="fa-solid fa-bed fs-1 mb-2 text-light"></i>
+                            <p>Belum ada data kamar terlaris</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -131,6 +168,45 @@
                     }
                 }
             });
+
+            // Chart Kamar Terlaris (Doughnut)
+            @if(count($chartRoomNames) > 0)
+            const kamarCtx = document.getElementById('kamarTerlarisChart').getContext('2d');
+            new Chart(kamarCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: {!! json_encode($chartRoomNames) !!},
+                    datasets: [{
+                        data: {!! json_encode($chartRoomCounts) !!},
+                        backgroundColor: [
+                            '#0d6efd', // primary
+                            '#4a85f6', // lighter primary
+                            '#198754', // success
+                            '#ffc107', // warning
+                            '#0dcaf0'  // info
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+            @endif
         });
     </script>
 @endpush

@@ -279,6 +279,32 @@
                         <input type="hidden" name="latitude" id="input_lat" value="{{ $kost->latitude }}">
                         <input type="hidden" name="longitude" id="input_lng" value="{{ $kost->longitude }}">
 
+                        @php
+                            $areas_list = ['Badean', 'Blindungan', 'Dabaan', 'Kademangan', 'Kauman', 'Kotakulon', 'Nangkaan', 'Pancoran', 'Pejaten', 'Tamansari'];
+                            $currentArea = '';
+                            foreach($areas_list as $a) {
+                                if(str_starts_with($kost->alamat, $a . ',')) {
+                                    $currentArea = $a;
+                                    break;
+                                }
+                            }
+                            // Bersihkan tampilan detail alamat dari prefix area jika ada
+                            $displayAlamat = $kost->alamat;
+                            if($currentArea) {
+                                $displayAlamat = trim(substr($kost->alamat, strlen($currentArea) + 1));
+                            }
+                        @endphp
+
+                        <div class="mb-3">
+                            <label class="form-label-custom">AREA KELURAHAN <span class="text-danger">*</span></label>
+                            <select name="area" class="form-control form-control-custom w-100" required>
+                                <option value="" disabled>Pilih Kelurahan</option>
+                                @foreach($areas_list as $area_item)
+                                    <option value="{{ $area_item }}" {{ $currentArea == $area_item ? 'selected' : '' }}>{{ $area_item }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label-custom">ALAMAT DARI PETA</label>
                             <textarea id="input_alamat_maps" class="form-control form-control-custom w-100" style="height: 70px;"
@@ -290,7 +316,7 @@
                                     style="text-transform:none;letter-spacing:0;">(RT/RW, Blok, No. Rumah,
                                     dll)</span></label>
                             <input type="text" id="input_detail" class="form-control form-control-custom w-100"
-                                value="{{ $kost->alamat }}">
+                                value="{{ $displayAlamat }}">
                             <p class="text-muted small mt-1 mb-0"><i class="fa-solid fa-circle-info me-1"></i>Detail ini
                                 akan digabung dengan alamat peta secara otomatis.</p>
                         </div>

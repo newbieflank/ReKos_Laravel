@@ -80,6 +80,26 @@ class PemilikKosController extends Controller
         $occupiedRooms = $totalRooms - $availableRooms;
         $occupancyRate = $totalRooms > 0 ? round(($occupiedRooms / $totalRooms) * 100) : 0;
 
+        // Kamar Terlaris (Berdasarkan jumlah tenant)
+        $bestSellingRoom = \App\Models\Room::whereIn('id', $roomIds)
+            ->withCount('tenants')
+            ->orderBy('tenants_count', 'desc')
+            ->first();
+
+        // Data for Chart Kamar Terlaris (Top 5)
+        $topRooms = \App\Models\Room::whereIn('id', $roomIds)
+            ->with(['boardingHouse'])
+            ->withCount('tenants')
+            ->orderBy('tenants_count', 'desc')
+            ->take(5)
+            ->get();
+
+        $chartRoomNames = $topRooms->map(function ($room) {
+            $kostName = $room->boardingHouse ? $room->boardingHouse->name : 'Kost';
+            return $kostName . ' - ' . $room->room_name;
+        })->toArray();
+        $chartRoomCounts = $topRooms->pluck('tenants_count')->toArray();
+
         return view('pemilik.dashboard', compact(
             'months',
             'chartIncome',
@@ -93,22 +113,46 @@ class PemilikKosController extends Controller
             'totalRooms',
             'availableRooms',
             'occupiedRooms',
-            'occupancyRate'
+            'occupancyRate',
+            'bestSellingRoom',
+            'chartRoomNames',
+            'chartRoomCounts'
         ));
     }
 
-    public function kamar($id)
+    public function kamar(Request $request, $id)
     {
         $kost = \App\Models\BoardingHouse::findOrFail($id);
-        $rooms = \App\Models\Room::where('boarding_house_id', $id)->get();
+        $statusFilter = $request->query('status');
+        $search = $request->query('search');
 
-        // Statistik Okupansi Properti Ini
-        $totalRooms = $rooms->count();
-        $availableRooms = $rooms->where('available', true)->count();
+        $query = \App\Models\Room::with(['tenants' => function($q) {
+            $q->latest();
+        }, 'tenants.user'])->where('boarding_house_id', $id);
+
+        if ($search) {
+            $query->where('room_name', 'LIKE', '%' . $search . '%');
+        }
+
+        if ($statusFilter === 'tersedia') {
+            $query->where('available', true);
+        } elseif ($statusFilter === 'terisi') {
+            $query->where('available', false);
+        }
+
+        $rooms = $query->orderByRaw('LENGTH(room_name) ASC')
+            ->orderBy('room_name', 'asc')
+            ->paginate(8)
+            ->withQueryString();
+
+        // Statistik Okupansi Properti Ini (Tetap ambil data keseluruhan kost ini)
+        $allRooms = \App\Models\Room::where('boarding_house_id', $id)->get();
+        $totalRooms = $allRooms->count();
+        $availableRooms = $allRooms->where('available', true)->count();
         $occupiedRooms = $totalRooms - $availableRooms;
         $occupancyRate = $totalRooms > 0 ? round(($occupiedRooms / $totalRooms) * 100) : 0;
 
-        return view('pemilik.kamar', compact('kost', 'rooms', 'totalRooms', 'availableRooms', 'occupiedRooms', 'occupancyRate'));
+        return view('pemilik.kamar', compact('kost', 'rooms', 'totalRooms', 'availableRooms', 'occupiedRooms', 'occupancyRate', 'statusFilter', 'search'));
     }
 
     public function penyewa(Request $request)
@@ -594,7 +638,7 @@ class PemilikKosController extends Controller
             $query->whereDoesntHave('rooms', fn($q) => $q->where('available', true));
         }
 
-        $kosts = $query->get();
+        $kosts = $query->paginate(8)->withQueryString();
 
         $totalRooms = \App\Models\Room::whereHas('boardingHouse', function ($q) {
             $q->where('owner_id', auth()->id());
@@ -620,6 +664,7 @@ class PemilikKosController extends Controller
         $data['owner_id'] = auth()->id();
         $data['latitude'] = $request->latitude ?? 0.0;
         $data['longitude'] = $request->longitude ?? 0.0;
+        $data['alamat'] = $request->area . ', ' . $request->alamat;
 
         $type = strtolower($request->boarding_house_type ?? '');
         if (in_array($type, ['putra', 'male'])) {
@@ -695,6 +740,7 @@ class PemilikKosController extends Controller
     {
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
         $data = $request->all();
+        $data['alamat'] = $request->area . ', ' . $request->alamat;
 
         $type = strtolower($request->boarding_house_type ?? '');
         if (in_array($type, ['putra', 'male'])) {

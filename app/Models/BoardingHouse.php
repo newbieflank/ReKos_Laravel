@@ -56,4 +56,9 @@ class BoardingHouse extends Model
     {
         return $this->hasMany(BoardingHouseReview::class);
     }
+
+    public function tenants(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(Tenant::class, Room::class);
+    }
 }
