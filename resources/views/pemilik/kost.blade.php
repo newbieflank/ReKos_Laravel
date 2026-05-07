@@ -256,12 +256,18 @@
                 </div>
             @endforelse
 
-            <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                <a href="{{ route('pemilik.kost.tambah') }}" class="add-kost-card">
-                    <i class="fa-solid fa-plus mb-3" style="font-size: 32px; color: #4a85f6;"></i>
-                    <h5 class="fw-bold mb-0" style="color: #4a85f6;">Tambah Kost</h5>
-                </a>
-            </div>
+            @if($kosts->count() < 8)
+                <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                    <a href="{{ route('pemilik.kost.tambah') }}" class="add-kost-card">
+                        <i class="fa-solid fa-plus mb-3" style="font-size: 32px; color: #4a85f6;"></i>
+                        <h5 class="fw-bold mb-0" style="color: #4a85f6;">Tambah Kost</h5>
+                    </a>
+                </div>
+            @endif
+        </div>
+
+        <div class="d-flex justify-content-center mb-5">
+            {{ $kosts->links('pagination::bootstrap-5') }}
         </div>
 
         <div class="occupancy-card">

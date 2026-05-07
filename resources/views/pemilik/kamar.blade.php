@@ -275,9 +275,14 @@
     <div class="container-fluid-custom">
         <a href="{{ route('pemilik.kost') }}" class="btn btn-primary btn-sm mb-3 text-white"><i
                 class="fa-solid fa-arrow-left me-1"></i> Kembali ke Daftar Kost</a>
-        <div class="mb-4">
-            <h3 class="text-dark fw-bold mb-1">Daftar Kamar - {{ $kost->boarding_house_name }}</h3>
-            <p class="text-secondary small">Kelola hunian, fasilitas, dan status penyewa Kost Anda.</p>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="text-dark fw-bold mb-1">Daftar Kamar - {{ $kost->boarding_house_name }}</h3>
+                <p class="text-secondary small mb-0">Kelola hunian, fasilitas, dan status penyewa Kost Anda.</p>
+            </div>
+            <a href="{{ route('pemilik.kamar.tambah', $kost->id) }}" class="btn btn-primary px-4 py-2 fw-bold shadow-sm">
+                <i class="fa-solid fa-plus me-2"></i> Tambah Kamar
+            </a>
         </div>
 
         @if (session('success'))
@@ -291,25 +296,28 @@
             </div>
         @endif
 
-        <div class="row mb-4">
+        <form action="{{ route('pemilik.kamar', $kost->id) }}" method="GET" class="row mb-4">
             <div class="col-12">
                 <div class="search-filter-bar">
                     <div class="search-input-wrapper">
                         <i class="fa-solid fa-magnifying-glass text-muted"></i>
-                        <input type="text" class="search-input" placeholder="Cari nomor kamar atau penyewa...">
+                        <input type="text" name="search" class="search-input" placeholder="Cari nomor kamar..." value="{{ $search }}">
                     </div>
                     <div class="d-flex gap-2">
-                        <button class="filter-btn active" onclick="filterRooms('semua', this)">SEMUA</button>
-                        <button class="filter-btn inactive" onclick="filterRooms('tersedia', this)">TERSEDIA</button>
-                        <button class="filter-btn inactive" onclick="filterRooms('terisi', this)">TERISI</button>
+                        <a href="{{ route('pemilik.kamar', ['id' => $kost->id, 'search' => $search]) }}" 
+                           class="filter-btn {{ !$statusFilter ? 'active' : 'inactive' }} text-decoration-none d-flex align-items-center">SEMUA</a>
+                        <a href="{{ route('pemilik.kamar', ['id' => $kost->id, 'status' => 'tersedia', 'search' => $search]) }}" 
+                           class="filter-btn {{ $statusFilter === 'tersedia' ? 'active' : 'inactive' }} text-decoration-none d-flex align-items-center">TERSEDIA</a>
+                        <a href="{{ route('pemilik.kamar', ['id' => $kost->id, 'status' => 'terisi', 'search' => $search]) }}" 
+                           class="filter-btn {{ $statusFilter === 'terisi' ? 'active' : 'inactive' }} text-decoration-none d-flex align-items-center">TERISI</a>
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
 
-        <div class="row g-4 mb-5" id="roomsContainer">
+        <div class="row g-4 mb-3" id="roomsContainer">
 
-            @forelse($rooms->sortByDesc('available') as $room)
+            @forelse($rooms as $room)
                 <div class="col-12 col-sm-6 col-lg-4 col-xl-3 room-wrapper"
                     data-room-name="{{ strtolower($room->room_name) }}"
                     data-room-status="{{ $room->available ? 'tersedia' : 'terisi' }}">
@@ -324,9 +332,15 @@
                         </div>
                         <p class="text-secondary small mb-3">
                             @if ($room->available)
-                                Tersedia
+                                <span class="text-success fw-medium"><i class="fa-solid fa-check-circle me-1"></i> Tersedia</span>
                             @else
-                                Terisi
+                                @php
+                                    $activeTenant = $room->tenants->first();
+                                @endphp
+                                <span class="text-danger fw-medium"><i class="fa-solid fa-user-lock me-1"></i> Terisi</span>
+                                @if($activeTenant && $activeTenant->user)
+                                    <span class="d-block mt-1 text-dark fw-bold"><i class="fa-regular fa-user me-1"></i> {{ $activeTenant->user->name }}</span>
+                                @endif
                             @endif
                         </p>
                         <div class="d-flex flex-wrap gap-2 mb-4">
@@ -380,13 +394,18 @@
                 </div>
             @endforelse
 
-            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                <a href="{{ route('pemilik.kamar.tambah', $kost->id) }}" class="add-room-card text-decoration-none">
-                    <i class="fa-solid fa-plus mb-2" style="font-size: 28px;"></i>
-                    <h5 class="fw-bold mb-0">Tambah Kamar</h5>
-                </a>
-            </div>
+            @if($rooms->count() < 8)
+                <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                    <a href="{{ route('pemilik.kamar.tambah', $kost->id) }}" class="add-room-card text-decoration-none">
+                        <i class="fa-solid fa-plus mb-2" style="font-size: 28px;"></i>
+                        <h5 class="fw-bold mb-0">Tambah Kamar</h5>
+                    </a>
+                </div>
+            @endif
+        </div>
 
+        <div class="d-flex justify-content-center mb-5">
+            {{ $rooms->links('pagination::bootstrap-5') }}
         </div>
 
         <div class="row">
@@ -506,43 +525,6 @@
 
 @push('scripts')
     <script>
-        let currentFilter = 'semua';
-
-        function filterRooms(status, btnElement) {
-            currentFilter = status;
-
-            // Update active class on buttons
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-                btn.classList.add('inactive');
-            });
-            btnElement.classList.remove('inactive');
-            btnElement.classList.add('active');
-
-            applyFilters();
-        }
-
-        document.querySelector('.search-input').addEventListener('input', function() {
-            applyFilters();
-        });
-
-        function applyFilters() {
-            const searchQuery = document.querySelector('.search-input').value.toLowerCase();
-            const rooms = document.querySelectorAll('.room-wrapper');
-
-            rooms.forEach(room => {
-                const name = room.getAttribute('data-room-name');
-                const status = room.getAttribute('data-room-status');
-
-                const matchSearch = name.includes(searchQuery);
-                const matchFilter = (currentFilter === 'semua') || (status === currentFilter);
-
-                if (matchSearch && matchFilter) {
-                    room.style.display = 'block';
-                } else {
-                    room.style.display = 'none';
-                }
-            });
-        }
+        // Backend filtering is now handled by the controller
     </script>
 @endpush

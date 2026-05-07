@@ -285,6 +285,23 @@
                         <input type="hidden" name="longitude" id="input_lng" value="113.8204">
 
                         <div class="mb-3">
+                            <label class="form-label-custom">AREA KELURAHAN <span class="text-danger">*</span></label>
+                            <select name="area" class="form-control form-control-custom w-100" required>
+                                <option value="" disabled selected>Pilih Kelurahan</option>
+                                <option value="Badean">Badean</option>
+                                <option value="Blindungan">Blindungan</option>
+                                <option value="Dabaan">Dabaan</option>
+                                <option value="Kademangan">Kademangan</option>
+                                <option value="Kauman">Kauman</option>
+                                <option value="Kotakulon">Kotakulon</option>
+                                <option value="Nangkaan">Nangkaan</option>
+                                <option value="Pancoran">Pancoran</option>
+                                <option value="Pejaten">Pejaten</option>
+                                <option value="Tamansari">Tamansari</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label-custom">ALAMAT DARI PETA</label>
                             <textarea id="input_alamat_maps" class="form-control form-control-custom w-100" style="height: 70px;"
                                 placeholder="Klik peta untuk mengisi alamat otomatis..." readonly></textarea>
@@ -300,7 +317,7 @@
                                 akan digabung dengan alamat peta secara otomatis.</p>
                         </div>
 
-                        {{-- Field yang dikirim ke server: gabungan keduanya --}}
+                        {{-- Field yang dikirim ke server: gabungan keduanya (Nanti digabung dengan Area di Controller) --}}
                         <input type="hidden" name="alamat" id="input_alamat">
                     </div>
                 </div>

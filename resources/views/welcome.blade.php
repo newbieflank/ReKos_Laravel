@@ -2,6 +2,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <style>
         .swiper-container-wrapper {
             position: relative;
@@ -56,6 +57,67 @@
         .section-biru .swiper-button-prev {
             color: #59A1FF;
         }
+
+        /* Custom Styling for Choices.js */
+        .choices {
+            margin-bottom: 0;
+            width: 100%;
+        }
+        .choices__inner {
+            background-color: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            min-height: auto !important;
+            display: flex;
+            align-items: center;
+        }
+        .choices__list--single {
+            padding: 0 !important;
+            font-weight: 600;
+            color: #4A5568 !important;
+        }
+        .choices__list--dropdown {
+            border-radius: 15px !important;
+            border: none !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+            margin-top: 15px !important;
+            padding: 8px !important;
+            z-index: 1000 !important;
+        }
+        .choices__item--selectable {
+            border-radius: 10px !important;
+            padding: 10px 15px !important;
+            font-weight: 500 !important;
+            transition: all 0.2s ease;
+        }
+        .choices__item--selectable.is-highlighted {
+            background-color: #E6F0FF !important;
+            color: #0d6efd !important;
+        }
+        .choices[data-type*="select-one"]:after {
+            display: none !important; /* Hide default arrow */
+        }
+        .search-pill-wrapper {
+            background-color: #f8f9fa;
+            border-radius: 50px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        .search-pill-wrapper:hover {
+            background-color: #eef2f7;
+        }
+        .search-pill-wrapper:focus-within {
+            background-color: #fff;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+        }
+        .choices__placeholder {
+            opacity: 1;
+            color: #718096 !important;
+        }
     </style>
 @endpush
 
@@ -100,10 +162,9 @@
 
                     <div class="flex-grow-1 w-100">
                         <label class="form-label text-dark small fw-bold ms-2 mb-2">Harga</label>
-                        <div class="bg-light rounded-pill px-3 py-2 d-flex align-items-center">
-                            <select name="harga"
-                                class="form-select border-0 bg-transparent shadow-none p-0 text-muted fw-medium"
-                                style="cursor: pointer; appearance: none; background-image: none;">
+                        <div class="search-pill-wrapper">
+                            <i class="fas fa-money-bill-wave me-2 text-primary opacity-75"></i>
+                            <select name="harga" class="choices-select">
                                 <option value="">Pilih Harga</option>
                                 <option value="100000">Rp 0 - Rp 100.000</option>
                                 <option value="200000">Rp 100.000 - Rp 200.000</option>
@@ -123,10 +184,9 @@
 
                     <div class="flex-grow-1 w-100">
                         <label class="form-label text-dark small fw-bold ms-2 mb-2">Area</label>
-                        <div class="bg-light rounded-pill px-3 py-2 d-flex align-items-center">
-                            <select name="area"
-                                class="form-select border-0 bg-transparent shadow-none p-0 text-muted fw-medium"
-                                style="cursor: pointer; appearance: none; background-image: none;">
+                        <div class="search-pill-wrapper">
+                            <i class="fas fa-map-marker-alt me-2 text-danger opacity-75"></i>
+                            <select name="area" class="choices-select">
                                 <option value="">Pilih Area</option>
                                 @if (isset($areas) && count($areas) > 0)
                                     @foreach ($areas as $a)
@@ -142,10 +202,9 @@
 
                     <div class="flex-grow-1 w-100">
                         <label class="form-label text-dark small fw-bold ms-2 mb-2">Tipe Kost</label>
-                        <div class="bg-light rounded-pill px-3 py-2 d-flex align-items-center">
-                            <select name="tipe"
-                                class="form-select border-0 bg-transparent shadow-none p-0 text-muted fw-medium"
-                                style="cursor: pointer; appearance: none; background-image: none;">
+                        <div class="search-pill-wrapper">
+                            <i class="fas fa-users me-2 text-success opacity-75"></i>
+                            <select name="tipe" class="choices-select">
                                 <option value="">Pilih Tipe</option>
                                 <option value="male">Putra</option>
                                 <option value="female">Putri</option>
@@ -155,9 +214,9 @@
                         </div>
                     </div>
 
-                    <div class="w-100" style="max-width: 180px;">
-                        <button type="submit" class="btn btn-primary rounded-pill w-100 py-2 fw-bold text-white shadow-sm"
-                            style="height: 44px;">Cari</button>
+                    <div class="w-100" style="max-width: 140px;">
+                        <button type="submit" class="btn btn-primary rounded-pill w-100 py-2 fw-bold text-white shadow"
+                            style="height: 48px;">Cari</button>
                     </div>
 
                 </form>
@@ -590,8 +649,46 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Choices.js
+            const selects = document.querySelectorAll('.choices-select');
+            selects.forEach(select => {
+                new Choices(select, {
+                    searchEnabled: false,
+                    itemSelectText: '',
+                    shouldSort: false,
+                    classNames: {
+                        containerOuter: 'choices',
+                        containerInner: 'choices__inner',
+                        input: 'choices__input',
+                        inputCloned: 'choices__input--cloned',
+                        list: 'choices__list',
+                        listItems: 'choices__list--multiple',
+                        listSingle: 'choices__list--single',
+                        listDropdown: 'choices__list--dropdown',
+                        item: 'choices__item',
+                        itemSelectable: 'choices__item--selectable',
+                        itemDisabled: 'choices__item--disabled',
+                        itemChoice: 'choices__item--choice',
+                        placeholder: 'choices__placeholder',
+                        group: 'choices__group',
+                        groupHeading: 'choices__heading',
+                        button: 'choices__button',
+                        activeState: 'is-active',
+                        focusState: 'is-focused',
+                        openState: 'is-open',
+                        disabledState: 'is-disabled',
+                        highlightState: 'is-highlighted',
+                        selectedState: 'is-selected',
+                        flippedState: 'is-flipped',
+                        loadingState: 'is-loading',
+                        noResults: 'has-no-results',
+                        noChoices: 'has-no-choices'
+                    }
+                });
+            });
             // Initialize all room sliders
             document.querySelectorAll('.roomSwiper').forEach((el) => {
                 const container = el.closest('.swiper-container-wrapper');
