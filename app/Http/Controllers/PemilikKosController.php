@@ -12,9 +12,8 @@ class PemilikKosController extends Controller
     {
         $ownerId = auth()->id();
 
-        $roomIds = Room::whereHas('boardingHouse', function ($q) use ($ownerId) {
-            $q->where('owner_id', $ownerId);
-        })->pluck('id');
+        $boardingHouseIds = \App\Models\BoardingHouse::where('owner_id', $ownerId)->pluck('id');
+        $roomIds = Room::whereIn('boarding_house_id', $boardingHouseIds)->pluck('id');
 
         $months = [];
         $chartIncome = [];
@@ -32,61 +31,69 @@ class PemilikKosController extends Controller
             $availableYears = [date('Y')];
         }
         
-        // Ensure max 2 years are shown
         $availableYears = array_slice($availableYears, 0, 2);
         sort($availableYears);
 
         $currentYear = $request->query('year', date('Y'));
+        $chartIncome = array_fill(0, 12, 0);
+        $chartExpense = array_fill(0, 12, 0);
+
         for ($month = 1; $month <= 12; $month++) {
             $startOfMonth = \Carbon\Carbon::create($currentYear, $month, 1)->startOfMonth();
-            $endOfMonth = \Carbon\Carbon::create($currentYear, $month, 1)->endOfMonth();
-
             $months[] = $startOfMonth->translatedFormat('M');
+        }
 
-            $income = Tenant::whereIn('room_id', $roomIds)
-                ->whereYear('start_date', $currentYear)
-                ->whereMonth('start_date', $month)
-                ->withSum('payments', 'amount')
-                ->get()
-                ->sum('payments_sum_amount');
+        $tenantsIncomeThisYear = Tenant::whereIn('room_id', $roomIds)
+            ->whereYear('start_date', $currentYear)
+            ->withSum('payments', 'amount')
+            ->get(['id', 'room_id', 'start_date']);
 
-            $chartIncome[] = $income ?: 0;
+        foreach ($tenantsIncomeThisYear as $tenant) {
+            $monthIndex = (int) \Carbon\Carbon::parse($tenant->start_date)->format('n') - 1;
+            $chartIncome[$monthIndex] += $tenant->payments_sum_amount ?: 0;
+        }
 
-            $occupiedRoomIdsThisMonth = Tenant::whereIn('room_id', $roomIds)
-                ->whereYear('start_date', $currentYear)
-                ->whereMonth('start_date', $month)
-                ->whereHas('payments', function ($query) {
-                    $query->whereIn('status', ['successful', 'waiting']);
-                })
-                ->pluck('room_id')
-                ->unique()
-                ->values();
+        $expenseTenantsThisYear = Tenant::whereIn('room_id', $roomIds)
+            ->whereYear('start_date', $currentYear)
+            ->whereHas('payments', function ($query) {
+                $query->whereIn('status', ['successful', 'waiting']);
+            })
+            ->get(['id', 'room_id', 'start_date']);
 
-            $expense = \App\Models\Room::whereIn('id', $occupiedRoomIdsThisMonth)->sum('monthly_expense');
-            $chartExpense[] = $expense ?: 0;
+        $monthlyOccupiedRooms = array_fill(0, 12, []);
+        foreach ($expenseTenantsThisYear as $tenant) {
+            $monthIndex = (int) \Carbon\Carbon::parse($tenant->start_date)->format('n') - 1;
+            $monthlyOccupiedRooms[$monthIndex][] = $tenant->room_id;
+        }
+
+        $roomExpenses = \App\Models\Room::whereIn('id', $roomIds)->pluck('monthly_expense', 'id');
+
+        for ($i = 0; $i < 12; $i++) {
+            $uniqueRoomIds = array_unique($monthlyOccupiedRooms[$i]);
+            $expense = 0;
+            foreach ($uniqueRoomIds as $rId) {
+                $expense += $roomExpenses[$rId] ?? 0;
+            }
+            $chartExpense[$i] = $expense;
         }
 
         $totalIncome = array_sum($chartIncome);
         $totalExpense = array_sum($chartExpense);
 
-        $boardingHouseIds = \App\Models\BoardingHouse::where('owner_id', $ownerId)->pluck('id');
         $reviewsQuery = \App\Models\BoardingHouseReview::whereIn('boarding_house_id', $boardingHouseIds);
         $totalReviews = $reviewsQuery->count();
         $avgRating = $totalReviews > 0 ? $reviewsQuery->avg('rating') : 0;
 
-        // Okupansi Keseluruhan
         $totalRooms = \App\Models\Room::whereIn('id', $roomIds)->count();
         $availableRooms = \App\Models\Room::whereIn('id', $roomIds)->where('available', true)->count();
         $occupiedRooms = $totalRooms - $availableRooms;
         $occupancyRate = $totalRooms > 0 ? round(($occupiedRooms / $totalRooms) * 100) : 0;
 
-        // Kamar Terlaris (Berdasarkan jumlah tenant)
         $bestSellingRoom = \App\Models\Room::whereIn('id', $roomIds)
             ->withCount('tenants')
             ->orderBy('tenants_count', 'desc')
             ->first();
 
-        // Data for Chart Kamar Terlaris (Top 5)
         $topRooms = \App\Models\Room::whereIn('id', $roomIds)
             ->with(['boardingHouse'])
             ->withCount('tenants')
@@ -127,7 +134,7 @@ class PemilikKosController extends Controller
         $search = $request->query('search');
 
         $query = \App\Models\Room::with(['tenants' => function($q) {
-            $q->latest();
+            $q->where('status', 'active')->latest();
         }, 'tenants.user'])->where('boarding_house_id', $id);
 
         if ($search) {
@@ -146,9 +153,8 @@ class PemilikKosController extends Controller
             ->withQueryString();
 
         // Statistik Okupansi Properti Ini (Tetap ambil data keseluruhan kost ini)
-        $allRooms = \App\Models\Room::where('boarding_house_id', $id)->get();
-        $totalRooms = $allRooms->count();
-        $availableRooms = $allRooms->where('available', true)->count();
+        $totalRooms = \App\Models\Room::where('boarding_house_id', $id)->count();
+        $availableRooms = \App\Models\Room::where('boarding_house_id', $id)->where('available', true)->count();
         $occupiedRooms = $totalRooms - $availableRooms;
         $occupancyRate = $totalRooms > 0 ? round(($occupiedRooms / $totalRooms) * 100) : 0;
 
@@ -161,9 +167,8 @@ class PemilikKosController extends Controller
         $statusFilter = $request->query('status');
         $search = $request->query('search');
 
-        $roomIds = Room::whereHas('boardingHouse', function ($q) use ($ownerId) {
-            $q->where('owner_id', $ownerId);
-        })->pluck('id');
+        $boardingHouseIds = \App\Models\BoardingHouse::where('owner_id', $ownerId)->pluck('id');
+        $roomIds = Room::whereIn('boarding_house_id', $boardingHouseIds)->pluck('id');
 
         $query = Tenant::whereIn('room_id', $roomIds)
             ->with(['user', 'user.userDetail', 'room', 'room.boardingHouse'])->withCount(['payments as has_paid' => function ($q) {
@@ -194,12 +199,12 @@ class PemilikKosController extends Controller
     {
         $ownerId = auth()->id();
         $kosts = \App\Models\BoardingHouse::where('owner_id', $ownerId)->pluck('id');
-        $rooms = \App\Models\Room::whereIn('boarding_house_id', $kosts)->where('available', true)->get();
+        $rooms = \App\Models\Room::whereIn('boarding_house_id', $kosts)->where('available', true)->get(['id', 'room_name', 'room_type', 'daily_price', 'weekly_price', 'monthly_price']);
 
-        // Ambil semua user dengan role tenant beserta data detail
+        // Ambil semua user dengan role tenant beserta data detail secara efisien
         $users = \App\Models\User::where('role', 'tenant')
-            ->with('userDetail')
-            ->get();
+            ->with('userDetail:user_id,gender,birth_date,occupation,institution')
+            ->get(['id', 'name', 'email']);
 
         $selectedRoomId = $request->query('room_id');
 
@@ -259,11 +264,11 @@ class PemilikKosController extends Controller
         $ownerId = auth()->id();
         $kosts = \App\Models\BoardingHouse::where('owner_id', $ownerId)->pluck('id');
         $tenant = \App\Models\Tenant::with(['user', 'user.userDetail', 'room'])
-            ->whereHas('room.boardingHouse', fn($q) => $q->where('owner_id', $ownerId))
+            ->whereHas('room', fn($q) => $q->whereIn('boarding_house_id', $kosts))
             ->findOrFail($id);
 
         $rooms = \App\Models\Room::whereIn('boarding_house_id', $kosts)->get();
-        $users = \App\Models\User::where('role', 'tenant')->with('userDetail')->get();
+        $users = \App\Models\User::where('role', 'tenant')->with('userDetail:user_id,gender,birth_date,occupation,institution')->get(['id', 'name', 'email']);
 
         return view('pemilik.edit-penyewa', compact('tenant', 'rooms', 'users'));
     }
@@ -271,7 +276,8 @@ class PemilikKosController extends Controller
     public function updatePenyewa(Request $request, $id)
     {
         $ownerId = auth()->id();
-        $tenant = \App\Models\Tenant::whereHas('room.boardingHouse', fn($q) => $q->where('owner_id', $ownerId))
+        $kostIds = \App\Models\BoardingHouse::where('owner_id', $ownerId)->pluck('id');
+        $tenant = \App\Models\Tenant::whereHas('room', fn($q) => $q->whereIn('boarding_house_id', $kostIds))
             ->findOrFail($id);
 
         $data = $request->validate([
@@ -303,7 +309,8 @@ class PemilikKosController extends Controller
     public function hapusPenyewa($id)
     {
         $ownerId = auth()->id();
-        $tenant = \App\Models\Tenant::whereHas('room.boardingHouse', fn($q) => $q->where('owner_id', $ownerId))
+        $kostIds = \App\Models\BoardingHouse::where('owner_id', $ownerId)->pluck('id');
+        $tenant = \App\Models\Tenant::whereHas('room', fn($q) => $q->whereIn('boarding_house_id', $kostIds))
             ->findOrFail($id);
 
         // Kembalikan kamar jadi available
@@ -397,13 +404,6 @@ class PemilikKosController extends Controller
         $room = \App\Models\Room::where('boarding_house_id', $id)->findOrFail($roomId);
         $boardingHouseId = $id;
 
-        $checkImageUsed = function($imagePath, $rId) {
-            if (!$imagePath) return false;
-            return \App\Models\Room::where('id', '!=', $rId)->where(function($q) use ($imagePath) {
-                $q->where('main_image', $imagePath)
-                  ->orWhere('other_images', 'LIKE', '%"'. $imagePath .'"%');
-            })->exists();
-        };
 
         $data = $request->all();
         if (!$request->has('available')) {
@@ -420,7 +420,7 @@ class PemilikKosController extends Controller
 
         if ($request->has('remove_main_image')) {
             if ($room->main_image && file_exists(public_path($room->main_image))) {
-                if (!$checkImageUsed($room->main_image, $room->id)) {
+                if (!$this->isImageUsedByOtherRooms($room->main_image, $room->id)) {
                     @unlink(public_path($room->main_image));
                 }
             }
@@ -429,7 +429,7 @@ class PemilikKosController extends Controller
 
         if ($request->hasFile('main_image')) {
             if ($room->main_image && file_exists(public_path($room->main_image))) {
-                if (!$checkImageUsed($room->main_image, $room->id)) {
+                if (!$this->isImageUsedByOtherRooms($room->main_image, $room->id)) {
                     @unlink(public_path($room->main_image));
                 }
             }
@@ -448,7 +448,7 @@ class PemilikKosController extends Controller
 
         if ($request->has("remove_other_image_1")) {
             if (!empty($otherImages[0]) && is_string($otherImages[0]) && file_exists(public_path($otherImages[0]))) {
-                if (!$checkImageUsed($otherImages[0], $room->id)) {
+                if (!$this->isImageUsedByOtherRooms($otherImages[0], $room->id)) {
                     @unlink(public_path($otherImages[0]));
                 }
             }
@@ -457,7 +457,7 @@ class PemilikKosController extends Controller
 
         if ($request->hasFile("other_image_1")) {
             if (!empty($otherImages[0]) && is_string($otherImages[0]) && file_exists(public_path($otherImages[0]))) {
-                if (!$checkImageUsed($otherImages[0], $room->id)) {
+                if (!$this->isImageUsedByOtherRooms($otherImages[0], $room->id)) {
                     @unlink(public_path($otherImages[0]));
                 }
             }
@@ -472,12 +472,12 @@ class PemilikKosController extends Controller
                 if (is_array($otherImages[1])) {
                     foreach ($otherImages[1] as $oldImg) {
                         if (file_exists(public_path($oldImg))) {
-                            if (!$checkImageUsed($oldImg, $room->id)) @unlink(public_path($oldImg));
+                            if (!$this->isImageUsedByOtherRooms($oldImg, $room->id)) @unlink(public_path($oldImg));
                         }
                     }
                 } else {
                     if (file_exists(public_path($otherImages[1]))) {
-                        if (!$checkImageUsed($otherImages[1], $room->id)) @unlink(public_path($otherImages[1]));
+                        if (!$this->isImageUsedByOtherRooms($otherImages[1], $room->id)) @unlink(public_path($otherImages[1]));
                     }
                 }
             }
@@ -489,12 +489,12 @@ class PemilikKosController extends Controller
                 if (is_array($otherImages[1])) {
                     foreach ($otherImages[1] as $oldImg) {
                         if (file_exists(public_path($oldImg))) {
-                            if (!$checkImageUsed($oldImg, $room->id)) @unlink(public_path($oldImg));
+                            if (!$this->isImageUsedByOtherRooms($oldImg, $room->id)) @unlink(public_path($oldImg));
                         }
                     }
                 } else {
                     if (file_exists(public_path($otherImages[1]))) {
-                        if (!$checkImageUsed($otherImages[1], $room->id)) @unlink(public_path($otherImages[1]));
+                        if (!$this->isImageUsedByOtherRooms($otherImages[1], $room->id)) @unlink(public_path($otherImages[1]));
                     }
                 }
             }
@@ -512,12 +512,12 @@ class PemilikKosController extends Controller
                 if (is_array($otherImages[2])) {
                     foreach ($otherImages[2] as $oldImg) {
                         if (file_exists(public_path($oldImg))) {
-                            if (!$checkImageUsed($oldImg, $room->id)) @unlink(public_path($oldImg));
+                            if (!$this->isImageUsedByOtherRooms($oldImg, $room->id)) @unlink(public_path($oldImg));
                         }
                     }
                 } else {
                     if (file_exists(public_path($otherImages[2]))) {
-                        if (!$checkImageUsed($otherImages[2], $room->id)) @unlink(public_path($otherImages[2]));
+                        if (!$this->isImageUsedByOtherRooms($otherImages[2], $room->id)) @unlink(public_path($otherImages[2]));
                     }
                 }
             }
@@ -540,16 +540,9 @@ class PemilikKosController extends Controller
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
         $room = \App\Models\Room::where('boarding_house_id', $id)->findOrFail($roomId);
         
-        $checkImageUsed = function($imagePath, $rId) {
-            if (!$imagePath) return false;
-            return \App\Models\Room::where('id', '!=', $rId)->where(function($q) use ($imagePath) {
-                $q->where('main_image', $imagePath)
-                  ->orWhere('other_images', 'LIKE', '%"'. $imagePath .'"%');
-            })->exists();
-        };
 
         if ($room->main_image && file_exists(public_path($room->main_image))) {
-            if (!$checkImageUsed($room->main_image, $room->id)) {
+            if (!$this->isImageUsedByOtherRooms($room->main_image, $room->id)) {
                 @unlink(public_path($room->main_image));
             }
         }
@@ -572,7 +565,7 @@ class PemilikKosController extends Controller
             $flatImages = $collectImages($otherImages);
             foreach ($flatImages as $img) {
                 if ($img && file_exists(public_path($img))) {
-                    if (!$checkImageUsed($img, $room->id)) {
+                    if (!$this->isImageUsedByOtherRooms($img, $room->id)) {
                         @unlink(public_path($img));
                     }
                 }
@@ -640,12 +633,9 @@ class PemilikKosController extends Controller
 
         $kosts = $query->paginate(8)->withQueryString();
 
-        $totalRooms = \App\Models\Room::whereHas('boardingHouse', function ($q) {
-            $q->where('owner_id', auth()->id());
-        })->count();
-        $availableRooms = \App\Models\Room::whereHas('boardingHouse', function ($q) {
-            $q->where('owner_id', auth()->id());
-        })->where('available', true)->count();
+        $boardingHouseIds = \App\Models\BoardingHouse::where('owner_id', auth()->id())->pluck('id');
+        $totalRooms = \App\Models\Room::whereIn('boarding_house_id', $boardingHouseIds)->count();
+        $availableRooms = \App\Models\Room::whereIn('boarding_house_id', $boardingHouseIds)->where('available', true)->count();
         $occupiedRooms = $totalRooms - $availableRooms;
         $occupancyRate = $totalRooms > 0 ? round(($occupiedRooms / $totalRooms) * 100) : 0;
         $totalKosts = $kosts->count();
@@ -867,26 +857,12 @@ class PemilikKosController extends Controller
         return redirect()->route('pemilik.kost')->with('success', 'Data Properti Kost berhasil dihapus!');
     }
 
-    public function simpanPengeluaran(Request $request)
+    private function isImageUsedByOtherRooms($imagePath, $rId)
     {
-        $request->validate([
-            'room_id' => 'required|exists:rooms,id',
-            'amount' => 'required|numeric',
-            'description' => 'required|string',
-            'expense_date' => 'required|date'
-        ]);
-
-        $room = \App\Models\Room::whereHas('boardingHouse', function ($q) {
-            $q->where('owner_id', auth()->id());
-        })->findOrFail($request->room_id);
-
-        \App\Models\Expense::create([
-            'room_id' => $room->id,
-            'amount' => $request->amount,
-            'description' => $request->description,
-            'expense_date' => $request->expense_date,
-        ]);
-
-        return redirect()->back()->with('success', 'Pengeluaran kamar berhasil dicatat.');
+        if (!$imagePath) return false;
+        return \App\Models\Room::where('id', '!=', $rId)->where(function($q) use ($imagePath) {
+            $q->where('main_image', $imagePath)
+              ->orWhere('other_images', 'LIKE', '%"'. $imagePath .'"%');
+        })->exists();
     }
 }
