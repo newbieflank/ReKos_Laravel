@@ -21,9 +21,9 @@ class ProfileController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'nullable|numeric',
+            'phone' => 'required|numeric',
             'gender' => 'required|in:male,female,unknown',
-            'birth_date' => 'nullable|date',
+            'birth_date' => 'required|date',
             'occupation' => 'nullable|string|max:100',
             'institution' => 'nullable|string|max:100',
             'city' => 'nullable|string|max:100',

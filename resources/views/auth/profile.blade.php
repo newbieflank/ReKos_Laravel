@@ -49,14 +49,14 @@
 
                     <div class="row g-3">
                         <div class="col-md-6 mb-3">
-                            <label for="name" class="form-label">Nama Lengkap</label>
+                            <label for="name" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name"
                                 value="{{ old('name', $user->name) }}" required>
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <label for="gender" class="form-label">Jenis Kelamin</label>
-                            <select class="form-select" id="gender" name="gender">
+                            <label for="gender" class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
+                            <select class="form-select" id="gender" name="gender" required>
                                 <option value="unknown"
                                     {{ old('gender', $user->userDetail->gender) == 'unknown' ? 'selected' : '' }}>Pilih
                                     Jenis
@@ -71,9 +71,9 @@
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <label for="birth_date" class="form-label">Tanggal Lahir</label>
+                            <label for="birth_date" class="form-label">Tanggal Lahir <span class="text-danger">*</span></label>
                             <input type="date" class="form-control datepicker" id="birth_date" name="birth_date"
-                                value="{{ old('birth_date', $user->userDetail->birth_date) }}" placeholder="YYYY-MM-DD">
+                                value="{{ old('birth_date', $user->userDetail->birth_date) }}" placeholder="YYYY-MM-DD" required>
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -95,9 +95,9 @@
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <label for="phone" class="form-label">Nomor Telepon</label>
+                            <label for="phone" class="form-label">Nomor Telepon <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="phone" name="phone"
-                                value="{{ old('phone', $user->userDetail->phone) }}">
+                                value="{{ old('phone', $user->userDetail->phone) }}" required>
                         </div>
 
                         <div class="col-12 mb-4">
