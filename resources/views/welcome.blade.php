@@ -621,26 +621,40 @@
                         </div>
 
                         @auth
-                            <form id="reviewForm" action="{{ route('app.review.store') }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="rating" id="ratingInput" value="0">
-                                <div class="input-group">
-                                    <input type="text" name="review" id="reviewText"
-                                        class="form-control rounded-start-pill border-end-0 @error('review') is-invalid @enderror"
-                                        placeholder="Tulis ulasan anda disini..." style="border-color:#dee2e6;"
-                                        maxlength="500">
-                                    <button type="submit" class="btn btn-primary rounded-end-pill px-3"
-                                        style="border-top-left-radius:0;border-bottom-left-radius:0;">
-                                        <i class="fas fa-paper-plane"></i>
+                            @php
+                                $userReview = auth()->user()->appReview;
+                            @endphp
+                            
+                            @if($userReview)
+                                <div class="text-center w-100">
+                                    <p class="text-success fw-bold mb-1"><i class="fas fa-check-circle me-1"></i> Anda sudah memberikan ulasan!</p>
+                                    <p class="text-muted small mb-3">Terima kasih atas tanggapan Anda.</p>
+                                    <button type="button" class="btn btn-outline-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#editReviewModal">
+                                        <i class="fas fa-edit me-2"></i>Edit Ulasan Anda
                                     </button>
                                 </div>
-                                @error('review')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                @enderror
-                                @error('rating')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                @enderror
-                            </form>
+                            @else
+                                <form id="reviewForm" action="{{ route('app.review.store') }}" method="POST" class="w-100">
+                                    @csrf
+                                    <input type="hidden" name="rating" id="ratingInput" value="0">
+                                    <div class="input-group">
+                                        <input type="text" name="review" id="reviewText"
+                                            class="form-control rounded-start-pill border-end-0 @error('review') is-invalid @enderror"
+                                            placeholder="Tulis ulasan anda disini..." style="border-color:#dee2e6;"
+                                            maxlength="500">
+                                        <button type="submit" class="btn btn-primary rounded-end-pill px-3"
+                                            style="border-top-left-radius:0;border-bottom-left-radius:0;">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </div>
+                                    @error('review')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                    @error('rating')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </form>
+                            @endif
                         @else
                             <div class="input-group">
                                 <input type="text" class="form-control rounded-start-pill border-end-0"
@@ -657,11 +671,56 @@
             </div>
         </div>
     </section>
+
+    <!-- Modal Edit Review -->
+    @auth
+    @if(auth()->user()->appReview)
+    <div class="modal fade" id="editReviewModal" tabindex="-1" aria-labelledby="editReviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="editReviewModalLabel">Edit Ulasan Anda</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editReviewForm" action="{{ route('app.review.store') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="rating" id="editRatingInput" value="{{ auth()->user()->appReview->rating }}">
+                        
+                        <div class="mb-3 text-center">
+                            <label class="form-label text-muted small">Rating Anda</label>
+                            <div class="star-rating d-flex justify-content-center gap-2" id="editStarRating">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star edit-star-icon fs-3" data-value="{{ $i }}"
+                                        style="color: {{ $i <= auth()->user()->appReview->rating ? '#FBBF24' : '#ddd' }}; cursor: pointer; transition: color 0.15s;">
+                                    </i>
+                                @endfor
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label text-muted small">Ulasan</label>
+                            <textarea name="review" id="editReviewText" class="form-control rounded-3" rows="4" 
+                                placeholder="Tulis ulasan anda disini..." maxlength="500" required>{{ auth()->user()->appReview->review }}</textarea>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary rounded-pill py-2 fw-bold">Update Ulasan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+    @endauth
+
 @endsection
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Choices.js
@@ -885,6 +944,114 @@
                             submitBtn.disabled = false;
                             showAlert('danger', 'Terjadi kesalahan sistem. Coba lagi nanti.');
                         });
+                });
+            }
+
+            // Edit Rating Interaktif
+            const editStars = document.querySelectorAll('.edit-star-icon');
+            const editRatingInput = document.getElementById('editRatingInput');
+            let editSelectedRating = editRatingInput ? parseInt(editRatingInput.value) : 0;
+            const originalEditRating = editSelectedRating;
+            const editReviewText = document.getElementById('editReviewText');
+            const originalEditReview = editReviewText ? editReviewText.value : '';
+
+            const editModal = document.getElementById('editReviewModal');
+            if (editModal) {
+                editModal.addEventListener('hidden.bs.modal', function () {
+                    if (editRatingInput) editRatingInput.value = originalEditRating;
+                    editSelectedRating = originalEditRating;
+                    editStars.forEach(s => {
+                        s.style.color = parseInt(s.getAttribute('data-value')) <= originalEditRating ? '#FBBF24' : '#ddd';
+                    });
+                    if (editReviewText) editReviewText.value = originalEditReview;
+                });
+            }
+
+            editStars.forEach(star => {
+                star.addEventListener('mouseover', () => {
+                    const val = parseInt(star.getAttribute('data-value'));
+                    editStars.forEach(s => {
+                        s.style.color = parseInt(s.getAttribute('data-value')) <= val ? '#FBBF24' : '#ddd';
+                    });
+                });
+                star.addEventListener('mouseout', () => {
+                    editStars.forEach(s => {
+                        s.style.color = parseInt(s.getAttribute('data-value')) <= editSelectedRating ? '#FBBF24' : '#ddd';
+                    });
+                });
+                star.addEventListener('click', () => {
+                    editSelectedRating = parseInt(star.getAttribute('data-value'));
+                    if (editRatingInput) editRatingInput.value = editSelectedRating;
+                    editStars.forEach(s => {
+                        s.style.color = parseInt(s.getAttribute('data-value')) <= editSelectedRating ? '#FBBF24' : '#ddd';
+                    });
+                });
+            });
+
+            // AJAX Form Submission untuk Edit Review
+            const editReviewForm = document.getElementById('editReviewForm');
+            if (editReviewForm) {
+                editReviewForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalBtnHtml = submitBtn.innerHTML;
+                    
+                    if (formData.get('rating') == '0') {
+                        Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Silakan pilih rating bintang terlebih dahulu.' });
+                        return;
+                    }
+                    if (!formData.get('review').trim()) {
+                        Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Silakan tulis ulasan Anda.' });
+                        return;
+                    }
+
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                    submitBtn.disabled = true;
+
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        submitBtn.innerHTML = originalBtnHtml;
+                        submitBtn.disabled = false;
+
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: data.message,
+                                icon: 'success',
+                                confirmButtonColor: '#0d6efd'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Gagal!',
+                                text: data.message || 'Terjadi kesalahan.',
+                                icon: 'error',
+                                confirmButtonColor: '#0d6efd'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        submitBtn.innerHTML = originalBtnHtml;
+                        submitBtn.disabled = false;
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Terjadi kesalahan sistem. Coba lagi nanti.',
+                            icon: 'error',
+                            confirmButtonColor: '#0d6efd'
+                        });
+                    });
                 });
             }
 

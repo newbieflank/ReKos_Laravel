@@ -6,6 +6,7 @@ use App\Models\AppReview;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 class AppReviewController extends Controller
 {
@@ -16,27 +17,60 @@ class AppReviewController extends Controller
             'review' => 'required|string|max:500',
         ]);
 
-        // Cek apakah user sudah pernah review
-        $existing = AppReview::where('user_id', Auth::id())->first();
+        $badWords = [];
+        if (Storage::exists('badwords.json')) {
+            $badWords = json_decode(Storage::get('badwords.json'), true) ?? [];
+        }
+        
+        $leet = [
+            'a' => '[aA4@]', 'b' => '[bB8]', 'e' => '[eE3]', 'i' => '[iI1\!\|]', 
+            'o' => '[oO0]', 's' => '[sS5\$]', 't' => '[tT7]', 'g' => '[gG9]'
+        ];
 
-        if ($existing) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['success' => false, 'message' => 'Kamu sudah pernah memberikan ulasan sebelumnya.']);
+        foreach ($badWords as $word) {
+            $regex = '';
+            foreach (str_split($word) as $char) {
+                $regex .= (isset($leet[$char]) ? $leet[$char] : preg_quote($char, '/')) . '[\W_]*';
             }
-            return back()->with('error', 'Kamu sudah pernah memberikan ulasan sebelumnya.');
+            $regex = substr($regex, 0, -6);
+            
+            $pattern = '/' . $regex . '/i';
+
+            if (preg_match($pattern, $request->review)) {
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Ulasan Anda mengandung kata-kata yang tidak pantas.']);
+                }
+                return back()->with('error', 'Ulasan Anda mengandung kata-kata yang tidak pantas.')->withInput();
+            }
         }
 
-        $review = AppReview::create([
-            'user_id' => Auth::id(),
-            'rating'  => $request->rating,
-            'review'  => $request->review,
-        ]);
+        // Cek apakah user sudah pernah review
+        $existing = AppReview::where('user_id', Auth::id())->first();
+        $isUpdate = false;
+
+        if ($existing) {
+            $existing->update([
+                'rating' => $request->rating,
+                'review' => $request->review,
+            ]);
+            $review = $existing;
+            $message = 'Ulasan berhasil diperbarui! Terima kasih';
+            $isUpdate = true;
+        } else {
+            $review = AppReview::create([
+                'user_id' => Auth::id(),
+                'rating'  => $request->rating,
+                'review'  => $request->review,
+            ]);
+            $message = 'Ulasan berhasil dikirim! Terima kasih';
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             $user = Auth::user();
             return response()->json([
                 'success' => true,
-                'message' => 'Ulasan berhasil dikirim! Terima kasih 🎉',
+                'message' => $message,
+                'is_update' => $isUpdate,
                 'data' => [
                     'rating' => $review->rating,
                     'review' => $review->review,
@@ -48,6 +82,6 @@ class AppReviewController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Ulasan berhasil dikirim! Terima kasih 🎉');
+        return back()->with('success', $message);
     }
 }

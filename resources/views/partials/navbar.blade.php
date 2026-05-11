@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white py-3 shadow-sm sticky-top">
     <div class="container">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="{{ route('home') }}">
             <img src="{{ asset('images/logo.svg') }}" alt="Logo Re-Kost" height="70">
         </a>
 
