@@ -3,12 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\AppReview;
+use App\Services\ContentFilterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class AppReviewController extends Controller
 {
+    protected ContentFilterService $contentFilter;
+
+    public function __construct(ContentFilterService $contentFilter)
+    {
+        $this->contentFilter = $contentFilter;
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -16,27 +24,51 @@ class AppReviewController extends Controller
             'review' => 'required|string|max:500',
         ]);
 
-        // Cek apakah user sudah pernah review
+
+        $filterResult = $this->contentFilter->check($request->review);
+
+        if (!$filterResult['is_clean']) {
+            $categories = collect($filterResult['violations'])->pluck('label')->implode(', ');
+            $message = "Ulasan tidak dapat dikirim karena mengandung konten yang tidak diperbolehkan ({$categories}). Mohon gunakan bahasa yang sopan dan sesuai.";
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'filtered' => true,
+                    'message' => $message,
+                    'violations' => $filterResult['violations'],
+                ]);
+            }
+            return back()->with('error', $message)->withInput();
+        }
+
+
         $existing = AppReview::where('user_id', Auth::id())->first();
 
         if ($existing) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['success' => false, 'message' => 'Kamu sudah pernah memberikan ulasan sebelumnya.']);
-            }
-            return back()->with('error', 'Kamu sudah pernah memberikan ulasan sebelumnya.');
+            $existing->update([
+                'rating' => $request->rating,
+                'review' => $request->review,
+            ]);
+            $review = $existing;
+            $message = 'Ulasan berhasil diperbarui! Terima kasih 🎉';
+            $isUpdated = true;
+        } else {
+            $review = AppReview::create([
+                'user_id' => Auth::id(),
+                'rating'  => $request->rating,
+                'review'  => $request->review,
+            ]);
+            $message = 'Ulasan berhasil dikirim! Terima kasih 🎉';
+            $isUpdated = false;
         }
-
-        $review = AppReview::create([
-            'user_id' => Auth::id(),
-            'rating'  => $request->rating,
-            'review'  => $request->review,
-        ]);
 
         if ($request->ajax() || $request->wantsJson()) {
             $user = Auth::user();
             return response()->json([
                 'success' => true,
-                'message' => 'Ulasan berhasil dikirim! Terima kasih 🎉',
+                'updated' => $isUpdated,
+                'message' => $message,
                 'data' => [
                     'rating' => $review->rating,
                     'review' => $review->review,
@@ -48,6 +80,6 @@ class AppReviewController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Ulasan berhasil dikirim! Terima kasih 🎉');
+        return back()->with('success', $message);
     }
 }

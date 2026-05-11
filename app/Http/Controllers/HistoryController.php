@@ -6,10 +6,18 @@ use Illuminate\Http\Request;
 use App\Models\Tenant;
 use App\Models\BoardingHouseReview;
 use App\Models\BoardingHouse;
+use App\Services\ContentFilterService;
 use Illuminate\Support\Facades\Auth;
 
 class HistoryController extends Controller
 {
+    protected ContentFilterService $contentFilter;
+
+    public function __construct(ContentFilterService $contentFilter)
+    {
+        $this->contentFilter = $contentFilter;
+    }
+
     public function index()
     {
         $histories = Tenant::with(['room.boardingHouse', 'payments'])
@@ -34,25 +42,38 @@ class HistoryController extends Controller
             'review' => 'nullable|string|max:500',
         ]);
 
+        if ($request->filled('review')) {
+            $filterResult = $this->contentFilter->check($request->review);
+            if (!$filterResult['is_clean']) {
+                $categories = collect($filterResult['violations'])->pluck('label')->implode(', ');
+                $message = "Ulasan tidak dapat dikirim karena mengandung konten yang tidak diperbolehkan ({$categories}). Mohon gunakan bahasa yang sopan dan sesuai.";
+                return back()->with('error', $message)->withInput();
+            }
+        }
+
         $existing = BoardingHouseReview::where('tenant_id', Auth::id())
             ->where('boarding_house_id', $request->boarding_house_id)
             ->first();
 
         if ($existing) {
-            return back()->with('error', 'Anda sudah memberikan rating untuk kost ini.');
+            $existing->update([
+                'rating' => $request->rating,
+                'review' => $request->review,
+            ]);
+            $message = 'Ulasan berhasil diperbarui! Terima kasih atas ulasan Anda.';
+        } else {
+            BoardingHouseReview::create([
+                'tenant_id' => Auth::id(),
+                'boarding_house_id' => $request->boarding_house_id,
+                'rating' => $request->rating,
+                'review' => $request->review,
+            ]);
+            $message = 'Terima kasih atas ulasan Anda!';
         }
-
-        BoardingHouseReview::create([
-            'tenant_id' => Auth::id(),
-            'boarding_house_id' => $request->boarding_house_id,
-            'rating' => $request->rating,
-            'review' => $request->review,
-        ]);
-
-        // Update average rating on boarding house
+      
         $avgRating = BoardingHouseReview::where('boarding_house_id', $request->boarding_house_id)->avg('rating');
         BoardingHouse::where('id', $request->boarding_house_id)->update(['rating' => $avgRating]);
 
-        return back()->with('success', 'Terima kasih atas ulasan Anda!');
+        return back()->with('success', $message);
     }
 }

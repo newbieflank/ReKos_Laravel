@@ -73,47 +73,46 @@
                                                     class="text-muted ms-1 small text-dark fw-medium">{{ number_format($userReview->rating, 1) }}/5</span>
                                             </div>
                                             @if ($userReview->review)
-                                                <p class="text-muted small mt-1 mb-0 fst-italic">
+                                                <p class="text-muted small mt-1 mb-2 fst-italic">
                                                     "{{ Str::limit($userReview->review, 50) }}"</p>
                                             @endif
-                                        @else
-                                            <button
-                                                class="btn btn-sm text-primary p-0 bg-transparent shadow-none d-flex align-items-center gap-1"
-                                                type="button" id="ratingDropdown{{ $history->id }}"
-                                                data-bs-toggle="dropdown" aria-expanded="false" style="font-weight: 500;">
-                                                <i class="far fa-star"></i> Beri Rating <i class="fas fa-chevron-down ms-1"
-                                                    style="font-size: 0.7rem;"></i>
-                                            </button>
-                                            <div class="dropdown-menu p-3 shadow border-0"
-                                                aria-labelledby="ratingDropdown{{ $history->id }}"
-                                                style="min-width: 260px; border-radius: 12px; margin-top: 10px;">
-                                                <h6 class="fw-bold mb-3 text-dark" style="font-size: 0.95rem;">Nilai
-                                                    Pengalamanmu</h6>
-                                                <form action="{{ route('user.history.review') }}" method="POST"
-                                                    class="rating-form">
-                                                    @csrf
-                                                    <input type="hidden" name="boarding_house_id"
-                                                        value="{{ $boardingHouseId }}">
-                                                    <input type="hidden" name="rating" class="rating-input"
-                                                        value="0">
-
-                                                    <div class="d-flex mb-3 star-container" style="gap: 5px;">
-                                                        @for ($i = 1; $i <= 5; $i++)
-                                                            <i class="fas fa-star fs-4 star-icon"
-                                                                data-value="{{ $i }}"
-                                                                style="color: #e5e7eb; cursor: pointer; transition: color 0.2s;"></i>
-                                                        @endfor
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <textarea name="review" class="form-control form-control-sm border-0 bg-light" rows="3"
-                                                            placeholder="Tulis ulasan Anda (opsional)..." style="resize: none; border-radius: 8px;"></textarea>
-                                                    </div>
-                                                    <button type="submit"
-                                                        class="btn btn-primary btn-sm w-100 rounded-pill fw-medium py-2">Kirim
-                                                        Ulasan</button>
-                                                </form>
-                                            </div>
                                         @endif
+
+                                        <button
+                                            class="btn btn-sm text-primary p-0 bg-transparent shadow-none d-flex align-items-center gap-1 mt-1"
+                                            type="button" id="ratingDropdown{{ $history->id }}"
+                                            data-bs-toggle="dropdown" aria-expanded="false" style="font-weight: 500;">
+                                            <i class="far fa-star"></i> {{ $hasReviewed ? 'Update Rating' : 'Beri Rating' }} <i class="fas fa-chevron-down ms-1"
+                                                style="font-size: 0.7rem;"></i>
+                                        </button>
+                                        <div class="dropdown-menu p-3 shadow border-0"
+                                            aria-labelledby="ratingDropdown{{ $history->id }}"
+                                            style="min-width: 260px; border-radius: 12px; margin-top: 10px;">
+                                            <h6 class="fw-bold mb-3 text-dark" style="font-size: 0.95rem;">Nilai
+                                                Pengalamanmu</h6>
+                                            <form action="{{ route('user.history.review') }}" method="POST"
+                                                class="rating-form">
+                                                @csrf
+                                                <input type="hidden" name="boarding_house_id"
+                                                    value="{{ $boardingHouseId }}">
+                                                <input type="hidden" name="rating" class="rating-input"
+                                                    value="{{ $hasReviewed ? $userReview->rating : 0 }}">
+
+                                                <div class="d-flex mb-3 star-container" style="gap: 5px;">
+                                                    @for ($i = 1; $i <= 5; $i++)
+                                                        <i class="fas fa-star fs-4 star-icon"
+                                                            data-value="{{ $i }}"
+                                                            style="color: {{ $hasReviewed && $i <= $userReview->rating ? '#FBBF24' : '#e5e7eb' }}; cursor: pointer; transition: color 0.2s;"></i>
+                                                    @endfor
+                                                </div>
+                                                <div class="mb-3">
+                                                    <textarea name="review" class="form-control form-control-sm border-0 bg-light" rows="3"
+                                                        placeholder="Tulis ulasan Anda (opsional)..." style="resize: none; border-radius: 8px;">{{ $hasReviewed ? $userReview->review : '' }}</textarea>
+                                                </div>
+                                                <button type="submit"
+                                                    class="btn btn-primary btn-sm w-100 rounded-pill fw-medium py-2">{{ $hasReviewed ? 'Update Ulasan' : 'Kirim Ulasan' }}</button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -172,12 +171,61 @@
                 });
             });
 
+          
+            const bannedWords = {
+                kata_kasar: [
+                    'anjing','anjir','anjrit','bangsat','bgst','babi','kontol','kntl',
+                    'memek','ngentot','ngewe','entot','pepek','jancok','jancuk','dancok',
+                    'goblok','goblog','kampret','taik','tahi','peler','titit','pantat',
+                    'pantek','lonte','sundal','pelacur','jablay','perek','brengsek',
+                    'keparat','bajingan','bacot','bokep','colmek','kimak','pukimak'
+                ],
+                judol: [
+                    'judi online','slot gacor','slot online','situs slot','agen slot',
+                    'bandar togel','bocoran slot','pola slot','bonus new member',
+                    'gates of olympus','sweet bonanza','mahjong ways','daftar slot',
+                    'link slot','agen judi','rtp live','freebet',
+                    'judol','togel','slotgacor','maxwin','bandarq','dominoqq','sbobet'
+                ],
+                asusila: [
+                    'open bo','openbo','sugar daddy','sugar baby','pijat plus','plus plus',
+                    'onlyfans','video panas','foto bugil',
+                    'pornografi','telanjang','bugil','orgasme','masturbasi','onani',
+                    'hentai','blowjob','handjob','dildo','vibrator','mesum','cabul','zina'
+                ]
+            };
+            const categoryLabels = {kata_kasar:'Kata Kasar/Jorok',judol:'Judi Online (Judol)',asusila:'Konten Asusila'};
+
+            function normalizeText(text) {
+                text = text.toLowerCase();
+                text = text.replace(/(.)(\1{2,})/g, '$1');
+                const map = {'0':'o','1':'i','3':'e','4':'a','5':'s','6':'g','7':'t','8':'b','9':'g','@':'a','$':'s','!':'i','+':'t'};
+                for (const [k,v] of Object.entries(map)) text = text.split(k).join(v);
+                text = text.replace(/[^a-z0-9\s]/g, '');
+                return text.replace(/\s+/g, ' ').trim();
+            }
+
+            function checkContent(text) {
+                const norm = normalizeText(text);
+                const found = [];
+                for (const [cat, words] of Object.entries(bannedWords)) {
+                    for (const w of words) {
+                        const escaped = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const isPhrase = w.includes(' ');
+                        const re = isPhrase ? new RegExp(escaped) : new RegExp('\\b' + escaped + '\\b');
+                        if (re.test(norm)) { found.push(categoryLabels[cat]); break; }
+                    }
+                }
+                return found;
+            }
+
             const starContainers = document.querySelectorAll('.star-container');
 
             starContainers.forEach(container => {
+                const form = container.closest('form');
                 const stars = container.querySelectorAll('.star-icon');
-                const ratingInput = container.closest('form').querySelector('.rating-input');
-                let selectedRating = 0;
+                const ratingInput = form.querySelector('.rating-input');
+                let selectedRating = parseInt(ratingInput.value) || 0;
 
                 stars.forEach(star => {
                     // Hover event
@@ -189,7 +237,7 @@
                         });
                     });
 
-                    // Mouseout event
+                   
                     star.addEventListener('mouseout', () => {
                         stars.forEach(s => {
                             s.style.color = parseInt(s.getAttribute(
@@ -198,7 +246,7 @@
                         });
                     });
 
-                    // Click event
+                 
                     star.addEventListener('click', () => {
                         selectedRating = parseInt(star.getAttribute('data-value'));
                         ratingInput.value = selectedRating;
@@ -209,7 +257,121 @@
                         });
                     });
                 });
+
+             
+                const reviewText = form.querySelector('textarea[name="review"]');
+                const submitBtn = form.querySelector('button[type="submit"]');
+                
+                let filterWarning = form.querySelector('.filter-warning');
+                if (!filterWarning) {
+                    filterWarning = document.createElement('div');
+                    filterWarning.className = 'filter-warning mt-2 mb-2';
+                    filterWarning.style.display = 'none';
+                    filterWarning.innerHTML = `
+                        <div class="d-flex align-items-start gap-2 p-2 rounded-3" style="background: #fff3cd; border: 1px solid #ffc107;">
+                            <i class="fas fa-exclamation-triangle text-warning mt-1" style="font-size: 0.85rem;"></i>
+                            <div>
+                                <span class="fw-semibold text-dark" style="font-size: 0.8rem;">Konten terlarang!</span>
+                                <p class="mb-0 text-muted filter-warning-text" style="font-size: 0.75rem;"></p>
+                            </div>
+                        </div>
+                    `;
+                   
+                    submitBtn.parentNode.insertBefore(filterWarning, submitBtn);
+                }
+                const filterWarningText = filterWarning.querySelector('.filter-warning-text');
+
+                if (reviewText) {
+                    let debounceTimer;
+                    reviewText.addEventListener('input', function() {
+                        clearTimeout(debounceTimer);
+                        debounceTimer = setTimeout(() => {
+                            const val = this.value.trim();
+                            if (!val) {
+                                filterWarning.style.display = 'none';
+                                submitBtn.disabled = false;
+                                reviewText.style.borderColor = '#e5e7eb';
+                                return;
+                            }
+                            const violations = checkContent(val);
+                            if (violations.length > 0) {
+                                filterWarning.style.display = 'block';
+                                filterWarningText.textContent = 'Mengandung: ' + violations.join(', ');
+                                submitBtn.disabled = true;
+                                reviewText.style.borderColor = '#dc3545';
+                            } else {
+                                filterWarning.style.display = 'none';
+                                submitBtn.disabled = false;
+                                reviewText.style.borderColor = '#e5e7eb';
+                            }
+                        }, 300);
+                    });
+                }
+                
+        
+                form.addEventListener('submit', function(e) {
+                    const ratingVal = ratingInput ? parseInt(ratingInput.value) : 0;
+                    
+                    if (ratingVal === 0) {
+                        e.preventDefault();
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Rating Kosong',
+                                text: 'Silakan pilih rating bintang terlebih dahulu sebelum mengirim ulasan.',
+                                confirmButtonColor: '#f8b425'
+                            });
+                        } else {
+                            alert('Silakan pilih rating bintang terlebih dahulu.');
+                        }
+                        return; 
+                    }
+
+                    const reviewVal = reviewText ? reviewText.value.trim() : '';
+                    if (reviewVal) {
+                        const violations = checkContent(reviewVal);
+                        if (violations.length > 0) {
+                            e.preventDefault();
+                            
+                       
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Konten Terlarang!',
+                                    text: 'Ulasan tidak dapat dikirim karena mengandung konten yang tidak diperbolehkan (' + violations.join(', ') + '). Mohon gunakan bahasa yang sopan.',
+                                    confirmButtonColor: '#dc3545'
+                                });
+                            } else {
+                                
+                                alert('Peringatan: Ulasan mengandung konten yang tidak diperbolehkan (' + violations.join(', ') + ').');
+                            }
+                        }
+                    }
+                });
             });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}',
+                    confirmButtonColor: '#0d6efd'
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: '{{ session('error') }}',
+                    confirmButtonColor: '#dc3545'
+                });
+            @endif
         });
     </script>
 @endpush

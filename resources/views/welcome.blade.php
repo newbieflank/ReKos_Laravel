@@ -435,7 +435,7 @@
     <section id="rating" class="py-5 bg-white">
         <div class="container">
             <div class="text-center mb-5">
-                <h6 class="fw-bold text-primary mb-1">Ulasam</h6>
+                <h6 class="fw-bold text-primary mb-1">Ulasan</h6>
                 <h2 class="fw-bold">Ulasan Pengguna Re-Kost</h2>
             </div>
 
@@ -557,11 +557,21 @@
                                     <input type="text" name="review" id="reviewText"
                                         class="form-control rounded-start-pill border-end-0 @error('review') is-invalid @enderror"
                                         placeholder="Tulis ulasan anda disini..." style="border-color:#dee2e6;"
-                                        maxlength="500">
-                                    <button type="submit" class="btn btn-primary rounded-end-pill px-3"
+                                        maxlength="500" autocomplete="off">
+                                    <button type="submit" class="btn btn-primary rounded-end-pill px-3" id="submitReviewBtn"
                                         style="border-top-left-radius:0;border-bottom-left-radius:0;">
                                         <i class="fas fa-paper-plane"></i>
                                     </button>
+                                </div>
+                                {{-- Filter warning area (real-time) --}}
+                                <div id="filterWarning" class="mt-2" style="display:none;">
+                                    <div class="d-flex align-items-start gap-2 p-2 rounded-3" style="background: #fff3cd; border: 1px solid #ffc107;">
+                                        <i class="fas fa-exclamation-triangle text-warning mt-1" style="font-size: 0.85rem;"></i>
+                                        <div>
+                                            <span class="fw-semibold text-dark" style="font-size: 0.8rem;">Konten terlarang terdeteksi!</span>
+                                            <p class="mb-0 text-muted" style="font-size: 0.75rem;" id="filterWarningText"></p>
+                                        </div>
+                                    </div>
                                 </div>
                                 @error('review')
                                     <div class="text-danger small mt-1">{{ $message }}</div>
@@ -570,6 +580,10 @@
                                     <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
                             </form>
+                            <p class="text-muted mt-2 mb-0" style="font-size: 0.7rem;">
+                                <i class="fas fa-shield-alt me-1 text-primary"></i>
+                                Ulasan dilindungi filter otomatis terhadap kata kasar, konten judi online, dan konten asusila.
+                            </p>
                         @else
                             <div class="input-group">
                                 <input type="text" class="form-control rounded-start-pill border-end-0"
@@ -592,75 +606,120 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize all room sliders
+          
+            const bannedWords = {
+                kata_kasar: [
+                   
+                    'anjing','anjir','anjrit','bangsat','bgst','babi','kontol','kntl',
+                    'memek','ngentot','ngewe','entot','pepek','jancok','jancuk','dancok',
+                    'goblok','goblog','kampret','taik','tahi','peler','titit','pantat',
+                    'pantek','lonte','sundal','pelacur','jablay','perek','brengsek',
+                    'keparat','bajingan','bacot','bokep','colmek','kimak','pukimak'
+                ],
+                judol: [
+                    
+                    'judi online','slot gacor','slot online','situs slot','agen slot',
+                    'bandar togel','bocoran slot','pola slot','bonus new member',
+                    'gates of olympus','sweet bonanza','mahjong ways','daftar slot',
+                    'link slot','agen judi','rtp live','freebet',
+                   
+                    'judol','togel','slotgacor','maxwin','bandarq','dominoqq','sbobet'
+                ],
+                asusila: [
+                    
+                    'open bo','openbo','sugar daddy','sugar baby','pijat plus','plus plus',
+                    'onlyfans','video panas','foto bugil',
+
+                    'pornografi','telanjang','bugil','orgasme','masturbasi','onani',
+                    'hentai','blowjob','handjob','dildo','vibrator','mesum','cabul','zina'
+                ]
+            };
+            const categoryLabels = {kata_kasar:'Kata Kasar/Jorok',judol:'Judi Online (Judol)',asusila:'Konten Asusila'};
+
+            function normalizeText(text) {
+                text = text.toLowerCase();
+              
+                text = text.replace(/(.)(\1{2,})/g, '$1');
+             
+                const map = {'0':'o','1':'i','3':'e','4':'a','5':'s','6':'g','7':'t','8':'b','9':'g','@':'a','$':'s','!':'i','+':'t'};
+                for (const [k,v] of Object.entries(map)) text = text.split(k).join(v);
+           
+                text = text.replace(/[^a-z0-9\s]/g, '');
+                return text.replace(/\s+/g, ' ').trim();
+            }
+
+            function checkContent(text) {
+                const norm = normalizeText(text);
+                const found = [];
+                for (const [cat, words] of Object.entries(bannedWords)) {
+                    for (const w of words) {
+                        const escaped = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                      
+                        const isPhrase = w.includes(' ');
+                        const re = isPhrase
+                            ? new RegExp(escaped)
+                            : new RegExp('\\b' + escaped + '\\b');
+                        if (re.test(norm)) { found.push(categoryLabels[cat]); break; }
+                    }
+                }
+                return found;
+            }
+
+
+            const reviewText = document.getElementById('reviewText');
+            const filterWarning = document.getElementById('filterWarning');
+            const filterWarningText = document.getElementById('filterWarningText');
+            const submitBtn = document.getElementById('submitReviewBtn');
+            let contentClean = true;
+
+            if (reviewText) {
+                let debounceTimer;
+                reviewText.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        const val = this.value.trim();
+                        if (!val) {
+                            filterWarning && (filterWarning.style.display = 'none');
+                            submitBtn && (submitBtn.disabled = false);
+                            contentClean = true;
+                            reviewText.style.borderColor = '#dee2e6';
+                            return;
+                        }
+                        const violations = checkContent(val);
+                        if (violations.length > 0) {
+                            contentClean = false;
+                            filterWarning && (filterWarning.style.display = 'block');
+                            filterWarningText && (filterWarningText.textContent = 'Mengandung: ' + violations.join(', ') + '. Mohon ubah ulasan Anda.');
+                            submitBtn && (submitBtn.disabled = true);
+                            reviewText.style.borderColor = '#dc3545';
+                        } else {
+                            contentClean = true;
+                            filterWarning && (filterWarning.style.display = 'none');
+                            submitBtn && (submitBtn.disabled = false);
+                            reviewText.style.borderColor = '#dee2e6';
+                        }
+                    }, 300);
+                });
+            }
+
+        
             document.querySelectorAll('.roomSwiper').forEach((el) => {
                 const container = el.closest('.swiper-container-wrapper');
-                const prevEl = container.querySelector('.swiper-button-prev');
-                const nextEl = container.querySelector('.swiper-button-next');
-                const paginationEl = el.querySelector('.swiper-pagination');
-
                 new Swiper(el, {
-                    slidesPerView: 1,
-                    spaceBetween: 20,
-                    navigation: {
-                        nextEl: nextEl,
-                        prevEl: prevEl,
-                    },
-                    pagination: {
-                        el: paginationEl,
-                        clickable: true,
-                    },
-                    breakpoints: {
-                        640: {
-                            slidesPerView: 2,
-                            spaceBetween: 20
-                        },
-                        768: {
-                            slidesPerView: 3,
-                            spaceBetween: 30
-                        },
-                        1024: {
-                            slidesPerView: 4,
-                            spaceBetween: 30
-                        },
-                    },
+                    slidesPerView: 1, spaceBetween: 20,
+                    navigation: { nextEl: container.querySelector('.swiper-button-next'), prevEl: container.querySelector('.swiper-button-prev') },
+                    pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
+                    breakpoints: { 640:{slidesPerView:2,spaceBetween:20}, 768:{slidesPerView:3,spaceBetween:30}, 1024:{slidesPerView:4,spaceBetween:30} },
                 });
             });
-
-            // Initialize review slider
             window.reviewSwiperInstances = [];
             document.querySelectorAll('.reviewSwiper').forEach((el) => {
                 const container = el.closest('.swiper-container-wrapper');
-                const prevEl = container.querySelector('.swiper-button-prev');
-                const nextEl = container.querySelector('.swiper-button-next');
-                const paginationEl = el.querySelector('.swiper-pagination');
-
                 const swiper = new Swiper(el, {
-                    slidesPerView: 1,
-                    spaceBetween: 20,
-                    centerInsufficientSlides: true,
-                    navigation: {
-                        nextEl: nextEl,
-                        prevEl: prevEl,
-                    },
-                    pagination: {
-                        el: paginationEl,
-                        clickable: true,
-                    },
-                    breakpoints: {
-                        640: {
-                            slidesPerView: 2,
-                            spaceBetween: 20
-                        },
-                        768: {
-                            slidesPerView: 3,
-                            spaceBetween: 30
-                        },
-                        1024: {
-                            slidesPerView: 4,
-                            spaceBetween: 30
-                        },
-                    },
+                    slidesPerView: 1, spaceBetween: 20, centerInsufficientSlides: true,
+                    navigation: { nextEl: container.querySelector('.swiper-button-next'), prevEl: container.querySelector('.swiper-button-prev') },
+                    pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
+                    breakpoints: { 640:{slidesPerView:2,spaceBetween:20}, 768:{slidesPerView:3,spaceBetween:30}, 1024:{slidesPerView:4,spaceBetween:30} },
                 });
                 window.reviewSwiperInstances.push(swiper);
             });
@@ -669,33 +728,18 @@
             const stars = document.querySelectorAll('.star-icon');
             const ratingInput = document.getElementById('ratingInput');
             let selectedRating = 0;
-
             stars.forEach(star => {
-                // Hover: highlight bintang
                 star.addEventListener('mouseover', () => {
                     const val = parseInt(star.getAttribute('data-value'));
-                    stars.forEach(s => {
-                        s.style.color = parseInt(s.getAttribute('data-value')) <= val ?
-                            '#FBBF24' : '#ddd';
-                    });
+                    stars.forEach(s => { s.style.color = parseInt(s.getAttribute('data-value')) <= val ? '#FBBF24' : '#ddd'; });
                 });
-
-                // Keluar hover: kembali ke selected
                 star.addEventListener('mouseout', () => {
-                    stars.forEach(s => {
-                        s.style.color = parseInt(s.getAttribute('data-value')) <=
-                            selectedRating ? '#FBBF24' : '#ddd';
-                    });
+                    stars.forEach(s => { s.style.color = parseInt(s.getAttribute('data-value')) <= selectedRating ? '#FBBF24' : '#ddd'; });
                 });
-
-                // Klik: simpan rating
                 star.addEventListener('click', () => {
                     selectedRating = parseInt(star.getAttribute('data-value'));
                     if (ratingInput) ratingInput.value = selectedRating;
-                    stars.forEach(s => {
-                        s.style.color = parseInt(s.getAttribute('data-value')) <=
-                            selectedRating ? '#FBBF24' : '#ddd';
-                    });
+                    stars.forEach(s => { s.style.color = parseInt(s.getAttribute('data-value')) <= selectedRating ? '#FBBF24' : '#ddd'; });
                 });
             });
 
@@ -704,132 +748,79 @@
             if (reviewForm) {
                 reviewForm.addEventListener('submit', function(e) {
                     e.preventDefault();
-
                     const formData = new FormData(this);
-                    const submitBtn = this.querySelector('button[type="submit"]');
-                    const originalBtnHtml = submitBtn.innerHTML;
-                    const dynamicAlertContainer = document.getElementById('dynamicAlertContainer');
+                    const btn = this.querySelector('button[type="submit"]');
+                    const originalHtml = btn.innerHTML;
+                    const alertBox = document.getElementById('dynamicAlertContainer');
+                    alertBox.innerHTML = '';
 
-                    // Reset alert container
-                    dynamicAlertContainer.innerHTML = '';
+                    if (formData.get('rating') == '0') { showAlert('danger', 'Silakan pilih rating bintang terlebih dahulu.'); return; }
+                    if (!formData.get('review').trim()) { showAlert('danger', 'Silakan tulis ulasan Anda.'); return; }
 
-                    // Validasi manual cepat
-                    if (formData.get('rating') == '0') {
-                        showAlert('danger', 'Silakan pilih rating bintang terlebih dahulu.');
+                    // Client-side filter check before sending
+                    const clientCheck = checkContent(formData.get('review'));
+                    if (clientCheck.length > 0) {
+                        showAlert('danger', 'Ulasan mengandung konten terlarang (' + clientCheck.join(', ') + '). Mohon ubah ulasan Anda.');
                         return;
                     }
-                    if (!formData.get('review').trim()) {
-                        showAlert('danger', 'Silakan tulis ulasan Anda.');
-                        return;
-                    }
 
-                    // Tampilkan loading
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    submitBtn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    btn.disabled = true;
 
                     fetch(this.action, {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            submitBtn.innerHTML = originalBtnHtml;
-                            submitBtn.disabled = false;
-
-                            if (data.success) {
-                                // Tampilkan pesan sukses
-                                showAlert('success', data.message);
-
-                                // Buat elemen slide baru
-                                const newSlide = generateReviewSlide(data.data);
-
-                                // Tambahkan slide ke Swiper
-                                if (window.reviewSwiperInstances && window.reviewSwiperInstances
-                                    .length > 0) {
-                                    const swiper = window.reviewSwiperInstances[0];
-                                    swiper.appendSlide(newSlide);
-                                    swiper.update();
-                                    swiper.slideTo(swiper.slides.length - 1); // Geser ke slide terakhir
-                                } else {
-                                    // Jika swiper belum ada (belum ada review), reload page saja atau buat swiper baru
+                        method: 'POST', body: formData,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                        if (data.success) {
+                            showAlert('success', data.message);
+                            if (data.updated) {
+                                setTimeout(() => {
                                     window.location.reload();
-                                }
-
-                                // Reset form
+                                }, 1500);
+                            } else {
+                                const newSlide = generateReviewSlide(data.data);
+                                if (window.reviewSwiperInstances && window.reviewSwiperInstances.length > 0) {
+                                    const sw = window.reviewSwiperInstances[0];
+                                    sw.appendSlide(newSlide); sw.update(); sw.slideTo(sw.slides.length - 1);
+                                } else { window.location.reload(); }
+                                // Reset form state
                                 reviewForm.reset();
                                 selectedRating = 0;
-                                ratingInput.value = 0;
+                                if (ratingInput) ratingInput.value = 0;
                                 stars.forEach(s => s.style.color = '#ddd');
-
-                            } else {
-                                // Tampilkan error (sudah review)
-                                showAlert('danger', data.message || 'Terjadi kesalahan.');
+                                if (filterWarning) filterWarning.style.display = 'none';
+                                if (reviewText) reviewText.style.borderColor = '#dee2e6';
                             }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            submitBtn.innerHTML = originalBtnHtml;
-                            submitBtn.disabled = false;
-                            showAlert('danger', 'Terjadi kesalahan sistem. Coba lagi nanti.');
-                        });
+                            // Re-enable submit button (clean state)
+                            if (submitBtn) submitBtn.disabled = false;
+                        } else {
+                            showAlert('danger', data.message || 'Terjadi kesalahan.');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        btn.innerHTML = originalHtml; btn.disabled = false;
+                        showAlert('danger', 'Terjadi kesalahan sistem. Coba lagi nanti.');
+                    });
                 });
             }
 
-            // Helper untuk memunculkan alert
             function showAlert(type, message) {
-                const dynamicAlertContainer = document.getElementById('dynamicAlertContainer');
+                const c = document.getElementById('dynamicAlertContainer');
                 const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-                dynamicAlertContainer.innerHTML = `
-                <div class="alert alert-${type} alert-dismissible fade show rounded-3 mb-4" role="alert">
-                    <i class="fas ${icon} me-2"></i>${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
+                c.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show rounded-3 mb-4" role="alert"><i class="fas ${icon} me-2"></i>${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+                c.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
 
-            // Helper untuk membuat HTML slide baru
             function generateReviewSlide(data) {
-                let starsHtml = '';
-                for (let i = 1; i <= 5; i++) {
-                    if (i <= Math.floor(data.rating)) {
-                        starsHtml += '<i class="fas fa-star"></i>';
-                    } else if (i - data.rating < 1 && i - data.rating > 0) {
-                        starsHtml += '<i class="fas fa-star-half-alt"></i>';
-                    } else {
-                        starsHtml += '<i class="far fa-star"></i>';
-                    }
-                }
-
-                let avatarHtml = '';
-                if (data.user_avatar) {
-                    avatarHtml =
-                        `<img src="${data.user_avatar}" class="rounded-circle me-2 object-fit-cover" width="40" height="40" alt="User">`;
-                } else {
-                    avatarHtml =
-                        `<div class="rounded-circle me-2 d-flex align-items-center justify-content-center bg-primary text-white fw-bold flex-shrink-0" style="width:40px;height:40px;font-size:16px;">${data.user_initial}</div>`;
-                }
-
-                return `
-                <div class="swiper-slide">
-                    <div class="p-4 rounded-4 bg-light border-0 h-100 text-start">
-                        <div class="text-warning mb-2">
-                            ${starsHtml}
-                        </div>
-                        <p class="text-muted small fst-italic">"${data.review}"</p>
-                        <div class="d-flex align-items-center mt-3">
-                            ${avatarHtml}
-                            <div>
-                                <h6 class="fw-bold mb-0" style="font-size:14px;">${data.user_name}</h6>
-                                <span class="text-muted" style="font-size:12px;">${data.user_city}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+                let sh = '';
+                for (let i=1;i<=5;i++) { if(i<=Math.floor(data.rating)) sh+='<i class="fas fa-star"></i>'; else if(i-data.rating<1&&i-data.rating>0) sh+='<i class="fas fa-star-half-alt"></i>'; else sh+='<i class="far fa-star"></i>'; }
+                let ah = data.user_avatar ? `<img src="${data.user_avatar}" class="rounded-circle me-2 object-fit-cover" width="40" height="40" alt="User">` : `<div class="rounded-circle me-2 d-flex align-items-center justify-content-center bg-primary text-white fw-bold flex-shrink-0" style="width:40px;height:40px;font-size:16px;">${data.user_initial}</div>`;
+                return `<div class="swiper-slide"><div class="p-4 rounded-4 bg-light border-0 h-100 text-start"><div class="text-warning mb-2">${sh}</div><p class="text-muted small fst-italic">"${data.review}"</p><div class="d-flex align-items-center mt-3">${ah}<div><h6 class="fw-bold mb-0" style="font-size:14px;">${data.user_name}</h6><span class="text-muted" style="font-size:12px;">${data.user_city}</span></div></div></div></div>`;
             }
         });
     </script>
