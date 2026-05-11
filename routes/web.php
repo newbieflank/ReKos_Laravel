@@ -13,31 +13,10 @@ use App\Http\Controllers\AppReviewController;
 use App\Http\Controllers\RoleRequestController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    $rooms = \App\Models\Room::with('boardingHouse')->where('available', true)->take(12)->get();
-    $reviews = \App\Models\AppReview::with('user')->latest()->take(12)->get();
-
-    $areas = [
-        'Badean',
-        'Blindungan',
-        'Dabaan',
-        'Kademangan',
-        'Kauman',
-        'Kotakulon',
-        'Nangkaan',
-        'Pancoran',
-        'Pejaten',
-        'Tamansari'
-    ];
-
-    $totalPengguna = \App\Models\User::count();
-    $totalKost = \App\Models\BoardingHouse::count();
-
-    return view('welcome', compact('rooms', 'reviews', 'areas', 'totalPengguna', 'totalKost'));
-})->name('home');
-
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 Route::get('/kos-terbaik', [kosTerbaikController::class, 'index'])->name('kosterbaik.index');

@@ -20,8 +20,7 @@ class GoogleController extends Controller
     public function handleGoogleCallback()
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
-
+            $googleUser = Socialite::driver('google')->stateless()->user();
             $user = User::where('email', $googleUser->email)->first();
 
             if ($user) {
@@ -45,6 +44,7 @@ class GoogleController extends Controller
 
             return redirect()->route('home');
         } catch (Exception $e) {
+            dd($e);
             return redirect('login')->with('error', 'Terjadi kesalahan saat pendaftaran.');
         }
     }

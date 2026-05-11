@@ -63,6 +63,7 @@
             margin-bottom: 0;
             width: 100%;
         }
+
         .choices__inner {
             background-color: transparent !important;
             border: none !important;
@@ -71,32 +72,39 @@
             display: flex;
             align-items: center;
         }
+
         .choices__list--single {
             padding: 0 !important;
             font-weight: 600;
             color: #4A5568 !important;
         }
+
         .choices__list--dropdown {
             border-radius: 15px !important;
             border: none !important;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
             margin-top: 15px !important;
             padding: 8px !important;
             z-index: 1000 !important;
         }
+
         .choices__item--selectable {
             border-radius: 10px !important;
             padding: 10px 15px !important;
             font-weight: 500 !important;
             transition: all 0.2s ease;
         }
+
         .choices__item--selectable.is-highlighted {
             background-color: #E6F0FF !important;
             color: #0d6efd !important;
         }
+
         .choices[data-type*="select-one"]:after {
-            display: none !important; /* Hide default arrow */
+            display: none !important;
+            /* Hide default arrow */
         }
+
         .search-pill-wrapper {
             background-color: #f8f9fa;
             border-radius: 50px;
@@ -106,14 +114,17 @@
             transition: all 0.3s ease;
             border: 1px solid transparent;
         }
+
         .search-pill-wrapper:hover {
             background-color: #eef2f7;
         }
+
         .search-pill-wrapper:focus-within {
             background-color: #fff;
             border-color: #0d6efd;
             box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
         }
+
         .choices__placeholder {
             opacity: 1;
             color: #718096 !important;
@@ -234,7 +245,7 @@
             <div class="swiper-container-wrapper">
                 <div class="swiper roomSwiper">
                     <div class="swiper-wrapper">
-                        @foreach ($rooms as $room)
+                        @foreach ($rekomendasi as $room)
                             <div class="swiper-slide">
                                 <a href="{{ route('detail', ['id' => $room->boardingHouse->id, 'room_id' => $room->id]) }}"
                                     class="text-decoration-none">
@@ -254,7 +265,8 @@
                                                 <div>
                                                     <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
                                                     <div class="d-flex align-items-center mt-1">
-                                                        <i class="fas fa-star text-warning" style="font-size: 0.75rem;"></i>
+                                                        <i class="fas fa-star text-warning"
+                                                            style="font-size: 0.75rem;"></i>
                                                         <span
                                                             class="ms-1 small fw-medium">{{ number_format($room->boardingHouse->rating ?? 0, 1) }}</span>
                                                     </div>
