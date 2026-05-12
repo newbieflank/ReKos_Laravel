@@ -134,7 +134,7 @@ class PemilikKosController extends Controller
         $search = $request->query('search');
 
         $query = \App\Models\Room::with(['tenants' => function($q) {
-            $q->where('status', 'active')->latest();
+            $q->latest();
         }, 'tenants.user'])->where('boarding_house_id', $id);
 
         if ($search) {
