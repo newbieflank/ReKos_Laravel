@@ -3,7 +3,7 @@ name: Deploy Laravel to VPS
 on:
   push:
     branches:
-      - Afriza  # CI/CD berjalan khusus untuk branch ini
+      - main  # CI/CD berjalan khusus untuk branch ini
 
 jobs:
   build-and-deploy:
@@ -50,3 +50,4 @@ jobs:
           cd /var/www/html/rekos-laravel
           docker compose pull
           docker compose up -d
+          docker exec rekos_app bash -c "if [ ! -f .env ]; then cp .env.example .env && php artisan key:generate; fi"
