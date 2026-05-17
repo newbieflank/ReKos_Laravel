@@ -3,7 +3,7 @@ name: Deploy Laravel to VPS
 on:
   push:
     branches:
-      - Afriza  # CI/CD berjalan khusus untuk branch ini
+      - main  # CI/CD berjalan khusus untuk branch ini
 
 jobs:
   build-and-deploy:
