@@ -353,6 +353,10 @@
                 <p class="text-muted small mb-3"><i class="fa-solid fa-circle-info text-primary me-1"></i> Centang
                     fasilitas yang tersedia di kost Anda.</p>
 
+                @error('facilities')
+                    <div class="text-danger small mb-3 fw-bold"><i class="fa-solid fa-triangle-exclamation me-1"></i> {{ $message }}</div>
+                @enderror
+
                 {{-- Fasilitas Umum Dasar --}}
                 <h6 class="fw-semibold text-dark mb-3 mt-2"><i
                         class="fa-solid fa-house-chimney-window text-primary me-2"></i>Fasilitas Umum Dasar</h6>
@@ -453,6 +457,17 @@
                         <label for="f_mushola" class="facility-card"><i
                                 class="fa-solid fa-place-of-worship"></i><span>Mushola</span></label>
                     </div>
+                </div>
+
+                <h6 class="fw-semibold text-dark mb-3 mt-4 border-top pt-3"><i class="fa-solid fa-ban text-secondary me-2"></i>Opsi Tanpa Fasilitas</h6>
+                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-5 g-3">
+                    <div class="col">
+                        <input type="checkbox" name="facilities[]" value="Tanpa Fasilitas" id="f_tanpa"
+                            class="facility-check" {{ in_array('Tanpa Fasilitas', $kost->facilities ?? []) ? 'checked' : '' }}>
+                        <label for="f_tanpa" class="facility-card"><i
+                                class="fa-solid fa-ban"></i><span>Tanpa Fasilitas</span></label>
+                    </div>
+                </div>
                 </div>
             </div>
 

@@ -44,8 +44,15 @@
                             <!-- Profile Link (Semua Role) -->
                             <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
 
-                            <!-- Menu Owner -->
-                            @if (auth()->user()->role === 'owner')
+                            <!-- Menu Admin -->
+                            @if (auth()->user()->role === 'admin')
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Dashboard Admin</a>
+                                </li>
+                                <!-- Menu Owner -->
+                            @elseif (auth()->user()->role === 'owner')
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
@@ -98,14 +105,14 @@
             const hash = href.substring(hashIndex + 1);
             const target = document.getElementById(hash);
 
-            // Jika section ada di halaman ini, scroll tanpa hash
             if (target) {
                 e.preventDefault();
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                // Hapus hash dari URL
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
                 history.replaceState(null, '', window.location.pathname);
             }
-            // Jika tidak ada (halaman lain), biarkan navigasi biasa terjadi
         });
     });
 </script>

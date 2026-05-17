@@ -328,6 +328,12 @@ class PemilikKosController extends Controller
 
     public function simpanKamar(Request $request, $id)
     {
+        $request->validate([
+            'facilities' => 'required|array|min:1',
+        ], [
+            'facilities.required' => 'Fasilitas wajib di isi.',
+        ]);
+
         $data = $request->all();
         $data['boarding_house_id'] = $id;
         // Asumsi form tidak mengirimkan checkbox jika false
@@ -400,6 +406,12 @@ class PemilikKosController extends Controller
 
     public function updateKamar(Request $request, $id, $roomId)
     {
+        $request->validate([
+            'facilities' => 'required|array|min:1',
+        ], [
+            'facilities.required' => 'Fasilitas wajib di isi.',
+        ]);
+
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
         $room = \App\Models\Room::where('boarding_house_id', $id)->findOrFail($roomId);
         $boardingHouseId = $id;
@@ -650,6 +662,12 @@ class PemilikKosController extends Controller
 
     public function simpanKost(Request $request)
     {
+        $request->validate([
+            'facilities' => 'required|array|min:1',
+        ], [
+            'facilities.required' => 'Fasilitas wajib di isi.',
+        ]);
+
         $data = $request->all();
         $data['owner_id'] = auth()->id();
         $data['latitude'] = $request->latitude ?? 0.0;
@@ -728,6 +746,12 @@ class PemilikKosController extends Controller
 
     public function updateKost(Request $request, $id)
     {
+        $request->validate([
+            'facilities' => 'required|array|min:1',
+        ], [
+            'facilities.required' => 'Fasilitas wajib di isi.',
+        ]);
+
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
         $data = $request->all();
         $data['alamat'] = $request->area . ', ' . $request->alamat;

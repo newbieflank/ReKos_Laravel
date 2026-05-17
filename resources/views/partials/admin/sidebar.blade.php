@@ -3,10 +3,10 @@
 
     <div class="d-flex align-items-center justify-content-between px-4 flex-shrink-0"
         style="height: 64px; border-bottom: 1px solid #f3f4f6;">
-        <div class="d-flex align-items-center gap-2 text-primary fw-bold fs-5">
+        <a href="{{ route('home') }}" class="d-flex align-items-center gap-2 text-primary fw-bold fs-5 text-decoration-none">
             <img src="{{ asset('images/logo.svg') }}" alt="RE-KOST Logo" style="width: 32px; height: 32px;">
             <span class="text-dark fs-6" style="letter-spacing: 2px;">RE-KOST</span>
-        </div>
+        </a>
 
         <button id="closeSidebar" class="btn btn-link text-secondary p-0 border-0 d-md-none">
             <i class="fa-solid fa-xmark fs-4"></i>

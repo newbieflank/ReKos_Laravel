@@ -138,6 +138,9 @@
                         </div>
                     @endforeach
                 </div>
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $rooms->links('pagination::bootstrap-5') }}
+                </div>
             @else
                 <div class="text-center py-5 my-5">
                     <i class="fa-solid fa-search fs-1 text-muted mb-3 opacity-50"></i>
