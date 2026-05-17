@@ -51,3 +51,4 @@ jobs:
           docker compose pull
           docker compose up -d
           docker exec rekos_app bash -c "if [ ! -f .env ]; then cp .env.example .env && php artisan key:generate; fi"
+          docker exec rekos_app bash -c "if [ ! -d public/storage ]; then php artisan storage:link; fi"
