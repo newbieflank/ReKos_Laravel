@@ -766,11 +766,59 @@
 
             updateAddress(defaultLat, defaultLng);
 
+            // Mutually exclusive "Tanpa Fasilitas"
+            document.querySelectorAll('.facility-check').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    const isTanpa = this.value === 'Tanpa Fasilitas';
+                    if (this.checked) {
+                        if (isTanpa) {
+                            // Uncheck others
+                            document.querySelectorAll('.facility-check').forEach(other => {
+                                if (other !== this) other.checked = false;
+                            });
+                        } else {
+                            // Uncheck tanpa fasilitas
+                            const tanpaCb = Array.from(document.querySelectorAll('.facility-check')).find(c => c.value === 'Tanpa Fasilitas');
+                            if (tanpaCb) tanpaCb.checked = false;
+                        }
+                    }
+                });
+            });
+
             function validateForm(form) {
+                const facilities = form.querySelectorAll('.facility-check:checked');
+                if (facilities.length === 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Fasilitas Kosong',
+                        text: 'Mohon pilih minimal satu fasilitas kost atau opsi "Tanpa Fasilitas".',
+                        confirmButtonColor: '#0d6efd'
+                    }).then(() => {
+                        const facilSection = document.querySelector('#f_parkir');
+                        if (facilSection) facilSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    });
+                    return false;
+                }
+
                 const inputs = form.querySelectorAll('input[required]:not(.d-none), textarea[required]:not(.d-none), select[required]:not(.d-none)');
                 for(let input of inputs) {
                     if(!input.checkValidity()) {
-                        input.reportValidity();
+                        let fieldName = 'Bagian ini';
+                        if(input.previousElementSibling && input.previousElementSibling.classList.contains('form-label-custom')) {
+                            fieldName = input.previousElementSibling.innerText;
+                        } else if(input.closest('.mb-3') && input.closest('.mb-3').querySelector('.form-label-custom')) {
+                            fieldName = input.closest('.mb-3').querySelector('.form-label-custom').innerText;
+                        }
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Belum Lengkap',
+                            text: 'Mohon isi ' + fieldName + ' terlebih dahulu.',
+                            confirmButtonColor: '#0d6efd'
+                        }).then(() => {
+                            input.focus();
+                            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        });
                         return false;
                     }
                 }

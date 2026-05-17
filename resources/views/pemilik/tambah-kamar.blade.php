@@ -323,7 +323,7 @@
             </div>
         </div>
 
-        <form id="tambahKamarForm" action="{{ route('pemilik.kamar.simpan', $kost->id) }}" method="POST" enctype="multipart/form-data">
+        <form id="tambahKamarForm" action="{{ route('pemilik.kamar.simpan', $kost->id) }}" method="POST" enctype="multipart/form-data" onsubmit="return validateAllSteps(this)">
             @csrf
 
             <div id="step-1">
@@ -332,19 +332,19 @@
                         <div class="col-12 col-md-6">
                             <label class="form-label-custom">Nama Kamar</label>
                             <input type="text" name="room_name" id="input_room_name" class="form-control form-control-custom w-100"
-                                placeholder="e.g. Kamar Standard" required>
+                                placeholder="Contoh: Kamar Standard" value="{{ old('room_name') }}" required>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label-custom">Tipe Kamar</label>
-                            <input type="text" name="room_type" id="input_room_type" class="form-control form-control-custom w-100" placeholder="e.g. Standard, Deluxe, VIP" required>
+                            <input type="text" name="room_type" id="input_room_type" class="form-control form-control-custom w-100" placeholder="Contoh: Standard, Deluxe, VIP" value="{{ old('room_type') }}" required>
                         </div>
                     </div>
                     <div class="row g-4">
                         <div class="col-12 col-md-4">
                             <label class="form-label-custom">Ukuran Kamar (m)</label>
                             <div class="position-relative">
-                                <input type="text" name="room_size" id="input_room_size" class="form-control form-control-custom w-100" placeholder="e.g. 3x4"
-                                    style="padding-right: 60px;" required>
+                                <input type="text" name="room_size" id="input_room_size" class="form-control form-control-custom w-100" placeholder="Contoh: 3x4"
+                                    style="padding-right: 60px;" value="{{ old('room_size') }}" required>
                                 <span class="position-absolute text-muted"
                                     style="right: 16px; top: 12px; font-size: 0.85rem;">Meter</span>
                             </div>
@@ -430,7 +430,7 @@
                     <label class="form-label-custom">Tambahan lainnya</label>
                     <div class="d-flex gap-2 mb-3">
                         <input type="text" id="custom-facility-input" class="form-control form-control-custom flex-grow-1"
-                            placeholder="Add custom facility (e.g. Balcony)">
+                            placeholder="Tambah fasilitas lain (Contoh: Balkon)">
                         <button type="button" class="btn btn-primary shadow-sm px-4 rounded-3" onclick="addCustomFacility()"><i
                                 class="fa-solid fa-plus me-1"></i> Add</button>
                     </div>
@@ -438,7 +438,7 @@
                     <div class="d-flex justify-content-end align-items-center mt-5 gap-3">
                         <button type="button" class="btn-outline-custom bg-light rounded-3 px-4"
                             onclick="goToStep(1)"><i class="fa-solid fa-arrow-left me-2"></i> Kembali</button>
-                        <button type="button" class="btn-primary-custom" onclick="goToStep(3)">Lanjut <i
+                        <button type="button" class="btn-primary-custom" onclick="nextStep(2)">Lanjut <i
                                 class="fa-solid fa-arrow-right ms-2"></i></button>
                     </div>
                 </div>
@@ -465,7 +465,7 @@
                                             <label class="form-label-custom">Harga Harian</label>
                                             <div class="input-group input-group-lg bg-white" style="border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden;">
                                                 <span class="input-group-text bg-transparent border-0 text-muted pe-1">Rp</span>
-                                                <input type="text" name="daily_price" id="input_daily_price" class="form-control border-0 px-2 fw-bold rupiah-input" placeholder="0">
+                                                <input type="text" name="daily_price" id="input_daily_price" class="form-control border-0 px-2 fw-bold rupiah-input" placeholder="0" value="{{ old('daily_price') }}">
                                                 <span class="input-group-text bg-transparent border-0 text-muted small fw-bold ps-1">/ HARI</span>
                                             </div>
                                         </div>
@@ -474,7 +474,7 @@
                                             <label class="form-label-custom">Harga Mingguan</label>
                                             <div class="input-group input-group-lg bg-white" style="border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden;">
                                                 <span class="input-group-text bg-transparent border-0 text-muted pe-1">Rp</span>
-                                                <input type="text" name="weekly_price" id="input_weekly_price" class="form-control border-0 px-2 fw-bold rupiah-input" placeholder="0">
+                                                <input type="text" name="weekly_price" id="input_weekly_price" class="form-control border-0 px-2 fw-bold rupiah-input" placeholder="0" value="{{ old('weekly_price') }}">
                                                 <span class="input-group-text bg-transparent border-0 text-muted small fw-bold ps-1">/ MINGGU</span>
                                             </div>
                                         </div>
@@ -483,7 +483,7 @@
                                             <label class="form-label-custom text-primary">Harga Bulanan <span class="text-danger">*</span></label>
                                             <div class="input-group input-group-lg bg-white" style="border: 2px solid #0d6efd; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(13,110,253,0.1);">
                                                 <span class="input-group-text bg-primary text-white border-0 fw-bold pe-2">Rp</span>
-                                                <input type="text" name="monthly_price" id="input_monthly_price" class="form-control border-0 px-2 fw-bold text-primary fs-5 rupiah-input" placeholder="0" required>
+                                                <input type="text" name="monthly_price" id="input_monthly_price" class="form-control border-0 px-2 fw-bold text-primary fs-5 rupiah-input" placeholder="0" value="{{ old('monthly_price') }}" required>
                                                 <span class="input-group-text bg-primary text-white border-0 small fw-bold ps-2">/ BULAN</span>
                                             </div>
                                         </div>
@@ -499,7 +499,7 @@
                                             <p class="text-muted mb-3" style="font-size: 0.75rem; line-height: 1.5;">Perkiraan biaya bulanan khusus untuk kamar ini (misal: porsi listrik, kebersihan, perawatan) untuk dihitung dalam laporan keuangan.</p>
                                             <div class="input-group input-group-lg bg-white" style="border: 2px solid #ffc107; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(255,193,7,0.1);">
                                                 <span class="input-group-text border-0 fw-bold pe-2" style="background-color: #ffc107; color: white;">Rp</span>
-                                                <input type="text" name="monthly_expense" id="input_monthly_expense" class="form-control border-0 px-2 fw-bold text-dark fs-5 rupiah-input" placeholder="0" required>
+                                                <input type="text" name="monthly_expense" id="input_monthly_expense" class="form-control border-0 px-2 fw-bold text-dark fs-5 rupiah-input" placeholder="0" value="{{ old('monthly_expense') }}" required>
                                                 <span class="input-group-text border-0 small fw-bold ps-2" style="background-color: #ffc107; color: white;">/ BULAN</span>
                                             </div>
                                         </div>
@@ -680,8 +680,7 @@
                         <div class="alert alert-info border-0 d-flex gap-3 mb-4"
                             style="background-color: #e6f3ff; color: #0056b3; border-radius: 12px;">
                             <i class="fa-regular fa-lightbulb fs-5 mt-1"></i>
-                            <p class="mb-0 small">Pastikan semua data sudah sesuai dengan standar operasional Estate
-                                Curator untuk meminimalisir kesalahan tagihan.</p>
+                            <p class="mb-0 small">Pastikan semua data untuk meminimalisir kesalahan tagihan.</p>
                         </div>
 
                         <div class="d-flex justify-content-between gap-3 mt-auto">
@@ -803,13 +802,84 @@
                 return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
             }
 
-            function validateStep(step) {
+            function validateAllSteps(form) {
+                for(let i=1; i<=4; i++) {
+                    if(!validateStep(i, true)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            function validateStep(step, isSubmit = false) {
                 const stepDiv = document.getElementById('step-' + step);
                 if(!stepDiv) return true;
                 const inputs = stepDiv.querySelectorAll('input, select, textarea');
                 for (let input of inputs) {
                     if (input.hasAttribute('required') && !input.checkValidity()) {
-                        input.reportValidity();
+                        let fieldName = 'Bagian ini';
+                        if(input.previousElementSibling && input.previousElementSibling.classList.contains('form-label-custom')) {
+                            fieldName = input.previousElementSibling.innerText;
+                        } else if(input.closest('.mb-4') && input.closest('.mb-4').querySelector('.form-label-custom')) {
+                            fieldName = input.closest('.mb-4').querySelector('.form-label-custom').innerText;
+                        } else if(input.closest('.mb-2') && input.closest('.mb-2').querySelector('.form-label-custom')) {
+                            fieldName = input.closest('.mb-2').querySelector('.form-label-custom').innerText.replace('*', '').trim();
+                        }
+
+                        if(isSubmit) goToStep(step); // Arahkan ke step yang error
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Belum Lengkap',
+                            text: 'Mohon isi ' + fieldName + ' terlebih dahulu.',
+                            confirmButtonColor: '#0d6efd'
+                        }).then(() => {
+                            input.focus();
+                        });
+                        return false;
+                    }
+                }
+
+                if (step === 2) {
+                    const facilities = stepDiv.querySelectorAll('.facility-check:checked');
+                    if (facilities.length === 0) {
+                        if(isSubmit) goToStep(2);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Fasilitas Kosong',
+                            text: 'Mohon pilih minimal satu fasilitas kamar atau opsi "Tanpa Fasilitas".',
+                            confirmButtonColor: '#0d6efd'
+                        });
+                        return false;
+                    }
+                }
+
+                if (step === 3) {
+                    const monthlyPrice = parseInt(document.getElementById('input_monthly_price').value.replace(/\./g, '')) || 0;
+                    const monthlyExpense = parseInt(document.getElementById('input_monthly_expense').value.replace(/\./g, '')) || 0;
+                    
+                    if (monthlyPrice <= 0) {
+                        if(isSubmit) goToStep(3);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Harga Tidak Valid',
+                            text: 'Harga Bulanan harus lebih dari Rp 0.',
+                            confirmButtonColor: '#0d6efd'
+                        }).then(() => {
+                            document.getElementById('input_monthly_price').focus();
+                        });
+                        return false;
+                    }
+                    if (monthlyExpense <= 0 && document.getElementById('input_monthly_expense').value.trim() === '') {
+                        if(isSubmit) goToStep(3);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Biaya Tidak Valid',
+                            text: 'Estimasi Pengeluaran Bulanan harus diisi (minimal Rp 0).',
+                            confirmButtonColor: '#0d6efd'
+                        }).then(() => {
+                            document.getElementById('input_monthly_expense').focus();
+                        });
                         return false;
                     }
                 }
@@ -817,6 +887,7 @@
                 if (step === 4) {
                     const mainImage = document.getElementById('file_main');
                     if (mainImage && mainImage.files.length === 0) {
+                        if(isSubmit) goToStep(4);
                         Swal.fire({
                             icon: 'warning',
                             title: 'Foto Utama Wajib Diisi',
@@ -842,9 +913,14 @@
                     document.getElementById('summary_room_type').innerText = document.getElementById('input_room_type').value || '-';
                     document.getElementById('summary_room_size').innerText = (document.getElementById('input_room_size').value || '-') + ' Meter';
                     
-                    document.getElementById('summary_daily_price').innerText = formatRupiah(document.getElementById('input_daily_price').value);
-                    document.getElementById('summary_weekly_price').innerText = formatRupiah(document.getElementById('input_weekly_price').value);
-                    document.getElementById('summary_monthly_price').innerText = formatRupiah(document.getElementById('input_monthly_price').value);
+                    const daily = document.getElementById('input_daily_price').value.replace(/\./g, '');
+                    const weekly = document.getElementById('input_weekly_price').value.replace(/\./g, '');
+                    
+                    document.getElementById('summary_daily_price').innerText = (!daily || parseInt(daily) <= 0) ? '-' : formatRupiah(daily);
+                    document.getElementById('summary_weekly_price').innerText = (!weekly || parseInt(weekly) <= 0) ? '-' : formatRupiah(weekly);
+                    
+                    const monthly = document.getElementById('input_monthly_price').value.replace(/\./g, '');
+                    document.getElementById('summary_monthly_price').innerText = formatRupiah(monthly);
                     
                     const isAvailable = document.getElementById('input_available').checked;
                     const availEl = document.getElementById('summary_available');
@@ -967,6 +1043,25 @@
             document.querySelectorAll('.rupiah-input').forEach(function(input) {
                 input.addEventListener('keyup', function(e) {
                     this.value = formatRupiah(this.value);
+                });
+            });
+
+            // Mutually exclusive "Tanpa Fasilitas"
+            document.querySelectorAll('.facility-check').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    const isTanpa = this.value === 'Tanpa Fasilitas';
+                    if (this.checked) {
+                        if (isTanpa) {
+                            // Uncheck others
+                            document.querySelectorAll('.facility-check').forEach(other => {
+                                if (other !== this) other.checked = false;
+                            });
+                        } else {
+                            // Uncheck tanpa fasilitas
+                            const tanpaCb = Array.from(document.querySelectorAll('.facility-check')).find(c => c.value === 'Tanpa Fasilitas');
+                            if (tanpaCb) tanpaCb.checked = false;
+                        }
+                    }
                 });
             });
 

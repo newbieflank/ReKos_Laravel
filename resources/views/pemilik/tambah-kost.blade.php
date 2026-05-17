@@ -239,7 +239,7 @@
                         <div class="mb-4">
                             <label class="form-label-custom">NAMA KOST</label>
                             <input type="text" name="boarding_house_name" class="form-control form-control-custom w-100"
-                                placeholder="Contoh: Stanza Residence Menteng" required>
+                                placeholder="Contoh: Kost Mawar Bondowoso" value="{{ old('boarding_house_name') }}" required>
                         </div>
 
                         <div class="mb-4">
@@ -312,7 +312,7 @@
                                     style="text-transform:none;letter-spacing:0;">(RT/RW, Blok, No. Rumah,
                                     dll)</span></label>
                             <input type="text" id="input_detail" class="form-control form-control-custom w-100"
-                                placeholder="Contoh: RT 03/RW 02, Blok B No. 12">
+                                placeholder="Contoh: RT 03/RW 02, Blok B No. 12" value="{{ old('input_detail') }}">
                             <p class="text-muted small mt-1 mb-0"><i class="fa-solid fa-circle-info me-1"></i>Detail ini
                                 akan digabung dengan alamat peta secara otomatis.</p>
                         </div>
@@ -333,12 +333,12 @@
                     <div class="col-12 col-md-6">
                         <label class="form-label-custom">DESKRIPSI PROPERTI</label>
                         <textarea name="description" class="form-control form-control-custom w-100"
-                            placeholder="Ceritakan keunggulan kost Anda..." required></textarea>
+                            placeholder="Ceritakan keunggulan kost Anda..." required>{{ old('description') }}</textarea>
                     </div>
                     <div class="col-12 col-md-6">
                         <label class="form-label-custom">PERATURAN KOST</label>
                         <textarea name="house_rule" class="form-control form-control-custom w-100"
-                            placeholder="Contoh: Dilarang membawa hewan peliharaan, Tamu maksimal jam 10 malam..." required></textarea>
+                            placeholder="Contoh: Dilarang membawa hewan peliharaan, Tamu maksimal jam 10 malam..." required>{{ old('house_rule') }}</textarea>
                     </div>
                 </div>
             </div>
@@ -698,11 +698,59 @@
             // Load alamat awal
             updateAddress(defaultLat, defaultLng);
 
+            // Mutually exclusive "Tanpa Fasilitas"
+            document.querySelectorAll('.facility-check').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    const isTanpa = this.value === 'Tanpa Fasilitas';
+                    if (this.checked) {
+                        if (isTanpa) {
+                            // Uncheck others
+                            document.querySelectorAll('.facility-check').forEach(other => {
+                                if (other !== this) other.checked = false;
+                            });
+                        } else {
+                            // Uncheck tanpa fasilitas
+                            const tanpaCb = Array.from(document.querySelectorAll('.facility-check')).find(c => c.value === 'Tanpa Fasilitas');
+                            if (tanpaCb) tanpaCb.checked = false;
+                        }
+                    }
+                });
+            });
+
             function validateForm(form) {
+                const facilities = form.querySelectorAll('.facility-check:checked');
+                if (facilities.length === 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Fasilitas Kosong',
+                        text: 'Mohon pilih minimal satu fasilitas kost atau opsi "Tanpa Fasilitas".',
+                        confirmButtonColor: '#0d6efd'
+                    }).then(() => {
+                        const facilSection = document.querySelector('#f_parkir');
+                        if (facilSection) facilSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    });
+                    return false;
+                }
+
                 const inputs = form.querySelectorAll('input[required]:not(.d-none), textarea[required]:not(.d-none), select[required]:not(.d-none)');
                 for(let input of inputs) {
                     if(!input.checkValidity()) {
-                        input.reportValidity();
+                        let fieldName = 'Bagian ini';
+                        if(input.previousElementSibling && input.previousElementSibling.classList.contains('form-label-custom')) {
+                            fieldName = input.previousElementSibling.innerText;
+                        } else if(input.closest('.mb-3') && input.closest('.mb-3').querySelector('.form-label-custom')) {
+                            fieldName = input.closest('.mb-3').querySelector('.form-label-custom').innerText;
+                        }
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Belum Lengkap',
+                            text: 'Mohon isi ' + fieldName + ' terlebih dahulu.',
+                            confirmButtonColor: '#0d6efd'
+                        }).then(() => {
+                            input.focus();
+                            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        });
                         return false;
                     }
                 }
