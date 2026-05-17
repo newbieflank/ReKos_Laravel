@@ -38,8 +38,7 @@ class allKosController extends Controller
                 $q->where('boarding_house_type', $tipe);
             });
         }
-
-        $rooms = $query->latest()->get();
+        $rooms = $query->latest()->paginate(16)->withQueryString();
 
         return view('landing.index_all_kos', compact('rooms'));
     }

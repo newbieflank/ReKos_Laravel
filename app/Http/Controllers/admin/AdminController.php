@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
-
     public function approveRole($id)
     {
         $request = RoleRequest::findOrFail($id);
@@ -34,7 +33,7 @@ class AdminController extends Controller
         return back()->with('error', 'Pengajuan role telah ditolak.');
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $stats = [
             'pemilik_kos' => User::where('role', 'owner')->count(),
@@ -43,18 +42,34 @@ class AdminController extends Controller
             'rating' => AppReview::count(),
         ];
 
-        $usersPerMonth = User::select(
-            DB::raw('COUNT(id) as total'),
-            DB::raw("DATE_FORMAT(created_at, '%b') as month"), // %b untuk nama bulan singkat (Jan, Feb)
-            DB::raw("MIN(created_at) as sort_date")
-        )
-            ->groupBy('month')
-            ->orderBy('sort_date', 'asc')
-            ->get();
+        $availableYears = User::selectRaw('YEAR(created_at) as year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->toArray();
+            
+        if (empty($availableYears)) {
+            $availableYears = [date('Y')];
+        }
 
-        $chartData = $usersPerMonth->pluck('total')->toArray();
-        $chartCategories = $usersPerMonth->pluck('month')->toArray();
+        $currentYear = $request->query('year', date('Y'));
 
-        return view('admin.dashboard', compact('stats', 'chartData', 'chartCategories'));
+        $usersPerMonth = User::whereYear('created_at', $currentYear)
+            ->select(
+                DB::raw('COUNT(id) as total'),
+                DB::raw('MONTH(created_at) as month_num')
+            )
+            ->groupBy('month_num')
+            ->get()
+            ->keyBy('month_num');
+
+        $chartData = [];
+        $chartCategories = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+        
+        for ($i = 1; $i <= 12; $i++) {
+            $chartData[] = isset($usersPerMonth[$i]) ? $usersPerMonth[$i]->total : 0;
+        }
+
+        return view('admin.dashboard', compact('stats', 'chartData', 'chartCategories', 'availableYears', 'currentYear'));
     }
 }

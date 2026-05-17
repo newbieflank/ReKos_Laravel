@@ -381,6 +381,9 @@
                         <i class="fa-solid fa-bed text-primary"></i>
                         <h6 class="fw-bold mb-0">Fasilitas Kamar</h6>
                     </div>
+                    @error('facilities')
+                        <div class="text-danger small mb-3 fw-bold"><i class="fa-solid fa-triangle-exclamation me-1"></i> {{ $message }}</div>
+                    @enderror
                     <div class="row g-3 mb-5" id="facilities-container">
                         <div class="col-6 col-md-3">
                             <input type="checkbox" name="facilities[]" value="AC" id="fac_ac" class="facility-check">
@@ -417,6 +420,10 @@
                         <div class="col-6 col-md-3">
                             <input type="checkbox" name="facilities[]" value="Bantal & Guling" id="fac_bantal" class="facility-check">
                             <label for="fac_bantal" class="facility-card"><i class="fa-solid fa-moon"></i><span>Bantal & Guling</span></label>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <input type="checkbox" name="facilities[]" value="Tanpa Fasilitas" id="fac_tanpa" class="facility-check">
+                            <label for="fac_tanpa" class="facility-card"><i class="fa-solid fa-ban"></i><span>Tanpa Fasilitas</span></label>
                         </div>
                     </div>
 

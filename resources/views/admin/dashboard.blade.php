@@ -113,11 +113,13 @@
     <div class="card card-custom p-3">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold text-dark m-0">New Users</h5>
-            <select class="form-select form-select-sm w-auto text-secondary shadow-none border-light-subtle">
-                <option>October</option>
-                <option>November</option>
-                <option>December</option>
-            </select>
+            <form id="yearFilterForm" method="GET" action="{{ route('admin.dashboard') }}">
+                <select name="year" class="form-select form-select-sm w-auto text-secondary shadow-none border-light-subtle" onchange="document.getElementById('yearFilterForm').submit();">
+                    @foreach ($availableYears as $year)
+                        <option value="{{ $year }}" {{ $currentYear == $year ? 'selected' : '' }}>{{ $year }}</option>
+                    @endforeach
+                </select>
+            </form>
         </div>
         <div id="salesChart" class="w-100" style="height: 350px;"></div>
     </div>
@@ -133,7 +135,7 @@
                     data: @json($chartData)
                 }],
                 chart: {
-                    type: 'area',
+                    type: 'bar',
                     height: 350,
                     toolbar: {
                         show: false
@@ -143,30 +145,14 @@
                     }
                 },
                 colors: ['#0d6efd'],
+                plotOptions: {
+                    bar: {
+                        borderRadius: 4,
+                        columnWidth: '50%',
+                    }
+                },
                 dataLabels: {
                     enabled: false
-                },
-                stroke: {
-                    curve: 'straight',
-                    width: 2
-                },
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        shadeIntensity: 1,
-                        opacityFrom: 0.4,
-                        opacityTo: 0.05,
-                        stops: [0, 100]
-                    }
-                },
-                markers: {
-                    size: 4,
-                    colors: ['#0d6efd'],
-                    strokeColors: '#fff',
-                    strokeWidth: 2,
-                    hover: {
-                        size: 6
-                    }
                 },
                 xaxis: {
                     categories: @json($chartCategories),

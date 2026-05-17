@@ -143,9 +143,7 @@
                     Platform pencarian tempat tinggal no 1 dan aman di Indonesia yang siap membantumu menemukan tempat
                     beristirahat!
                 </p>
-                <button class="btn btn-primary btn-lg px-4 fs-6 text-white mb-4 shadow-sm">
-                    Mulai Cari
-                </button>
+
                 <div class="d-flex gap-5">
                     <div>
                         <h3 class="fw-bold text-primary mb-0">{{ $totalPengguna }}+</h3>
@@ -506,7 +504,7 @@
     <section id="rating" class="py-5 bg-white">
         <div class="container">
             <div class="text-center mb-5">
-                <h6 class="fw-bold text-primary mb-1">Ulasam</h6>
+                <h6 class="fw-bold text-primary mb-1">Ulasan</h6>
                 <h2 class="fw-bold">Ulasan Pengguna Re-Kost</h2>
             </div>
 
@@ -624,17 +622,20 @@
                             @php
                                 $userReview = auth()->user()->appReview;
                             @endphp
-                            
-                            @if($userReview)
+
+                            @if ($userReview)
                                 <div class="text-center w-100">
-                                    <p class="text-success fw-bold mb-1"><i class="fas fa-check-circle me-1"></i> Anda sudah memberikan ulasan!</p>
+                                    <p class="text-success fw-bold mb-1"><i class="fas fa-check-circle me-1"></i> Anda sudah
+                                        memberikan ulasan!</p>
                                     <p class="text-muted small mb-3">Terima kasih atas tanggapan Anda.</p>
-                                    <button type="button" class="btn btn-outline-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#editReviewModal">
+                                    <button type="button" class="btn btn-outline-primary rounded-pill px-4"
+                                        data-bs-toggle="modal" data-bs-target="#editReviewModal">
                                         <i class="fas fa-edit me-2"></i>Edit Ulasan Anda
                                     </button>
                                 </div>
                             @else
-                                <form id="reviewForm" action="{{ route('app.review.store') }}" method="POST" class="w-100">
+                                <form id="reviewForm" action="{{ route('app.review.store') }}" method="POST"
+                                    class="w-100">
                                     @csrf
                                     <input type="hidden" name="rating" id="ratingInput" value="0">
                                     <div class="input-group">
@@ -674,45 +675,48 @@
 
     <!-- Modal Edit Review -->
     @auth
-    @if(auth()->user()->appReview)
-    <div class="modal fade" id="editReviewModal" tabindex="-1" aria-labelledby="editReviewModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-4">
-                <div class="modal-header border-bottom-0 pb-0">
-                    <h5 class="modal-title fw-bold" id="editReviewModalLabel">Edit Ulasan Anda</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editReviewForm" action="{{ route('app.review.store') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="rating" id="editRatingInput" value="{{ auth()->user()->appReview->rating }}">
-                        
-                        <div class="mb-3 text-center">
-                            <label class="form-label text-muted small">Rating Anda</label>
-                            <div class="star-rating d-flex justify-content-center gap-2" id="editStarRating">
-                                @for ($i = 1; $i <= 5; $i++)
-                                    <i class="fas fa-star edit-star-icon fs-3" data-value="{{ $i }}"
-                                        style="color: {{ $i <= auth()->user()->appReview->rating ? '#FBBF24' : '#ddd' }}; cursor: pointer; transition: color 0.15s;">
-                                    </i>
-                                @endfor
-                            </div>
+        @if (auth()->user()->appReview)
+            <div class="modal fade" id="editReviewModal" tabindex="-1" aria-labelledby="editReviewModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg rounded-4">
+                        <div class="modal-header border-bottom-0 pb-0">
+                            <h5 class="modal-title fw-bold" id="editReviewModalLabel">Edit Ulasan Anda</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        
-                        <div class="mb-4">
-                            <label class="form-label text-muted small">Ulasan</label>
-                            <textarea name="review" id="editReviewText" class="form-control rounded-3" rows="4" 
-                                placeholder="Tulis ulasan anda disini..." maxlength="500" required>{{ auth()->user()->appReview->review }}</textarea>
+                        <div class="modal-body">
+                            <form id="editReviewForm" action="{{ route('app.review.store') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="rating" id="editRatingInput"
+                                    value="{{ auth()->user()->appReview->rating }}">
+
+                                <div class="mb-3 text-center">
+                                    <label class="form-label text-muted small">Rating Anda</label>
+                                    <div class="star-rating d-flex justify-content-center gap-2" id="editStarRating">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            <i class="fas fa-star edit-star-icon fs-3" data-value="{{ $i }}"
+                                                style="color: {{ $i <= auth()->user()->appReview->rating ? '#FBBF24' : '#ddd' }}; cursor: pointer; transition: color 0.15s;">
+                                            </i>
+                                        @endfor
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label text-muted small">Ulasan</label>
+                                    <textarea name="review" id="editReviewText" class="form-control rounded-3" rows="4"
+                                        placeholder="Tulis ulasan anda disini..." maxlength="500" required>{{ auth()->user()->appReview->review }}</textarea>
+                                </div>
+
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary rounded-pill py-2 fw-bold">Update
+                                        Ulasan</button>
+                                </div>
+                            </form>
                         </div>
-                        
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary rounded-pill py-2 fw-bold">Update Ulasan</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    @endif
+        @endif
     @endauth
 
 @endsection
@@ -957,11 +961,12 @@
 
             const editModal = document.getElementById('editReviewModal');
             if (editModal) {
-                editModal.addEventListener('hidden.bs.modal', function () {
+                editModal.addEventListener('hidden.bs.modal', function() {
                     if (editRatingInput) editRatingInput.value = originalEditRating;
                     editSelectedRating = originalEditRating;
                     editStars.forEach(s => {
-                        s.style.color = parseInt(s.getAttribute('data-value')) <= originalEditRating ? '#FBBF24' : '#ddd';
+                        s.style.color = parseInt(s.getAttribute('data-value')) <=
+                            originalEditRating ? '#FBBF24' : '#ddd';
                     });
                     if (editReviewText) editReviewText.value = originalEditReview;
                 });
@@ -971,19 +976,22 @@
                 star.addEventListener('mouseover', () => {
                     const val = parseInt(star.getAttribute('data-value'));
                     editStars.forEach(s => {
-                        s.style.color = parseInt(s.getAttribute('data-value')) <= val ? '#FBBF24' : '#ddd';
+                        s.style.color = parseInt(s.getAttribute('data-value')) <= val ?
+                            '#FBBF24' : '#ddd';
                     });
                 });
                 star.addEventListener('mouseout', () => {
                     editStars.forEach(s => {
-                        s.style.color = parseInt(s.getAttribute('data-value')) <= editSelectedRating ? '#FBBF24' : '#ddd';
+                        s.style.color = parseInt(s.getAttribute('data-value')) <=
+                            editSelectedRating ? '#FBBF24' : '#ddd';
                     });
                 });
                 star.addEventListener('click', () => {
                     editSelectedRating = parseInt(star.getAttribute('data-value'));
                     if (editRatingInput) editRatingInput.value = editSelectedRating;
                     editStars.forEach(s => {
-                        s.style.color = parseInt(s.getAttribute('data-value')) <= editSelectedRating ? '#FBBF24' : '#ddd';
+                        s.style.color = parseInt(s.getAttribute('data-value')) <=
+                            editSelectedRating ? '#FBBF24' : '#ddd';
                     });
                 });
             });
@@ -993,17 +1001,25 @@
             if (editReviewForm) {
                 editReviewForm.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    
+
                     const formData = new FormData(this);
                     const submitBtn = this.querySelector('button[type="submit"]');
                     const originalBtnHtml = submitBtn.innerHTML;
-                    
+
                     if (formData.get('rating') == '0') {
-                        Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Silakan pilih rating bintang terlebih dahulu.' });
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Oops...',
+                            text: 'Silakan pilih rating bintang terlebih dahulu.'
+                        });
                         return;
                     }
                     if (!formData.get('review').trim()) {
-                        Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Silakan tulis ulasan Anda.' });
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Oops...',
+                            text: 'Silakan tulis ulasan Anda.'
+                        });
                         return;
                     }
 
@@ -1011,47 +1027,47 @@
                     submitBtn.disabled = true;
 
                     fetch(this.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        submitBtn.innerHTML = originalBtnHtml;
-                        submitBtn.disabled = false;
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            submitBtn.innerHTML = originalBtnHtml;
+                            submitBtn.disabled = false;
 
-                        if (data.success) {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    confirmButtonColor: '#0d6efd'
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Gagal!',
+                                    text: data.message || 'Terjadi kesalahan.',
+                                    icon: 'error',
+                                    confirmButtonColor: '#0d6efd'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            submitBtn.innerHTML = originalBtnHtml;
+                            submitBtn.disabled = false;
                             Swal.fire({
-                                title: 'Berhasil!',
-                                text: data.message,
-                                icon: 'success',
-                                confirmButtonColor: '#0d6efd'
-                            }).then(() => {
-                                window.location.reload();
-                            });
-                        } else {
-                            Swal.fire({
-                                title: 'Gagal!',
-                                text: data.message || 'Terjadi kesalahan.',
+                                title: 'Error!',
+                                text: 'Terjadi kesalahan sistem. Coba lagi nanti.',
                                 icon: 'error',
                                 confirmButtonColor: '#0d6efd'
                             });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        submitBtn.innerHTML = originalBtnHtml;
-                        submitBtn.disabled = false;
-                        Swal.fire({
-                            title: 'Error!',
-                            text: 'Terjadi kesalahan sistem. Coba lagi nanti.',
-                            icon: 'error',
-                            confirmButtonColor: '#0d6efd'
                         });
-                    });
                 });
             }
 
