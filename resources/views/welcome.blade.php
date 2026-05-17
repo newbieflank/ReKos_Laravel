@@ -504,7 +504,7 @@
     <section id="rating" class="py-5 bg-white">
         <div class="container">
             <div class="text-center mb-5">
-                <h6 class="fw-bold text-primary mb-1">Ulasan</h6>
+                <h6 class="fw-bold text-primary mb-1">Ulasan TES CI/CD</h6>
                 <h2 class="fw-bold">Ulasan Pengguna Re-Kost</h2>
             </div>
 
