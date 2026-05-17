@@ -240,107 +240,115 @@
                 <h2 class="fw-bold">Kost Terbaik di Bondowoso</h2>
             </div>
 
-            <div class="swiper-container-wrapper">
-                <div class="swiper roomSwiper">
-                    <div class="swiper-wrapper">
-                        @foreach ($rekomendasi as $room)
-                            <div class="swiper-slide">
-                                <a href="{{ route('detail', ['id' => $room->boardingHouse->id, 'room_id' => $room->id]) }}"
-                                    class="text-decoration-none">
-                                    <div class="card card-kost h-100 p-2 border-0 shadow-sm">
-                                        @if ($room->main_image)
-                                            <img src="{{ asset($room->main_image) }}"
-                                                class="card-img-top rounded-3 object-fit-cover" style="height: 180px;"
-                                                alt="Kamar">
-                                        @else
-                                            <div class="card-img-top rounded-3 d-flex align-items-center justify-content-center bg-light text-muted"
-                                                style="height: 180px;">
-                                                <i class="fa-solid fa-bed fs-2"></i>
-                                            </div>
-                                        @endif
-                                        <div class="card-body px-2 pb-1 pt-3 text-start">
-                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                <div>
-                                                    <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
-                                                    <div class="d-flex align-items-center mt-1">
-                                                        <i class="fas fa-star text-warning"
-                                                            style="font-size: 0.75rem;"></i>
-                                                        <span
-                                                            class="ms-1 small fw-medium">{{ number_format($room->boardingHouse->rating ?? 0, 1) }}</span>
-                                                    </div>
-                                                </div>
-                                                <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1"
-                                                    style="font-size: 0.7rem;">{{ $room->room_type }}</span>
-                                            </div>
-                                            @php
-                                                $typeMap = [
-                                                    'male' => 'Putra',
-                                                    'female' => 'Putri',
-                                                    'mixed' => 'Campur',
-                                                ];
-                                                $typeLabel =
-                                                    $typeMap[$room->boardingHouse->boarding_house_type] ??
-                                                    ucfirst($room->boardingHouse->boarding_house_type);
-                                            @endphp
-                                            <p class="text-muted small mb-1"><i
-                                                    class="fas fa-house text-secondary me-1"></i>
-                                                {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }} <span
-                                                    class="ms-1 fw-bold text-primary"
-                                                    style="font-size: 0.7rem;">({{ $typeLabel }})</span></p>
-                                            @php
-                                                $alamat = $room->boardingHouse->alamat ?? '';
-                                                $alamatParts = array_map('trim', explode(',', $alamat));
-                                                $area = 'Bondowoso';
-                                                if (
-                                                    count($alamatParts) >= 6 &&
-                                                    strtolower($alamatParts[count($alamatParts) - 5]) === 'bondowoso'
-                                                ) {
-                                                    $area = $alamatParts[count($alamatParts) - 6];
-                                                } elseif (count($alamatParts) > 1) {
-                                                    $area = $alamatParts[1];
-                                                }
-                                            @endphp
-                                            <p class="text-dark small mb-1 fw-medium"><i
-                                                    class="fas fa-map text-success me-1"></i> Area
-                                                {{ Str::limit($area, 20) }}</p>
-                                            <p class="text-muted small mb-2"><i
-                                                    class="fas fa-map-marker-alt text-danger me-1"></i>
-                                                {{ Str::limit($alamat, 25) }}</p>
-
-                                            @if ($room->available)
-                                                <span
-                                                    class="badge bg-success-subtle text-success rounded-pill px-2 py-1 mb-2"
-                                                    style="font-size: 0.7rem;"><i class="fa-solid fa-door-open me-1"></i>
-                                                    Tersedia</span>
+            @if (count($rekomendasi) > 0)
+                <div class="swiper-container-wrapper">
+                    <div class="swiper roomSwiper">
+                        <div class="swiper-wrapper">
+                            @foreach ($rekomendasi as $room)
+                                <div class="swiper-slide">
+                                    <a href="{{ route('detail', ['id' => $room->boardingHouse->id, 'room_id' => $room->id]) }}"
+                                        class="text-decoration-none">
+                                        <div class="card card-kost h-100 p-2 border-0 shadow-sm">
+                                            @if ($room->main_image)
+                                                <img src="{{ asset($room->main_image) }}"
+                                                    class="card-img-top rounded-3 object-fit-cover" style="height: 180px;"
+                                                    alt="Kamar">
                                             @else
-                                                <span
-                                                    class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 mb-2"
-                                                    style="font-size: 0.7rem;"><i
-                                                        class="fa-solid fa-door-closed me-1"></i>
-                                                    Penuh</span>
+                                                <div class="card-img-top rounded-3 d-flex align-items-center justify-content-center bg-light text-muted"
+                                                    style="height: 180px;">
+                                                    <i class="fa-solid fa-bed fs-2"></i>
+                                                </div>
                                             @endif
+                                            <div class="card-body px-2 pb-1 pt-3 text-start">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <div>
+                                                        <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
+                                                        <div class="d-flex align-items-center mt-1">
+                                                            <i class="fas fa-star text-warning"
+                                                                style="font-size: 0.75rem;"></i>
+                                                            <span
+                                                                class="ms-1 small fw-medium">{{ number_format($room->boardingHouse->rating ?? 0, 1) }}</span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1"
+                                                        style="font-size: 0.7rem;">{{ $room->room_type }}</span>
+                                                </div>
+                                                @php
+                                                    $typeMap = [
+                                                        'male' => 'Putra',
+                                                        'female' => 'Putri',
+                                                        'mixed' => 'Campur',
+                                                    ];
+                                                    $typeLabel =
+                                                        $typeMap[$room->boardingHouse->boarding_house_type] ??
+                                                        ucfirst($room->boardingHouse->boarding_house_type);
+                                                @endphp
+                                                <p class="text-muted small mb-1"><i
+                                                        class="fas fa-house text-secondary me-1"></i>
+                                                    {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }} <span
+                                                        class="ms-1 fw-bold text-primary"
+                                                        style="font-size: 0.7rem;">({{ $typeLabel }})</span></p>
+                                                @php
+                                                    $alamat = $room->boardingHouse->alamat ?? '';
+                                                    $alamatParts = array_map('trim', explode(',', $alamat));
+                                                    $area = 'Bondowoso';
+                                                    if (
+                                                        count($alamatParts) >= 6 &&
+                                                        strtolower($alamatParts[count($alamatParts) - 5]) === 'bondowoso'
+                                                    ) {
+                                                        $area = $alamatParts[count($alamatParts) - 6];
+                                                    } elseif (count($alamatParts) > 1) {
+                                                        $area = $alamatParts[1];
+                                                    }
+                                                @endphp
+                                                <p class="text-dark small mb-1 fw-medium"><i
+                                                        class="fas fa-map text-success me-1"></i> Area
+                                                    {{ Str::limit($area, 20) }}</p>
+                                                <p class="text-muted small mb-2"><i
+                                                        class="fas fa-map-marker-alt text-danger me-1"></i>
+                                                    {{ Str::limit($alamat, 25) }}</p>
 
-                                            <div class="mt-2 border-top pt-2">
-                                                <span class="fw-bold text-primary fs-5">Rp
-                                                    {{ number_format($room->monthly_price ?? 0, 0, ',', '.') }}<span
-                                                        class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                                                @if ($room->available)
+                                                    <span
+                                                        class="badge bg-success-subtle text-success rounded-pill px-2 py-1 mb-2"
+                                                        style="font-size: 0.7rem;"><i class="fa-solid fa-door-open me-1"></i>
+                                                        Tersedia</span>
+                                                @else
+                                                    <span
+                                                        class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 mb-2"
+                                                        style="font-size: 0.7rem;"><i
+                                                            class="fa-solid fa-door-closed me-1"></i>
+                                                        Penuh</span>
+                                                @endif
+
+                                                <div class="mt-2 border-top pt-2">
+                                                    <span class="fw-bold text-primary fs-5">Rp
+                                                        {{ number_format($room->monthly_price ?? 0, 0, ',', '.') }}<span
+                                                            class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </a>
-                            </div>
-                        @endforeach
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="swiper-pagination"></div>
                     </div>
-                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-prev d-none d-md-flex"></div>
+                    <div class="swiper-button-next d-none d-md-flex"></div>
                 </div>
-                <div class="swiper-button-prev d-none d-md-flex"></div>
-                <div class="swiper-button-next d-none d-md-flex"></div>
-            </div>
 
-            <div class="text-center mt-5">
-                <a class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm bg-white"
-                    href="{{ route('kosterbaik.index') }}">Lihat <i class="fas fa-arrow-right ms-2"></i></a>
-            </div>
+                <div class="text-center mt-5">
+                    <a class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm bg-white"
+                        href="{{ route('kosterbaik.index') }}">Lihat <i class="fas fa-arrow-right ms-2"></i></a>
+                </div>
+            @else
+                <div class="text-center py-5 text-light text-opacity-75">
+                    <i class="fa-solid fa-house-flag fs-1 mb-3 d-block" style="color: rgba(255,255,255,0.5);"></i>
+                    <h5 class="fw-bold text-white">Belum Ada Rekomendasi</h5>
+                    <p class="mb-0">Saat ini belum ada kost yang direkomendasikan. Silakan kembali lagi nanti!</p>
+                </div>
+            @endif
         </div>
     </section>
 
@@ -351,97 +359,105 @@
                 <p class="text-muted">Berikut ini adalah pilihan kost-kost di Bondowoso</p>
             </div>
 
-            <div class="swiper-container-wrapper">
-                <div class="swiper roomSwiper">
-                    <div class="swiper-wrapper">
-                        @foreach ($rooms as $room)
-                            <div class="swiper-slide">
-                                <a href="{{ route('detail', ['id' => $room->boardingHouse->id, 'room_id' => $room->id]) }}"
-                                    class="text-decoration-none">
-                                    <div class="card card-kost h-100 p-2 border shadow-sm">
-                                        @if ($room->main_image)
-                                            <img src="{{ asset($room->main_image) }}"
-                                                class="card-img-top rounded-3 object-fit-cover" style="height: 180px;"
-                                                alt="Kamar">
-                                        @else
-                                            <div class="card-img-top rounded-3 d-flex align-items-center justify-content-center bg-light text-muted"
-                                                style="height: 180px;">
-                                                <i class="fa-solid fa-bed fs-2"></i>
-                                            </div>
-                                        @endif
-                                        <div class="card-body px-2 pb-1 pt-3 text-start">
-                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
-                                                <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1"
-                                                    style="font-size: 0.7rem;">{{ $room->room_type }}</span>
-                                            </div>
-                                            @php
-                                                $typeMap = [
-                                                    'male' => 'Putra',
-                                                    'female' => 'Putri',
-                                                    'mixed' => 'Campur',
-                                                ];
-                                                $typeLabel =
-                                                    $typeMap[$room->boardingHouse->boarding_house_type] ??
-                                                    ucfirst($room->boardingHouse->boarding_house_type);
-                                            @endphp
-                                            <p class="text-muted small mb-1"><i
-                                                    class="fas fa-house text-secondary me-1"></i>
-                                                {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }} <span
-                                                    class="ms-1 fw-bold text-primary"
-                                                    style="font-size: 0.7rem;">({{ $typeLabel }})</span></p>
-                                            @php
-                                                $alamat = $room->boardingHouse->alamat ?? '';
-                                                $alamatParts = array_map('trim', explode(',', $alamat));
-                                                $area = 'Bondowoso';
-                                                if (
-                                                    count($alamatParts) >= 6 &&
-                                                    strtolower($alamatParts[count($alamatParts) - 5]) === 'bondowoso'
-                                                ) {
-                                                    $area = $alamatParts[count($alamatParts) - 6];
-                                                } elseif (count($alamatParts) > 1) {
-                                                    $area = $alamatParts[1];
-                                                }
-                                            @endphp
-                                            <p class="text-dark small mb-1 fw-medium"><i
-                                                    class="fas fa-map text-success me-1"></i> Area
-                                                {{ Str::limit($area, 20) }}</p>
-                                            <p class="text-muted small mb-2"><i
-                                                    class="fas fa-map-marker-alt text-danger me-1"></i>
-                                                {{ Str::limit($alamat, 25) }}</p>
-
-                                            @if ($room->available)
-                                                <span
-                                                    class="badge bg-success-subtle text-success rounded-pill px-2 py-1 mb-2"
-                                                    style="font-size: 0.7rem;"><i class="fa-solid fa-door-open me-1"></i>
-                                                    Tersedia</span>
+            @if (count($rooms) > 0)
+                <div class="swiper-container-wrapper">
+                    <div class="swiper roomSwiper">
+                        <div class="swiper-wrapper">
+                            @foreach ($rooms as $room)
+                                <div class="swiper-slide">
+                                    <a href="{{ route('detail', ['id' => $room->boardingHouse->id, 'room_id' => $room->id]) }}"
+                                        class="text-decoration-none">
+                                        <div class="card card-kost h-100 p-2 border shadow-sm">
+                                            @if ($room->main_image)
+                                                <img src="{{ asset($room->main_image) }}"
+                                                    class="card-img-top rounded-3 object-fit-cover" style="height: 180px;"
+                                                    alt="Kamar">
                                             @else
-                                                <span
-                                                    class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 mb-2"
-                                                    style="font-size: 0.7rem;"><i
-                                                        class="fa-solid fa-door-closed me-1"></i> Penuh</span>
+                                                <div class="card-img-top rounded-3 d-flex align-items-center justify-content-center bg-light text-muted"
+                                                    style="height: 180px;">
+                                                    <i class="fa-solid fa-bed fs-2"></i>
+                                                </div>
                                             @endif
+                                            <div class="card-body px-2 pb-1 pt-3 text-start">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="fw-bold text-dark mb-0">{{ $room->room_name }}</h6>
+                                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1"
+                                                        style="font-size: 0.7rem;">{{ $room->room_type }}</span>
+                                                </div>
+                                                @php
+                                                    $typeMap = [
+                                                        'male' => 'Putra',
+                                                        'female' => 'Putri',
+                                                        'mixed' => 'Campur',
+                                                    ];
+                                                    $typeLabel =
+                                                        $typeMap[$room->boardingHouse->boarding_house_type] ??
+                                                        ucfirst($room->boardingHouse->boarding_house_type);
+                                                @endphp
+                                                <p class="text-muted small mb-1"><i
+                                                        class="fas fa-house text-secondary me-1"></i>
+                                                    {{ Str::limit($room->boardingHouse->boarding_house_name, 25) }} <span
+                                                        class="ms-1 fw-bold text-primary"
+                                                        style="font-size: 0.7rem;">({{ $typeLabel }})</span></p>
+                                                @php
+                                                    $alamat = $room->boardingHouse->alamat ?? '';
+                                                    $alamatParts = array_map('trim', explode(',', $alamat));
+                                                    $area = 'Bondowoso';
+                                                    if (
+                                                        count($alamatParts) >= 6 &&
+                                                        strtolower($alamatParts[count($alamatParts) - 5]) === 'bondowoso'
+                                                    ) {
+                                                        $area = $alamatParts[count($alamatParts) - 6];
+                                                    } elseif (count($alamatParts) > 1) {
+                                                        $area = $alamatParts[1];
+                                                    }
+                                                @endphp
+                                                <p class="text-dark small mb-1 fw-medium"><i
+                                                        class="fas fa-map text-success me-1"></i> Area
+                                                    {{ Str::limit($area, 20) }}</p>
+                                                <p class="text-muted small mb-2"><i
+                                                        class="fas fa-map-marker-alt text-danger me-1"></i>
+                                                    {{ Str::limit($alamat, 25) }}</p>
 
-                                            <div class="mt-2 border-top pt-2">
-                                                <span class="fw-bold text-primary fs-5">Rp
-                                                    {{ number_format($room->monthly_price ?? 0, 0, ',', '.') }}<span
-                                                        class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                                                @if ($room->available)
+                                                    <span
+                                                        class="badge bg-success-subtle text-success rounded-pill px-2 py-1 mb-2"
+                                                        style="font-size: 0.7rem;"><i class="fa-solid fa-door-open me-1"></i>
+                                                        Tersedia</span>
+                                                @else
+                                                    <span
+                                                        class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 mb-2"
+                                                        style="font-size: 0.7rem;"><i
+                                                            class="fa-solid fa-door-closed me-1"></i> Penuh</span>
+                                                @endif
+
+                                                <div class="mt-2 border-top pt-2">
+                                                    <span class="fw-bold text-primary fs-5">Rp
+                                                        {{ number_format($room->monthly_price ?? 0, 0, ',', '.') }}<span
+                                                            class="text-muted small fw-normal fs-6"> / Bulan</span></span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </a>
-                            </div>
-                        @endforeach
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="swiper-pagination"></div>
                     </div>
-                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-prev d-none d-md-flex"></div>
+                    <div class="swiper-button-next d-none d-md-flex"></div>
                 </div>
-                <div class="swiper-button-prev d-none d-md-flex"></div>
-                <div class="swiper-button-next d-none d-md-flex"></div>
-            </div>
-            <div class="text-center mt-5">
-                <a class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm bg-white"
-                    href="{{ route('allkos.index') }}">Lihat <i class="fas fa-arrow-right ms-2"></i></a>
-            </div>
+                <div class="text-center mt-5">
+                    <a class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm bg-white"
+                        href="{{ route('allkos.index') }}">Lihat <i class="fas fa-arrow-right ms-2"></i></a>
+                </div>
+            @else
+                <div class="text-center py-5 text-muted">
+                    <i class="fa-solid fa-house-chimney-window fs-1 mb-3 d-block" style="color:#dee2e6;"></i>
+                    <h5 class="fw-bold text-dark">Kost Belum Tersedia</h5>
+                    <p class="mb-0">Saat ini belum ada data kost di Bondowoso. Silakan kembali lagi nanti!</p>
+                </div>
+            @endif
         </div>
     </section>
 
