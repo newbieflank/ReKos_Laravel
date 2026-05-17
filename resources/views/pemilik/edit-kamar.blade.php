@@ -334,12 +334,12 @@
                         <div class="col-12 col-md-6">
                             <label class="form-label-custom">Nama Kamar</label>
                             <input type="text" name="room_name" id="input_room_name"
-                                class="form-control form-control-custom w-100" placeholder="e.g. Kamar Standard"
+                                class="form-control form-control-custom w-100" placeholder="Contoh: Kamar Standard"
                                 value="{{ old('room_name', $room->room_name) }}" required>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label-custom">Tipe Kamar</label>
-                            <input type="text" name="room_type" id="input_room_type" class="form-control form-control-custom w-100" placeholder="e.g. Standard, Deluxe, VIP" value="{{ old('room_type', $room->room_type) }}" required>
+                            <input type="text" name="room_type" id="input_room_type" class="form-control form-control-custom w-100" placeholder="Contoh: Standard, Deluxe, VIP" value="{{ old('room_type', $room->room_type) }}" required>
                         </div>
                     </div>
                     <div class="row g-4">
@@ -347,7 +347,7 @@
                             <label class="form-label-custom">Ukuran Kamar (m)</label>
                             <div class="position-relative">
                                 <input type="text" name="room_size" id="input_room_size"
-                                    class="form-control form-control-custom w-100" placeholder="e.g. 3x4"
+                                    class="form-control form-control-custom w-100" placeholder="Contoh: 3x4"
                                     style="padding-right: 60px;" value="{{ old('room_size', $room->room_size) }}" required>
                                 <span class="position-absolute text-muted"
                                     style="right: 16px; top: 12px; font-size: 0.85rem;">Meter</span>
@@ -456,7 +456,7 @@
                     <label class="form-label-custom">Tambahan lainnya</label>
                     <div class="d-flex gap-2 mb-3">
                         <input type="text" id="custom-facility-input" class="form-control form-control-custom flex-grow-1"
-                            placeholder="Add custom facility (e.g. Balcony)">
+                            placeholder="Tambah fasilitas lain (Contoh: Balkon)">
                         <button type="button" class="btn btn-primary shadow-sm px-4 rounded-3" onclick="addCustomFacility()"><i
                                 class="fa-solid fa-plus me-1"></i> Add</button>
                     </div>
