@@ -51,4 +51,7 @@ jobs:
           docker compose pull
           docker compose up -d
           docker exec rekos_app bash -c "if [ ! -f .env ]; then cp .env.example .env && php artisan key:generate; fi"
+          docker exec rekos_app php artisan migrate --force
           docker exec rekos_app bash -c "if [ ! -d public/storage ]; then php artisan storage:link; fi"
+          docker exec rekos_app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+          docker exec rekos_app php artisan optimize:clear
