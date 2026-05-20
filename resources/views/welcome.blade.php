@@ -102,7 +102,6 @@
 
         .choices[data-type*="select-one"]:after {
             display: none !important;
-            /* Hide default arrow */
         }
 
         .search-pill-wrapper {
