@@ -16,6 +16,7 @@ services:
       - DB_PASSWORD=123qweasd
     volumes:
       - rekos_storage:/var/www/html/storage/app/public
+      - ./.env:/var/www/html/.env
     depends_on:
       - db
 
