@@ -31,12 +31,20 @@ abstract class DuskTestCase extends BaseTestCase
             $this->shouldStartMaximized() ? '--start-maximized' : '--window-size=1920,1080',
             '--disable-search-engine-choice-screen',
             '--disable-smooth-scrolling',
-        ])->unless($this->hasHeadlessDisabled(), function (Collection $items) {
+        ])->when(app()->environment('testing') && PHP_OS_FAMILY === 'Linux', function (Collection $items) {
+            // Flag wajib untuk CI/CD (GitHub Actions, Docker, Linux container)
+            return $items->merge([
+                '--no-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+                '--headless=new',
+            ]);
+        })->unless($this->hasHeadlessDisabled(), function (Collection $items) {
             return $items->merge([
                 '--disable-gpu',
                 '--headless=new',
             ]);
-        })->all());
+        })->unique()->all());
 
         return RemoteWebDriver::create(
             $_ENV['DUSK_DRIVER_URL'] ?? env('DUSK_DRIVER_URL') ?? 'http://localhost:9515',
