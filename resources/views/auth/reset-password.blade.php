@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reset Password - Re-Kost</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo.svg') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .login-card {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .login-image {
+            background-color: #e8f5e9;
+        }
+
+        .login-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo {
+            width: 80px;
+        }
+
+        .showPass {
+            cursor: pointer;
+            width: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid vh-100">
+        <div class="row shadow-lg login-card w-100 h-100 m-0 g-0">
+
+            <div class="col-lg-6 p-5 bg-white">
+                <a href="{{ route('home') }}">
+                    <img src="{{ asset('images/logo.svg') }}" class="logo mb-3" alt="Logo">
+                </a>
+
+                <h4 class="fw-bold">Buat Password Baru</h4>
+                <p class="text-muted mb-5">
+                    Sesi verifikasi berhasil. Masukkan password baru Anda di bawah ini secara rahasia dan aman.
+                </p>
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form method="post" action="{{ route('password.update') }}">
+                    @csrf
+
+                    <div class="mb-3">
+                        <label class="form-label">Password Baru</label>
+                        <div class="position-relative">
+                            <input type="password" name="password" id="password" class="form-control pe-5"
+                                placeholder="Password Baru (min. 8 karakter)" required>
+                            <img src="{{ asset('images/EyeLogin.svg') }}"
+                                class="position-absolute top-50 end-0 translate-middle-y me-3 showPass"
+                                onclick="togglePassword('password')">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Konfirmasi Password Baru</label>
+                        <div class="position-relative">
+                            <input type="password" name="password_confirmation" id="password_confirmation" class="form-control pe-5"
+                                placeholder="Ulangi Password Baru" required>
+                            <img src="{{ asset('images/EyeLogin.svg') }}"
+                                class="position-absolute top-50 end-0 translate-middle-y me-3 showPass"
+                                onclick="togglePassword('password_confirmation')">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn w-100 py-3 text-white fw-bold"
+                        style="background:#3f7ae0; border-radius:10px;">
+                        Perbarui Password
+                    </button>
+                </form>
+            </div>
+
+            <div class="col-lg-6 d-none d-lg-block login-image p-0 bg-white">
+                <img src="{{ asset('images/ImageLogin.svg') }}" class="w-100 h-100 object-fit-cover" alt="">
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            field.type = field.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+</body>
+</html>

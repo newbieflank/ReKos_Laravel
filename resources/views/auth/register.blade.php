@@ -73,6 +73,9 @@
 
             <div class="col-lg-6 p-5 bg-white">
                 <div class="card border-0 shadow-sm p-4" style="border-radius:15px;">
+                    <a href="{{ route('home') }}">
+                        <img src="{{ asset('images/logo.svg') }}" class="logo mb-3" alt="Logo">
+                    </a>
 
                     <!-- Header -->
                     <div class="mb-4">
