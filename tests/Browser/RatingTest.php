@@ -7,11 +7,14 @@ use App\Models\BoardingHouse;
 use App\Models\Room;
 use App\Models\Tenant;
 use App\Models\Payment;
+use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
 class RatingTest extends DuskTestCase
 {
+    use DatabaseTruncation;
+
     /**
      * Skenario 4: Memberi rating aplikasi (Harus Login)
      */
@@ -81,6 +84,7 @@ class RatingTest extends DuskTestCase
         $tenant = Tenant::create([
             'tenant_id' => $user->id,
             'room_id' => $room->id,
+            'rental_type' => 'monthly',
             'rental_duration' => 1,
             'start_date' => now(),
             'end_date' => now()->addMonth(),

@@ -6,12 +6,14 @@ use App\Models\User;
 use App\Models\BoardingHouse;
 use App\Models\Room;
 use App\Models\UserDetail;
+use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 use Illuminate\Support\Facades\Http;
 
 class PemilikKostTest extends DuskTestCase
 {
+    use DatabaseTruncation;
 
     private function getOrCreateOwner(): User
     {

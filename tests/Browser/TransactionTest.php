@@ -12,6 +12,7 @@ use Tests\DuskTestCase;
 
 class TransactionTest extends DuskTestCase
 {
+    use DatabaseTruncation;
     /**
      * Skenario: User bisa melakukan booking kamar dan sampai ke halaman sukses
      */

@@ -1,9 +1,9 @@
 <style>
     .footer-light {
-        background-color: #0f172a; /* Premium Deep Navy/Slate */
+        background-color: #0f172a; 
         color: #94a3b8;
         font-size: 0.95rem;
-        border-top: none; /* Removed border as contrast is strong enough */
+        border-top: none; 
     }
     
     .footer-light a {
@@ -20,7 +20,7 @@
         font-size: 1.75rem;
         font-weight: 800;
         letter-spacing: 1px;
-        color: #ffffff; /* White text for dark bg */
+        color: #ffffff; 
     }
     
     .footer-brand-title span {
@@ -55,7 +55,7 @@
     }
     
     .footer-social-icon {
-        background-color: rgba(255, 255, 255, 0.05); /* Subtle glassy bg */
+        background-color: rgba(255, 255, 255, 0.05); 
         border: 1px solid rgba(255, 255, 255, 0.1);
         display: inline-flex;
         align-items: center;
@@ -75,15 +75,15 @@
     
     .footer-contact-item {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         gap: 12px;
         margin-bottom: 1.25rem;
-        color: #cbd5e1; /* Brighter text for readability */
+        color: #cbd5e1; 
     }
     
     .footer-contact-item a {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         gap: 12px;
         color: #cbd5e1;
     }
@@ -95,12 +95,13 @@
     .footer-contact-icon {
         color: #59A1FF;
         font-size: 1.25rem;
-        margin-top: 2px;
         flex-shrink: 0;
+        width: 24px;
+        text-align: center;
     }
     
     .footer-bottom {
-        border-top: 1px solid #1e293b; /* Subtle dark border */
+        border-top: 1px solid #1e293b; 
         padding: 1.5rem 0;
         font-size: 0.85rem;
     }
@@ -109,7 +110,6 @@
 <footer id="contact" class="footer-light pt-5 mt-5">
     <div class="container py-4">
         <div class="row g-4">
-            <!-- Column 1: Brand Info -->
             <div class="col-md-6 mb-4 mb-lg-0">
                 <div class="footer-brand-title mb-3">
                     RE-KOST
@@ -124,7 +124,6 @@
                 </div>
             </div>
 
-            <!-- Column 2: Kontak Kami -->
             <div class="col-md-6">
                 <div class="footer-section-title">Kontak Kami</div>
                 
@@ -136,34 +135,27 @@
                 </div>
                 
                 <div class="footer-contact-item">
-                    <div class="d-flex align-items-start gap-2">
-                        <i class="bi bi-telephone footer-contact-icon"></i>
-                        <span>+62 877-9755-2625</span>
-                    </div>
+                    <i class="bi bi-telephone footer-contact-icon"></i>
+                    <span>+62 877-9755-2625</span>
                 </div>
                 
                 <div class="footer-contact-item">
-                    <div class="d-flex align-items-start gap-2">
-                        <i class="bi bi-envelope footer-contact-icon"></i>
-                        <span>rekostbondowoso@gmail.com</span>
-                    </div>
+                    <i class="bi bi-envelope footer-contact-icon"></i>
+                    <span>rekostbondowoso@gmail.com</span>
                 </div>
                 
                 <div class="footer-contact-item">
-                    <div class="d-flex align-items-start gap-2">
-                        <i class="bi bi-clock footer-contact-icon"></i>
-                        <span>Senin – Jumat, 07:00 – 17:00 WIB</span>
-                    </div>
+                    <i class="bi bi-clock footer-contact-icon"></i>
+                    <span>Senin – Jumat, 07:00 – 17:00 WIB</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bottom Footer -->
     <div class="footer-bottom">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-12 text-center text-muted">
+                <div class="col-12 text-center" style="color: #cbd5e1;">
                     &copy; {{ date('Y') }} RE-KOST. All rights reserved.
                 </div>
         </div>

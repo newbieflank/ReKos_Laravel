@@ -3,12 +3,14 @@
 namespace Tests\Browser;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
 class ProfileTest extends DuskTestCase
 {
+    use DatabaseTruncation;
+
     /**
      * Skenario 1: Tes User bisa mengubah profilnya.
      */

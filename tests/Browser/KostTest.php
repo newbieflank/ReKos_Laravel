@@ -5,11 +5,13 @@ namespace Tests\Browser;
 use App\Models\User;
 use App\Models\BoardingHouse;
 use App\Models\Room;
+use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
 class KostTest extends DuskTestCase
 {
+    use DatabaseTruncation;
     protected function setUp(): void
     {
         parent::setUp();
