@@ -6,52 +6,105 @@ on:
       - main  # CI/CD berjalan khusus untuk branch ini
 
 jobs:
-  build-and-deploy:
+  testing:
+    name: Run Dusk Tests
     runs-on: ubuntu-latest
-
     steps:
-    # 1. Mengambil kode terbaru dari GitHub
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    # 2. Login ke Docker Hub menggunakan Secrets
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, dom, fileinfo, sqlite3, pdo_sqlite
+          
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
-    # 3. Merakit Docker Image (Build) & mengirim ke Docker Hub (Push)
-    - name: Build and Push Docker Image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: true
-        tags: sonuafriza/rekos-laravel:latest
+      - name: Prepare Environment
+        run: |
+          # Gunakan .env.dusk.local sebagai template (sudah berisi konfigurasi SQLite)
+          cp .env.dusk.local .env
 
-    # 4. Mengirim file docker-compose ke VPS (SCP)
-    - name: Copy docker-compose to VPS
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.VPS_SSH_KEY }}
-        source: "docker-compose.yml"
-        target: "/var/www/html/rekos-laravel/"
+          # Timpa path SQLite ke path absolut di GitHub Actions runner
+          sed -i "s|DB_DATABASE=.*|DB_DATABASE=$(pwd)/database/dusk.sqlite|g" .env
 
-    # 5. Remote VPS via SSH untuk mengeksekusi aplikasi
-    - name: Execute Deployment on VPS
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.VPS_SSH_KEY }}
-        script: |
-          cd /var/www/html/rekos-laravel
-          docker compose pull
-          docker compose up -d
-          docker exec rekos_app bash -c "if [ ! -f .env ]; then cp .env.example .env && php artisan key:generate; fi"
-          docker exec rekos_app php artisan migrate --force
-          docker exec rekos_app bash -c "if [ ! -d public/storage ]; then php artisan storage:link; fi"
-          docker exec rekos_app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-          docker exec rekos_app php artisan optimize:clear
+          # Suntikkan API keys dari GitHub Secrets agar test yang membutuhkan API tidak error
+          echo "MIDTRANS_SERVER_KEY=${{ secrets.MIDTRANS_SERVER_KEY }}" >> .env
+          echo "MIDTRANS_CLIENT_KEY=${{ secrets.MIDTRANS_CLIENT_KEY }}" >> .env
+          echo "MIDTRANS_MERCHANT_ID=${{ secrets.MIDTRANS_MERCHANT_ID }}" >> .env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+
+          # Generate APP_KEY untuk environment testing
+          php artisan key:generate
+          
+      - name: Create SQLite Database
+        run: |
+          mkdir -p database
+          touch database/dusk.sqlite
+          php artisan migrate --force
+          
+      - name: Upgrade Chrome Driver
+        run: php artisan dusk:chrome-driver
+
+      - name: Start Web Server
+        run: php artisan serve &
+        
+      - name: Run Dusk Tests
+        run: php artisan dusk
+
+  build:
+    name: Build Docker Image
+    needs: testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: sonuafriza/rekos-laravel:latest
+
+  deploy:
+    name: Deploy to VPS
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: Copy docker-compose to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "docker-compose.yml"
+          target: "/var/www/html/rekos-laravel/"
+
+      - name: Execute Deployment on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /var/www/html/rekos-laravel
+            docker compose pull
+            docker compose up -d
+            docker exec rekos_app bash -c "if [ ! -f .env ]; then cp .env.example .env && php artisan key:generate; fi"
+            docker exec rekos_app php artisan migrate --force
+            docker exec rekos_app bash -c "if [ ! -d public/storage ]; then php artisan storage:link; fi"
+            docker exec rekos_app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+            docker exec rekos_app php artisan optimize:clear

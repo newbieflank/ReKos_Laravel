@@ -27,3 +27,8 @@ dusk_output*.txt
 laporan_tes.txt
 tests/Browser/report.html
 tests/Browser/report.xml
+
+# Dusk testing artifacts (tidak perlu di-commit ke git)
+database/dusk.sqlite
+tests/Browser/screenshots/
+tests/Browser/console/

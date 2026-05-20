@@ -11,6 +11,7 @@ use Tests\DuskTestCase;
 
 class AdminApprovalTest extends DuskTestCase
 {
+    use DatabaseTruncation;
     /**
      * Skenario: User biasa mengajukan diri sebagai owner dan disetujui admin
      */
