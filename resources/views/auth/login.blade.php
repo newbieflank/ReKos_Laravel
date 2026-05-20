@@ -66,7 +66,9 @@
         <div class="row shadow-lg login-card w-100 h-100 m-0 g-0">
 
             <div class="col-lg-6 p-5 bg-white">
-                <img src="{{ asset('images/logo.svg') }}" class="logo mb-3" alt="Logo">
+                <a href="{{ route('home') }}">
+                    <img src="{{ asset('images/logo.svg') }}" class="logo mb-3" alt="Logo">
+                </a>
 
                 <h4 class="fw-bold">Selamat Datang</h4>
                 <p class="text-muted mb-5">
@@ -110,7 +112,7 @@
                             <input type="checkbox" name="remember">
                             <label>Remember Me</label>
                         </div>
-                        <a href="{{ route('login') }}" class="small">Forgot Password?</a>
+                        <a href="{{ route('password.request') }}" class="small">Forgot Password?</a>
                     </div>
                     <button type="submit" class="btn w-100 py-3 text-white fw-bold"
                         style="background:#3f7ae0; border-radius:10px;">
