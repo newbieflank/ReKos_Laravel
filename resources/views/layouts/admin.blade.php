@@ -102,7 +102,14 @@
             @include('partials.admin.navbar')
         </div>
 
-        <main class="p-4 p-md-5" style="margin-top: 64px; min-height: calc(100vh - 64px);"> @yield('content')
+        <main class="p-4 p-md-5" style="margin-top: 64px; min-height: calc(100vh - 64px);"> 
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+            @yield('content')
         </main>
     </div>
 
