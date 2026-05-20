@@ -48,14 +48,9 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         script: |
           cd /var/www/html/rekos-laravel
-          # 1. Pastikan file .env ada di host VPS sebelum docker compose up untuk menghindari pembuatan folder .env oleh Docker
-          if [ ! -f .env ]; then
-            cp .env.example .env
-          fi
           docker compose pull
           docker compose up -d
-          # 2. Generate APP_KEY jika belum ada (akan tersimpan di host karena mounting)
-          docker exec rekos_app bash -c "if ! grep -q '^APP_KEY=base64:' .env; then php artisan key:generate; fi"
+          docker exec rekos_app bash -c "if [ ! -f .env ]; then cp .env.example .env && php artisan key:generate; fi"
           docker exec rekos_app php artisan migrate --force
           docker exec rekos_app bash -c "if [ ! -d public/storage ]; then php artisan storage:link; fi"
           docker exec rekos_app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
