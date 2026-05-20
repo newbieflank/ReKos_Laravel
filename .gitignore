@@ -23,3 +23,7 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 /public/image/
+dusk_output*.txt
+laporan_tes.txt
+tests/Browser/report.html
+tests/Browser/report.xml
