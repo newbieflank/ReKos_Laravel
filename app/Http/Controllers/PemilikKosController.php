@@ -828,14 +828,12 @@ class PemilikKosController extends Controller
             'house_rule'          => $request->house_rule,
         ];
 
-        // Upload files menggunakan Storage disk 'public'
         $storageDir   = 'boarding_house_' . $kost->id;
         $deleteStorage = function($path) {
             if ($path && \Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
             }
         };
-        // Helper: ubah path DB (storage/dir/file) → path relatif storage disk (dir/file)
         $toStoragePath = fn($dbPath) => $dbPath ? preg_replace('#^storage/#', '', $dbPath) : null;
 
         if ($request->has('remove_main_image')) {
@@ -928,7 +926,6 @@ class PemilikKosController extends Controller
         }
 
         $data['other_images'] = json_encode($otherImages);
-
         $kost->update($data);
         return redirect()->route('pemilik.kost')->with('success', 'Data Properti Kost berhasil diperbarui!');
     }
