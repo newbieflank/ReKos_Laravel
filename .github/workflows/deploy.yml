@@ -47,7 +47,7 @@ jobs:
           php artisan migrate --force
           
       - name: Upgrade Chrome Driver
-        run: php artisan dusk:chrome-driver
+        run: php artisan dusk:chrome-driver --detect
 
       - name: Start Web Server
         run: php artisan serve &
