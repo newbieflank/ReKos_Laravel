@@ -697,75 +697,88 @@ class PemilikKosController extends Controller
     public function simpanKost(Request $request)
     {
         $request->validate([
-            'facilities' => 'required|array|min:1',
+            'boarding_house_name' => 'required|string|max:255',
+            'area'                => 'required|string',
+            'alamat'              => 'required|string',
+            'facilities'          => 'required|array|min:1',
+            'description'         => 'nullable|string',
+            'house_rule'          => 'nullable|string',
+            'main_image'          => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'other_image_1'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ], [
             'facilities.required' => 'Fasilitas wajib di isi.',
+            'main_image.required' => 'Foto utama kost wajib diunggah.',
+            'main_image.image'    => 'Foto utama harus berupa file gambar.',
         ]);
-
-        $data = $request->all();
-        $data['owner_id'] = auth()->id();
-        $data['latitude'] = $request->latitude ?? 0.0;
-        $data['longitude'] = $request->longitude ?? 0.0;
-        $data['alamat'] = $request->area . ', ' . $request->alamat;
 
         $type = strtolower($request->boarding_house_type ?? '');
         if (in_array($type, ['putra', 'male'])) {
-            $data['boarding_house_type'] = 'male';
+            $boardingHouseType = 'male';
         } elseif (in_array($type, ['putri', 'female'])) {
-            $data['boarding_house_type'] = 'female';
+            $boardingHouseType = 'female';
         } else {
-            $data['boarding_house_type'] = 'mixed';
+            $boardingHouseType = 'mixed';
         }
+
+        $data = [
+            'owner_id'            => auth()->id(),
+            'boarding_house_name' => $request->boarding_house_name,
+            'boarding_house_type' => $boardingHouseType,
+            'alamat'              => $request->area . ', ' . $request->alamat,
+            'latitude'            => $request->latitude ?? 0.0,
+            'longitude'           => $request->longitude ?? 0.0,
+            'facilities'          => $request->facilities,
+            'description'         => $request->description,
+            'house_rule'          => $request->house_rule,
+        ];
 
         $kost = \App\Models\BoardingHouse::create($data);
 
-        // Upload files
-        $path = public_path('image/boarding_house_' . $kost->id);
-        if (!file_exists($path)) {
-            mkdir($path, 0777, true);
-        }
+        // Upload files menggunakan Storage disk 'public'
+        $storageDir = 'boarding_house_' . $kost->id;
 
         if ($request->hasFile('main_image')) {
-            $file = $request->file('main_image');
+            $file     = $request->file('main_image');
             $filename = 'foto_kost_utama_' . time() . '.' . $file->getClientOriginalExtension();
-            $file->move($path, $filename);
-            $kost->main_image = 'image/boarding_house_' . $kost->id . '/' . $filename;
+            \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+            $kost->main_image = 'storage/' . $storageDir . '/' . $filename;
             $kost->save();
         }
 
         $otherImages = [];
-        if ($request->hasFile("other_image_1")) {
-            $file = $request->file("other_image_1");
-            $filename = "foto_kost_tambahan_1_" . time() . '.' . $file->getClientOriginalExtension();
-            $file->move($path, $filename);
-            $otherImages[0] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+        if ($request->hasFile('other_image_1')) {
+            $file     = $request->file('other_image_1');
+            $filename = 'foto_kost_tambahan_1_' . time() . '.' . $file->getClientOriginalExtension();
+            \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+            $otherImages[0] = 'storage/' . $storageDir . '/' . $filename;
         } else {
             $otherImages[0] = null;
         }
 
-        if ($request->hasFile("other_image_2")) {
+        if ($request->hasFile('other_image_2')) {
             $other2Paths = [];
             foreach ($request->file('other_image_2') as $idx => $file) {
-                $filename = "foto_kost_tambahan_2_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
-                $file->move($path, $filename);
-                $other2Paths[] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+                $filename      = 'foto_kost_tambahan_2_' . $idx . '_' . time() . '.' . $file->getClientOriginalExtension();
+                \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+                $other2Paths[] = 'storage/' . $storageDir . '/' . $filename;
             }
             $otherImages[1] = $other2Paths;
         } else {
             $otherImages[1] = null;
         }
-        
-        if ($request->hasFile("other_image_3")) {
+
+        if ($request->hasFile('other_image_3')) {
             $other3Paths = [];
             foreach ($request->file('other_image_3') as $idx => $file) {
-                $filename = "foto_kost_tambahan_3_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
-                $file->move($path, $filename);
-                $other3Paths[] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+                $filename      = 'foto_kost_tambahan_3_' . $idx . '_' . time() . '.' . $file->getClientOriginalExtension();
+                \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+                $other3Paths[] = 'storage/' . $storageDir . '/' . $filename;
             }
             $otherImages[2] = $other3Paths;
         } else {
             $otherImages[2] = null;
         }
+
         $kost->other_images = json_encode($otherImages);
         $kost->save();
 
@@ -781,121 +794,139 @@ class PemilikKosController extends Controller
     public function updateKost(Request $request, $id)
     {
         $request->validate([
-            'facilities' => 'required|array|min:1',
+            'boarding_house_name' => 'required|string|max:255',
+            'area'                => 'required|string',
+            'alamat'              => 'required|string',
+            'facilities'          => 'required|array|min:1',
+            'description'         => 'nullable|string',
+            'house_rule'          => 'nullable|string',
+            'main_image'          => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'other_image_1'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ], [
             'facilities.required' => 'Fasilitas wajib di isi.',
         ]);
 
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
-        $data = $request->all();
-        $data['alamat'] = $request->area . ', ' . $request->alamat;
 
         $type = strtolower($request->boarding_house_type ?? '');
         if (in_array($type, ['putra', 'male'])) {
-            $data['boarding_house_type'] = 'male';
+            $boardingHouseType = 'male';
         } elseif (in_array($type, ['putri', 'female'])) {
-            $data['boarding_house_type'] = 'female';
-        } elseif ($type !== '') {
-            $data['boarding_house_type'] = 'mixed';
+            $boardingHouseType = 'female';
+        } else {
+            $boardingHouseType = 'mixed';
         }
 
-        // Upload files
-        $path = public_path('image/boarding_house_' . $kost->id);
-        if (!file_exists($path)) {
-            mkdir($path, 0777, true);
-        }
+        $data = [
+            'boarding_house_name' => $request->boarding_house_name,
+            'boarding_house_type' => $boardingHouseType,
+            'alamat'              => $request->area . ', ' . $request->alamat,
+            'latitude'            => $request->latitude ?? 0.0,
+            'longitude'           => $request->longitude ?? 0.0,
+            'facilities'          => $request->facilities,
+            'description'         => $request->description,
+            'house_rule'          => $request->house_rule,
+        ];
+
+        // Upload files menggunakan Storage disk 'public'
+        $storageDir   = 'boarding_house_' . $kost->id;
+        $deleteStorage = function($path) {
+            if ($path && \Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+            }
+        };
+        // Helper: ubah path DB (storage/dir/file) → path relatif storage disk (dir/file)
+        $toStoragePath = fn($dbPath) => $dbPath ? preg_replace('#^storage/#', '', $dbPath) : null;
 
         if ($request->has('remove_main_image')) {
-            if ($kost->main_image && file_exists(public_path($kost->main_image))) {
-                @unlink(public_path($kost->main_image));
-            }
+            $deleteStorage($toStoragePath($kost->main_image));
             $data['main_image'] = null;
         }
 
         if ($request->hasFile('main_image')) {
-            if ($kost->main_image && file_exists(public_path($kost->main_image))) {
-                @unlink(public_path($kost->main_image));
-            }
-            $file = $request->file('main_image');
-            $filename = 'foto_kost_utama_' . time() . '.' . $file->getClientOriginalExtension();
-            $file->move($path, $filename);
-            $data['main_image'] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+            $deleteStorage($toStoragePath($kost->main_image));
+            $file              = $request->file('main_image');
+            $filename          = 'foto_kost_utama_' . time() . '.' . $file->getClientOriginalExtension();
+            \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+            $data['main_image'] = 'storage/' . $storageDir . '/' . $filename;
         }
 
-        $oldImages = $kost->other_images ? json_decode($kost->other_images, true) : [];
+        $oldImages   = $kost->other_images ? json_decode($kost->other_images, true) : [];
         $otherImages = [
             $oldImages[0] ?? null,
             $oldImages[1] ?? null,
             $oldImages[2] ?? null,
         ];
 
-        if ($request->has("remove_other_image_1")) {
-            if (!empty($otherImages[0]) && is_string($otherImages[0]) && file_exists(public_path($otherImages[0]))) {
-                @unlink(public_path($otherImages[0]));
+        if ($request->has('remove_other_image_1')) {
+            if (!empty($otherImages[0]) && is_string($otherImages[0])) {
+                $deleteStorage($toStoragePath($otherImages[0]));
             }
             $otherImages[0] = null;
         }
 
-        if ($request->hasFile("other_image_1")) {
-            if (!empty($otherImages[0]) && is_string($otherImages[0]) && file_exists(public_path($otherImages[0]))) {
-                @unlink(public_path($otherImages[0]));
+        if ($request->hasFile('other_image_1')) {
+            if (!empty($otherImages[0]) && is_string($otherImages[0])) {
+                $deleteStorage($toStoragePath($otherImages[0]));
             }
-            $file = $request->file("other_image_1");
-            $filename = "foto_kost_tambahan_1_" . time() . '.' . $file->getClientOriginalExtension();
-            $file->move($path, $filename);
-            $otherImages[0] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+            $file           = $request->file('other_image_1');
+            $filename       = 'foto_kost_tambahan_1_' . time() . '.' . $file->getClientOriginalExtension();
+            \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+            $otherImages[0] = 'storage/' . $storageDir . '/' . $filename;
         }
 
-        if ($request->has("remove_other_image_2")) {
+        if ($request->has('remove_other_image_2')) {
             if (!empty($otherImages[1])) {
-                if (is_array($otherImages[1])) {
-                    foreach ($otherImages[1] as $oldImg) {
-                        if (file_exists(public_path($oldImg))) @unlink(public_path($oldImg));
-                    }
-                } else {
-                    if (file_exists(public_path($otherImages[1]))) @unlink(public_path($otherImages[1]));
+                $imgs = is_array($otherImages[1]) ? $otherImages[1] : [$otherImages[1]];
+                foreach ($imgs as $oldImg) {
+                    $deleteStorage($toStoragePath($oldImg));
                 }
             }
             $otherImages[1] = null;
         }
-        
-        if ($request->hasFile("other_image_2")) {
+
+        if ($request->hasFile('other_image_2')) {
             if (!empty($otherImages[1])) {
-                if (is_array($otherImages[1])) {
-                    foreach ($otherImages[1] as $oldImg) {
-                        if (file_exists(public_path($oldImg))) @unlink(public_path($oldImg));
-                    }
-                } else {
-                    if (file_exists(public_path($otherImages[1]))) @unlink(public_path($otherImages[1]));
+                $imgs = is_array($otherImages[1]) ? $otherImages[1] : [$otherImages[1]];
+                foreach ($imgs as $oldImg) {
+                    $deleteStorage($toStoragePath($oldImg));
                 }
             }
             $other2Paths = [];
             foreach ($request->file('other_image_2') as $idx => $file) {
-                $filename = "foto_kost_tambahan_2_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
-                $file->move($path, $filename);
-                $other2Paths[] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+                $filename      = 'foto_kost_tambahan_2_' . $idx . '_' . time() . '.' . $file->getClientOriginalExtension();
+                \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+                $other2Paths[] = 'storage/' . $storageDir . '/' . $filename;
             }
             $otherImages[1] = $other2Paths;
         }
-        
-        if ($request->hasFile("other_image_3")) {
+
+        if ($request->has('remove_other_image_3')) {
             if (!empty($otherImages[2])) {
-                if (is_array($otherImages[2])) {
-                    foreach ($otherImages[2] as $oldImg) {
-                        if (file_exists(public_path($oldImg))) @unlink(public_path($oldImg));
-                    }
-                } else {
-                    if (file_exists(public_path($otherImages[2]))) @unlink(public_path($otherImages[2]));
+                $imgs = is_array($otherImages[2]) ? $otherImages[2] : [$otherImages[2]];
+                foreach ($imgs as $oldImg) {
+                    $deleteStorage($toStoragePath($oldImg));
+                }
+            }
+            $otherImages[2] = null;
+        }
+
+        if ($request->hasFile('other_image_3')) {
+            if (!empty($otherImages[2])) {
+                $imgs = is_array($otherImages[2]) ? $otherImages[2] : [$otherImages[2]];
+                foreach ($imgs as $oldImg) {
+                    $deleteStorage($toStoragePath($oldImg));
                 }
             }
             $other3Paths = [];
             foreach ($request->file('other_image_3') as $idx => $file) {
-                $filename = "foto_kost_tambahan_3_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
-                $file->move($path, $filename);
-                $other3Paths[] = 'image/boarding_house_' . $kost->id . '/' . $filename;
+                $filename      = 'foto_kost_tambahan_3_' . $idx . '_' . time() . '.' . $file->getClientOriginalExtension();
+                \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+                $other3Paths[] = 'storage/' . $storageDir . '/' . $filename;
             }
             $otherImages[2] = $other3Paths;
         }
+
         $data['other_images'] = json_encode($otherImages);
 
         $kost->update($data);
@@ -906,9 +937,9 @@ class PemilikKosController extends Controller
     {
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
         
-        $path = public_path('image/boarding_house_' . $kost->id);
-        if (file_exists($path)) {
-            \Illuminate\Support\Facades\File::deleteDirectory($path);
+        $storageDir = 'boarding_house_' . $kost->id;
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($storageDir)) {
+            \Illuminate\Support\Facades\Storage::disk('public')->deleteDirectory($storageDir);
         }
         
         $kost->delete();
