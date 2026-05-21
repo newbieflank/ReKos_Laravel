@@ -23,35 +23,13 @@
         color: #ffffff; 
     }
     
-    .footer-brand-title span {
-        color: #59A1FF;
-    }
-    
     .footer-section-title {
-        font-size: 0.9rem;
+        font-size: 1rem;
         font-weight: 700;
         letter-spacing: 1px;
         text-transform: uppercase;
         color: #e2e8f0;
         margin-bottom: 1.5rem;
-    }
-    
-    .footer-links-list {
-        list-style: none;
-        padding-left: 0;
-        margin-bottom: 0;
-    }
-    
-    .footer-links-list li {
-        margin-bottom: 0.85rem;
-    }
-    
-    .footer-links-list a {
-        display: inline-block;
-    }
-    
-    .footer-links-list a:hover {
-        transform: translateX(4px);
     }
     
     .footer-social-icon {
@@ -61,34 +39,39 @@
         align-items: center;
         justify-content: center;
         border-radius: 8px;
-        color: #cbd5e1;
-        margin-right: 10px;
+        color: #cbd5e1 !important;
         transition: all 0.3s ease;
-        font-size: 1.1rem;
-        padding: 10px 20px !important;
+        font-size: 1rem;
+        padding: 10px 20px;
+        text-decoration: none;
     }
     
     .footer-social-icon:hover {
         transform: translateY(-3px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        background-color: #59A1FF;
+        color: #ffffff !important;
+        border-color: #59A1FF;
     }
     
-    .footer-contact-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 1.25rem;
-        color: #cbd5e1; 
+    .footer-contact-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
     }
-    
-    .footer-contact-item a {
+
+    .footer-contact-list li {
         display: flex;
-        align-items: center;
-        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 1rem;
         color: #cbd5e1;
     }
     
-    .footer-contact-item a:hover {
+    .footer-contact-list li a {
+        color: #cbd5e1;
+    }
+
+    .footer-contact-list li a:hover {
         color: #59A1FF;
     }
     
@@ -96,68 +79,71 @@
         color: #59A1FF;
         font-size: 1.25rem;
         flex-shrink: 0;
-        width: 24px;
-        text-align: center;
+        width: 30px;
+        margin-top: 2px;
     }
     
     .footer-bottom {
-        border-top: 1px solid #1e293b; 
+        border-top: 1px solid rgba(255, 255, 255, 0.05); 
         padding: 1.5rem 0;
         font-size: 0.85rem;
+        margin-top: 2rem;
     }
 </style>
 
 <footer id="contact" class="footer-light pt-5 mt-5">
     <div class="container py-4">
-        <div class="row g-4">
-            <div class="col-md-6 mb-4 mb-lg-0">
+        <div class="row justify-content-between g-5">
+            <!-- Kolom Brand -->
+            <div class="col-lg-5 col-md-6">
                 <div class="footer-brand-title mb-3">
                     RE-KOST
                 </div>
-                <p class="mb-4" style="line-height: 1.6; max-width: 320px;">
-                    Cari dan temukan rekomendasi kost terbaik di sekitar Bondowoso secara mudah, cepat, dan terpercaya.
+                <p class="mb-4" style="line-height: 1.7;">
+                    Cari dan temukan rekomendasi kost terbaik di sekitar Bondowoso secara mudah, cepat, dan terpercaya. Kami hadir untuk membantu Anda mendapatkan tempat tinggal yang nyaman.
                 </p>
-                <div class="d-flex">
-                    <a href="https://wa.me/6287797552625" target="_blank" class="footer-social-icon text-decoration-none" style="width: auto; padding: 0 16px;">
-                        <i class="fab fa-whatsapp me-2"></i> <span class="fw-semibold">WhatsApp</span>
-                    </a>
-                </div>
+                <a href="https://wa.me/6287797552625" target="_blank" class="footer-social-icon">
+                    <i class="fab fa-whatsapp me-2 fs-5"></i> <span class="fw-semibold">Hubungi Kami</span>
+                </a>
             </div>
 
-            <div class="col-md-6">
-                <div class="footer-section-title">Kontak Kami</div>
-                
-                <div class="footer-contact-item">
-                    <a href="https://www.google.com/maps/search/?api=1&query=Polije+Kampus+2+Bondowoso" target="_blank">
+            <!-- Kolom Kontak -->
+            <div class="col-lg-4 col-md-6">
+                <div class="footer-section-title">Informasi Kontak</div>
+                <ul class="footer-contact-list">
+                    <li>
                         <i class="bi bi-geo-alt footer-contact-icon"></i>
-                        <span>Polije Kampus 2 Bondowoso</span>
-                    </a>
-                </div>
-                
-                <div class="footer-contact-item">
-                    <i class="bi bi-telephone footer-contact-icon"></i>
-                    <span>+62 877-9755-2625</span>
-                </div>
-                
-                <div class="footer-contact-item">
-                    <i class="bi bi-envelope footer-contact-icon"></i>
-                    <span>rekostbondowoso@gmail.com</span>
-                </div>
-                
-                <div class="footer-contact-item">
-                    <i class="bi bi-clock footer-contact-icon"></i>
-                    <span>Senin – Jumat, 07:00 – 17:00 WIB</span>
-                </div>
+                        <div>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Polije+Kampus+2+Bondowoso" target="_blank">
+                                Polije Kampus 2 Bondowoso<br>
+                                Jawa Timur, Indonesia
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="bi bi-telephone footer-contact-icon"></i>
+                        <div>+62 877-9755-2625</div>
+                    </li>
+                    <li>
+                        <i class="bi bi-envelope footer-contact-icon"></i>
+                        <div>rekostbondowoso@gmail.com</div>
+                    </li>
+                    <li>
+                        <i class="bi bi-clock footer-contact-icon"></i>
+                        <div>Senin – Jumat<br>07:00 – 17:00 WIB</div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 
     <div class="footer-bottom">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-12 text-center" style="color: #cbd5e1;">
+            <div class="row">
+                <div class="col-12 text-center text-md-center" style="color: #cbd5e1;">
                     &copy; {{ date('Y') }} RE-KOST. All rights reserved.
                 </div>
+            </div>
         </div>
     </div>
 </footer>
