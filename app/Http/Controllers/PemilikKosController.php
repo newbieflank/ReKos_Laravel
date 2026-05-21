@@ -152,7 +152,6 @@ class PemilikKosController extends Controller
             ->paginate(8)
             ->withQueryString();
 
-        // Statistik Okupansi Properti Ini (Tetap ambil data keseluruhan kost ini)
         $totalRooms = \App\Models\Room::where('boarding_house_id', $id)->count();
         $availableRooms = \App\Models\Room::where('boarding_house_id', $id)->where('available', true)->count();
         $occupiedRooms = $totalRooms - $availableRooms;
@@ -201,7 +200,6 @@ class PemilikKosController extends Controller
         $kosts = \App\Models\BoardingHouse::where('owner_id', $ownerId)->pluck('id');
         $rooms = \App\Models\Room::whereIn('boarding_house_id', $kosts)->where('available', true)->get(['id', 'room_name', 'room_type', 'daily_price', 'weekly_price', 'monthly_price']);
 
-        // Ambil semua user dengan role tenant beserta data detail secara efisien
         $users = \App\Models\User::where('role', 'tenant')
             ->with('userDetail:user_id,gender,birth_date,occupation,institution')
             ->get(['id', 'name', 'email']);
@@ -313,7 +311,6 @@ class PemilikKosController extends Controller
         $tenant = \App\Models\Tenant::whereHas('room', fn($q) => $q->whereIn('boarding_house_id', $kostIds))
             ->findOrFail($id);
 
-        // Kembalikan kamar jadi available
         $tenant->room?->update(['available' => true]);
         $tenant->delete();
 
@@ -329,70 +326,89 @@ class PemilikKosController extends Controller
     public function simpanKamar(Request $request, $id)
     {
         $request->validate([
-            'facilities' => 'required|array|min:1',
+            'room_name'       => 'required|string|max:255',
+            'room_type'       => 'required|string|max:255',
+            'room_size'       => 'required|string|max:50',
+            'facilities'      => 'required|array|min:1',
+            'monthly_price'   => 'required',
+            'monthly_expense' => 'nullable',
+            'daily_price'     => 'nullable',
+            'weekly_price'    => 'nullable',
+            'main_image'      => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'other_image_1'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ], [
-            'facilities.required' => 'Fasilitas wajib di isi.',
+            'room_name.required'     => 'Nama kamar wajib diisi.',
+            'room_type.required'     => 'Tipe kamar wajib diisi.',
+            'room_size.required'     => 'Ukuran kamar wajib diisi.',
+            'facilities.required'    => 'Fasilitas wajib di isi.',
+            'monthly_price.required' => 'Harga bulanan wajib diisi.',
+            'main_image.required'    => 'Foto utama kamar wajib diunggah.',
+            'main_image.image'       => 'Foto utama harus berupa file gambar.',
         ]);
 
-        $data = $request->all();
-        $data['boarding_house_id'] = $id;
-        // Asumsi form tidak mengirimkan checkbox jika false
-        if (!$request->has('available')) {
-            $data['available'] = false;
-        } else {
-            $data['available'] = true;
-        }
+        $sanitizePrice = fn($val) => (int) preg_replace('/[^\d]/', '', $val ?? '0');
+
+        $data = [
+            'boarding_house_id' => $id,
+            'room_name'         => $request->room_name,
+            'room_type'         => $request->room_type,
+            'room_size'         => $request->room_size,
+            'facilities'        => $request->facilities,
+            'daily_price'       => $sanitizePrice($request->daily_price),
+            'weekly_price'      => $sanitizePrice($request->weekly_price),
+            'monthly_price'     => $sanitizePrice($request->monthly_price),
+            'monthly_expense'   => $sanitizePrice($request->monthly_expense),
+            'available'         => $request->has('available') ? true : false,
+        ];
 
         $room = \App\Models\Room::create($data);
 
-        // Upload files
-        $path = public_path('image/boarding_house_' . $id);
-        if (!file_exists($path)) {
-            mkdir($path, 0777, true);
-        }
+        $storageDir = 'boarding_house_' . $id;
 
         if ($request->hasFile('main_image')) {
-            $file = $request->file('main_image');
+            $file     = $request->file('main_image');
             $filename = 'foto_kamar_utama_' . $room->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $file->move($path, $filename);
-            $room->main_image = 'image/boarding_house_' . $id . '/' . $filename;
+            \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+            $room->main_image = 'storage/' . $storageDir . '/' . $filename;
             $room->save();
         }
 
         $otherImages = [];
-        if ($request->hasFile("other_image_1")) {
-            $file = $request->file("other_image_1");
-            $filename = "foto_kamar_tambahan_1_" . time() . '.' . $file->getClientOriginalExtension();
-            $file->move($path, $filename);
-            $otherImages[0] = 'image/boarding_house_' . $id . '/' . $filename;
+        if ($request->hasFile('other_image_1')) {
+            $file     = $request->file('other_image_1');
+            $filename = 'foto_kamar_tambahan_1_' . $room->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+            $otherImages[0] = 'storage/' . $storageDir . '/' . $filename;
         } else {
             $otherImages[0] = null;
         }
 
-        if ($request->hasFile("other_image_2")) {
+        if ($request->hasFile('other_image_2')) {
             $other2Paths = [];
             foreach ($request->file('other_image_2') as $idx => $file) {
-                $filename = "foto_kamar_tambahan_2_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
-                $file->move($path, $filename);
-                $other2Paths[] = 'image/boarding_house_' . $id . '/' . $filename;
+                $filename      = 'foto_kamar_tambahan_2_' . $idx . '_' . time() . '.' . $file->getClientOriginalExtension();
+                \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+                $other2Paths[] = 'storage/' . $storageDir . '/' . $filename;
             }
             $otherImages[1] = $other2Paths;
         } else {
             $otherImages[1] = null;
         }
-        
-        if ($request->hasFile("other_image_3")) {
+
+        if ($request->hasFile('other_image_3')) {
             $other3Paths = [];
             foreach ($request->file('other_image_3') as $idx => $file) {
-                $filename = "foto_kamar_tambahan_3_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
-                $file->move($path, $filename);
-                $other3Paths[] = 'image/boarding_house_' . $id . '/' . $filename;
+                $filename      = 'foto_kamar_tambahan_3_' . $idx . '_' . time() . '.' . $file->getClientOriginalExtension();
+                \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+                $other3Paths[] = 'storage/' . $storageDir . '/' . $filename;
             }
             $otherImages[2] = $other3Paths;
         } else {
             $otherImages[2] = null;
         }
-        $room->other_images = json_encode($otherImages);    $room->save();
+
+        $room->other_images = json_encode($otherImages);
+        $room->save();
 
         return redirect()->route('pemilik.kamar', $id)->with('success', 'Data kamar baru berhasil ditambahkan!');
     }
@@ -407,140 +423,155 @@ class PemilikKosController extends Controller
     public function updateKamar(Request $request, $id, $roomId)
     {
         $request->validate([
-            'facilities' => 'required|array|min:1',
+            'room_name'       => 'required|string|max:255',
+            'room_type'       => 'required|string|max:255',
+            'room_size'       => 'required|string|max:50',
+            'facilities'      => 'required|array|min:1',
+            'monthly_price'   => 'required',
+            'monthly_expense' => 'nullable',
+            'daily_price'     => 'nullable',
+            'weekly_price'    => 'nullable',
+            'main_image'      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'other_image_1'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ], [
-            'facilities.required' => 'Fasilitas wajib di isi.',
+            'room_name.required'     => 'Nama kamar wajib diisi.',
+            'room_type.required'     => 'Tipe kamar wajib diisi.',
+            'room_size.required'     => 'Ukuran kamar wajib diisi.',
+            'facilities.required'    => 'Fasilitas wajib di isi.',
+            'monthly_price.required' => 'Harga bulanan wajib diisi.',
         ]);
 
-        $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
-        $room = \App\Models\Room::where('boarding_house_id', $id)->findOrFail($roomId);
+        $kost           = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
+        $room           = \App\Models\Room::where('boarding_house_id', $id)->findOrFail($roomId);
         $boardingHouseId = $id;
 
+        $sanitizePrice = fn($val) => (int) preg_replace('/[^\d]/', '', $val ?? '0');
 
-        $data = $request->all();
-        if (!$request->has('available')) {
-            $data['available'] = false;
-        } else {
-            $data['available'] = true;
-        }
+        $data = [
+            'room_name'       => $request->room_name,
+            'room_type'       => $request->room_type,
+            'room_size'       => $request->room_size,
+            'facilities'      => $request->facilities,
+            'daily_price'     => $sanitizePrice($request->daily_price),
+            'weekly_price'    => $sanitizePrice($request->weekly_price),
+            'monthly_price'   => $sanitizePrice($request->monthly_price),
+            'monthly_expense' => $sanitizePrice($request->monthly_expense),
+            'available'       => $request->has('available') ? true : false,
+        ];
 
-        // Upload files
-        $path = public_path('image/boarding_house_' . $id);
-        if (!file_exists($path)) {
-            mkdir($path, 0777, true);
-        }
+        $storageDir   = 'boarding_house_' . $id;
+        $deleteStorage = function($path) {
+            if ($path && \Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+            }
+        };
+        $toStoragePath = fn($dbPath) => $dbPath ? preg_replace('#^storage/#', '', $dbPath) : null;
 
         if ($request->has('remove_main_image')) {
-            if ($room->main_image && file_exists(public_path($room->main_image))) {
-                if (!$this->isImageUsedByOtherRooms($room->main_image, $room->id)) {
-                    @unlink(public_path($room->main_image));
-                }
+            if (!$this->isImageUsedByOtherRooms($room->main_image, $room->id)) {
+                $deleteStorage($toStoragePath($room->main_image));
             }
             $data['main_image'] = null;
         }
 
         if ($request->hasFile('main_image')) {
-            if ($room->main_image && file_exists(public_path($room->main_image))) {
-                if (!$this->isImageUsedByOtherRooms($room->main_image, $room->id)) {
-                    @unlink(public_path($room->main_image));
-                }
+            if (!$this->isImageUsedByOtherRooms($room->main_image, $room->id)) {
+                $deleteStorage($toStoragePath($room->main_image));
             }
-            $file = $request->file('main_image');
-            $filename = 'foto_kamar_utama_' . $room->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $file->move($path, $filename);
-            $data['main_image'] = 'image/boarding_house_' . $id . '/' . $filename;
+            $file              = $request->file('main_image');
+            $filename          = 'foto_kamar_utama_' . $room->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+            $data['main_image'] = 'storage/' . $storageDir . '/' . $filename;
         }
 
-        $oldImages = $room->other_images ? json_decode($room->other_images, true) : [];
+        $oldImages   = $room->other_images ? json_decode($room->other_images, true) : [];
         $otherImages = [
             $oldImages[0] ?? null,
             $oldImages[1] ?? null,
             $oldImages[2] ?? null,
         ];
 
-        if ($request->has("remove_other_image_1")) {
-            if (!empty($otherImages[0]) && is_string($otherImages[0]) && file_exists(public_path($otherImages[0]))) {
+        if ($request->has('remove_other_image_1')) {
+            if (!empty($otherImages[0]) && is_string($otherImages[0])) {
                 if (!$this->isImageUsedByOtherRooms($otherImages[0], $room->id)) {
-                    @unlink(public_path($otherImages[0]));
+                    $deleteStorage($toStoragePath($otherImages[0]));
                 }
             }
             $otherImages[0] = null;
         }
 
-        if ($request->hasFile("other_image_1")) {
-            if (!empty($otherImages[0]) && is_string($otherImages[0]) && file_exists(public_path($otherImages[0]))) {
+        if ($request->hasFile('other_image_1')) {
+            if (!empty($otherImages[0]) && is_string($otherImages[0])) {
                 if (!$this->isImageUsedByOtherRooms($otherImages[0], $room->id)) {
-                    @unlink(public_path($otherImages[0]));
+                    $deleteStorage($toStoragePath($otherImages[0]));
                 }
             }
-            $file = $request->file("other_image_1");
-            $filename = "foto_kamar_tambahan_1_" . time() . '.' . $file->getClientOriginalExtension();
-            $file->move($path, $filename);
-            $otherImages[0] = 'image/boarding_house_' . $boardingHouseId . '/' . $filename;
+            $file           = $request->file('other_image_1');
+            $filename       = 'foto_kamar_tambahan_1_' . $room->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+            $otherImages[0] = 'storage/' . $storageDir . '/' . $filename;
         }
 
-        if ($request->has("remove_other_image_2")) {
+        if ($request->has('remove_other_image_2')) {
             if (!empty($otherImages[1])) {
-                if (is_array($otherImages[1])) {
-                    foreach ($otherImages[1] as $oldImg) {
-                        if (file_exists(public_path($oldImg))) {
-                            if (!$this->isImageUsedByOtherRooms($oldImg, $room->id)) @unlink(public_path($oldImg));
-                        }
-                    }
-                } else {
-                    if (file_exists(public_path($otherImages[1]))) {
-                        if (!$this->isImageUsedByOtherRooms($otherImages[1], $room->id)) @unlink(public_path($otherImages[1]));
+                $imgs = is_array($otherImages[1]) ? $otherImages[1] : [$otherImages[1]];
+                foreach ($imgs as $oldImg) {
+                    if (!$this->isImageUsedByOtherRooms($oldImg, $room->id)) {
+                        $deleteStorage($toStoragePath($oldImg));
                     }
                 }
             }
             $otherImages[1] = null;
         }
-        
-        if ($request->hasFile("other_image_2")) {
+
+        if ($request->hasFile('other_image_2')) {
             if (!empty($otherImages[1])) {
-                if (is_array($otherImages[1])) {
-                    foreach ($otherImages[1] as $oldImg) {
-                        if (file_exists(public_path($oldImg))) {
-                            if (!$this->isImageUsedByOtherRooms($oldImg, $room->id)) @unlink(public_path($oldImg));
-                        }
-                    }
-                } else {
-                    if (file_exists(public_path($otherImages[1]))) {
-                        if (!$this->isImageUsedByOtherRooms($otherImages[1], $room->id)) @unlink(public_path($otherImages[1]));
+                $imgs = is_array($otherImages[1]) ? $otherImages[1] : [$otherImages[1]];
+                foreach ($imgs as $oldImg) {
+                    if (!$this->isImageUsedByOtherRooms($oldImg, $room->id)) {
+                        $deleteStorage($toStoragePath($oldImg));
                     }
                 }
             }
             $other2Paths = [];
             foreach ($request->file('other_image_2') as $idx => $file) {
-                $filename = "foto_kamar_tambahan_2_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
-                $file->move($path, $filename);
-                $other2Paths[] = 'image/boarding_house_' . $boardingHouseId . '/' . $filename;
+                $filename      = 'foto_kamar_tambahan_2_' . $idx . '_' . time() . '.' . $file->getClientOriginalExtension();
+                \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+                $other2Paths[] = 'storage/' . $storageDir . '/' . $filename;
             }
             $otherImages[1] = $other2Paths;
         }
-        
-        if ($request->hasFile("other_image_3")) {
+
+        if ($request->has('remove_other_image_3')) {
             if (!empty($otherImages[2])) {
-                if (is_array($otherImages[2])) {
-                    foreach ($otherImages[2] as $oldImg) {
-                        if (file_exists(public_path($oldImg))) {
-                            if (!$this->isImageUsedByOtherRooms($oldImg, $room->id)) @unlink(public_path($oldImg));
-                        }
+                $imgs = is_array($otherImages[2]) ? $otherImages[2] : [$otherImages[2]];
+                foreach ($imgs as $oldImg) {
+                    if (!$this->isImageUsedByOtherRooms($oldImg, $room->id)) {
+                        $deleteStorage($toStoragePath($oldImg));
                     }
-                } else {
-                    if (file_exists(public_path($otherImages[2]))) {
-                        if (!$this->isImageUsedByOtherRooms($otherImages[2], $room->id)) @unlink(public_path($otherImages[2]));
+                }
+            }
+            $otherImages[2] = null;
+        }
+
+        if ($request->hasFile('other_image_3')) {
+            if (!empty($otherImages[2])) {
+                $imgs = is_array($otherImages[2]) ? $otherImages[2] : [$otherImages[2]];
+                foreach ($imgs as $oldImg) {
+                    if (!$this->isImageUsedByOtherRooms($oldImg, $room->id)) {
+                        $deleteStorage($toStoragePath($oldImg));
                     }
                 }
             }
             $other3Paths = [];
             foreach ($request->file('other_image_3') as $idx => $file) {
-                $filename = "foto_kamar_tambahan_3_" . $idx . "_" . time() . '.' . $file->getClientOriginalExtension();
-                $file->move($path, $filename);
-                $other3Paths[] = 'image/boarding_house_' . $boardingHouseId . '/' . $filename;
+                $filename      = 'foto_kamar_tambahan_3_' . $idx . '_' . time() . '.' . $file->getClientOriginalExtension();
+                \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($storageDir, $file, $filename);
+                $other3Paths[] = 'storage/' . $storageDir . '/' . $filename;
             }
             $otherImages[2] = $other3Paths;
         }
+
         $data['other_images'] = json_encode($otherImages);
 
         $room->update($data);
@@ -551,17 +582,22 @@ class PemilikKosController extends Controller
     {
         $kost = \App\Models\BoardingHouse::where('owner_id', auth()->id())->findOrFail($id);
         $room = \App\Models\Room::where('boarding_house_id', $id)->findOrFail($roomId);
-        
 
-        if ($room->main_image && file_exists(public_path($room->main_image))) {
-            if (!$this->isImageUsedByOtherRooms($room->main_image, $room->id)) {
-                @unlink(public_path($room->main_image));
+        $deleteStorage = function($dbPath) {
+            if (!$dbPath) return;
+            $storagePath = preg_replace('#^storage/#', '', $dbPath);
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($storagePath)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($storagePath);
             }
+        };
+
+        if ($room->main_image && !$this->isImageUsedByOtherRooms($room->main_image, $room->id)) {
+            $deleteStorage($room->main_image);
         }
-        
+
         if ($room->other_images) {
             $otherImages = json_decode($room->other_images, true) ?? [];
-            
+
             $collectImages = function($items) use (&$collectImages) {
                 $result = [];
                 foreach ($items as $item) {
@@ -573,13 +609,11 @@ class PemilikKosController extends Controller
                 }
                 return $result;
             };
-            
+
             $flatImages = $collectImages($otherImages);
             foreach ($flatImages as $img) {
-                if ($img && file_exists(public_path($img))) {
-                    if (!$this->isImageUsedByOtherRooms($img, $room->id)) {
-                        @unlink(public_path($img));
-                    }
+                if ($img && !$this->isImageUsedByOtherRooms($img, $room->id)) {
+                    $deleteStorage($img);
                 }
             }
         }
