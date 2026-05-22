@@ -49,8 +49,8 @@ services:
           - node.role == manager
 
 volumes:
-  db_data:
-  rekos_storage:
+  - /var/www/html/rekos-laravel/.env:/var/www/html/.env
+  - /var/www/html/rekos-laravel/storage/app/public:/var/www/html/storage/app/public
 
 networks:
   default:
