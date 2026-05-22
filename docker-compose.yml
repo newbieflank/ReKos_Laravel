@@ -2,9 +2,9 @@ version: '3.8'
 
 services:
   app:
-    image: sonuafriza/rekos-laravel:latest 
+    image: sonuafriza/rekos-laravel:latest
     ports:
-      - "8000:80" 
+      - "8000:80"
     environment:
       - DB_CONNECTION=mysql
       - DB_HOST=db
@@ -13,8 +13,8 @@ services:
       - DB_USERNAME=root
       - DB_PASSWORD=123qweasd
     volumes:
-      - rekos_storage:/var/www/html/storage/app/public
-      - ./.env:/var/www/html/.env
+      - /var/www/html/rekos-laravel/storage/app/public:/var/www/html/storage/app/public
+      - /var/www/html/rekos-laravel/.env:/var/www/html/.env
     depends_on:
       - db
     deploy:
@@ -49,8 +49,7 @@ services:
           - node.role == manager
 
 volumes:
-  - /var/www/html/rekos-laravel/.env:/var/www/html/.env
-  - /var/www/html/rekos-laravel/storage/app/public:/var/www/html/storage/app/public
+  db_data: 
 
 networks:
   default:
