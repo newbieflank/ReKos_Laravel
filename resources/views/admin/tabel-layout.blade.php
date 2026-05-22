@@ -65,6 +65,9 @@
                         <th>Number Phone</th>
                         <th>Kota Asal</th>
                         <th>Asal Instansi</th>
+                        @if ($title == 'Persetujuan Kost')
+                            <th>KTP</th>
+                        @endif
                         <th class="text-center">Deskripsi</th>
                     </tr>
                 </thead>
@@ -84,6 +87,33 @@
                             <td>{{ $currentUser->userDetail->phone ?? '-' }}</td>
                             <td>{{ $currentUser->userDetail->city ?? '-' }}</td>
                             <td>{{ $currentUser->userDetail->institution ?? '-' }}</td>
+
+                            @if ($title == 'Persetujuan Kost')
+                                <td>
+                                    @if ($item->ktp_image)
+                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#ktpModal{{ $item->id }}">
+                                            Lihat KTP
+                                        </button>
+
+                                        <!-- Modal KTP -->
+                                        <div class="modal fade" id="ktpModal{{ $item->id }}" tabindex="-1" aria-labelledby="ktpModalLabel{{ $item->id }}" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="ktpModalLabel{{ $item->id }}">KTP - {{ $currentUser->name }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body text-center">
+                                                        <img src="{{ asset('storage/' . $item->ktp_image) }}" alt="KTP {{ $currentUser->name }}" class="img-fluid rounded">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <span class="text-muted small">Tidak ada KTP</span>
+                                    @endif
+                                </td>
+                            @endif
 
                             <td class="text-center text-nowrap">
                                 @if ($title == 'Persetujuan Kost')

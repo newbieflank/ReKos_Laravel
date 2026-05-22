@@ -64,15 +64,12 @@
                                     <hr class="dropdown-divider">
                                 </li>
                                 <li><a class="dropdown-item" href="{{ route('user.history') }}">Riwayat</a></li>
-                                @if (auth()->user()->roleRequest && auth()->user()->roleRequest->status == 'pending')
-                                    <li><button class="dropdown-item text-muted" disabled>Menunggu Persetujuan...</button>
+                                @if (\App\Models\RoleRequest::where('user_id', auth()->id())->where('status', 'pending')->exists())
+                                    <li><button class="dropdown-item text-muted" disabled style="background-color: #f8f9fa; cursor: not-allowed;">Dalam proses persetujuan admin</button>
                                     </li>
                                 @else
                                     <li>
-                                        <form action="{{ route('role.request') }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="dropdown-item">Ajukan Jadi Owner</button>
-                                        </form>
+                                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#ajukanOwnerModal">Ajukan Jadi Owner</a>
                                     </li>
                                 @endif
                             @endif
@@ -94,6 +91,35 @@
         </div>
     </div>
 </nav>
+
+<div class="modal fade" id="ajukanOwnerModal" tabindex="-1" aria-labelledby="ajukanOwnerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ route('role.request') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ajukanOwnerModalLabel">Ajukan Jadi Owner</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Untuk mengajukan diri sebagai pemilik kost, Anda perlu mengunggah foto KTP.</p>
+                    <div class="mb-3">
+                        <label for="ktp_image" class="form-label">Foto KTP <span class="text-danger">*</span></label>
+                        <input class="form-control @error('ktp_image') is-invalid @enderror" type="file" id="ktp_image" name="ktp_image" accept="image/*" required>
+                        @error('ktp_image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted d-block mt-1">Maksimal ukuran file 2MB. Format: JPG, JPEG, PNG.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Kirim Pengajuan</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script>
     document.querySelectorAll('a.nav-link[href*="#"]').forEach(function(link) {

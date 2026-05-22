@@ -41,17 +41,28 @@ class AdminApprovalTest extends DuskTestCase
             'birth_date' => '1990-01-01',
         ]);
 
-        $this->browse(function (Browser $browser, Browser $adminBrowser) use ($user, $admin) {
+        $dummyPath = storage_path('app/public/dummy.png');
+        if (!file_exists($dummyPath)) {
+            $im = imagecreate(1, 1);
+            imagecolorallocate($im, 0, 0, 0);
+            imagepng($im, $dummyPath);
+            imagedestroy($im);
+        }
+
+        $this->browse(function (Browser $browser, Browser $adminBrowser) use ($user, $admin, $dummyPath) {
             // --- BROWSER 1: USER ---
             $browser->loginAs($user)
                     ->visit('/')
                     ->click('#profileDropdown')
                     ->pause(500)
-                    ->press('Ajukan Jadi Owner')
+                    ->clickLink('Ajukan Jadi Owner')
+                    ->pause(1000)
+                    ->attach('#ktp_image', $dummyPath)
+                    ->press('Kirim Pengajuan')
                     ->pause(1000)
                     ->click('#profileDropdown')
                     ->pause(500)
-                    ->assertSee('Menunggu Persetujuan...');
+                    ->assertSee('Dalam proses persetujuan admin');
 
             // --- BROWSER 2: ADMIN ---
             $user->refresh();

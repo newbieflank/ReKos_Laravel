@@ -9,8 +9,11 @@ use Illuminate\Support\Facades\Auth;
 
 class RoleRequestController extends Controller
 {
-    public function store()
+    public function store(Request $request)
     {
+        $request->validate([
+            'ktp_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
         $user = Auth::user();
 
         if ($user->role !== 'tenant') {
@@ -25,11 +28,20 @@ class RoleRequestController extends Controller
             return back()->with('error', 'Anda sudah memiliki pengajuan yang sedang diproses.');
         }
 
+        $ktpPath = $request->file('ktp_image')->store('ktp_images', 'public');
+
         // Buat pengajuan baru
         RoleRequest::create([
             'user_id' => $user->id,
+            'ktp_image' => $ktpPath,
             'status' => 'pending'
         ]);
+
+        // Kirim email notifikasi ke semua admin (di-queue di background)
+        $admins = \App\Models\User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            \Illuminate\Support\Facades\Mail::to($admin->email)->send(new \App\Mail\RoleRequestNotificationAdmin($user));
+        }
 
         return back()->with('success', 'Pengajuan berhasil dikirim! Silakan tunggu konfirmasi admin.');
     }

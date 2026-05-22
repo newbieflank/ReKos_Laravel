@@ -22,6 +22,27 @@ services:
       restart_policy:
         condition: on-failure
 
+  queue:
+    image: sonuafriza/rekos-laravel:latest
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=rekos_db
+      - DB_USERNAME=root
+      - DB_PASSWORD=123qweasd
+    command: php artisan queue:work --sleep=3 --tries=3
+    volumes:
+      - /var/www/html/rekos-laravel/storage/app/public:/var/www/html/storage/app/public
+      - /var/www/html/rekos-laravel/.env:/var/www/html/.env
+    depends_on:
+      - db
+      - app
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+
   db:
     image: mysql:8.0
     environment:
