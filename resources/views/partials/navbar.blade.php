@@ -69,7 +69,7 @@
                                     </li>
                                 @else
                                     <li>
-                                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#ajukanOwnerModal">Ajukan Jadi Owner</a>
+                                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#ajukanOwnerModal">Ajukan Jadi Pemilik Kos</a>
                                     </li>
                                 @endif
                             @endif
