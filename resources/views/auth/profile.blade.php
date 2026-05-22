@@ -112,6 +112,13 @@
                         <button type="submit" class="btn btn-primary px-4">Save Changes</button>
                     </div>
                 </form>
+
+                <hr class="my-4">
+                <div class="mb-3">
+                    <h6 class="mb-2">Ubah Kata Sandi</h6>
+                    <p class="text-muted small mb-3">Untuk alasan keamanan, kami akan mengirimkan OTP ke email Anda (<strong>{{ $user->email }}</strong>) sebelum mengubah kata sandi.</p>
+                    <a href="{{ route('profile.reset-password.request') }}" class="btn btn-outline-danger">Mulai Reset Password</a>
+                </div>
             </div>
         </div>
     </div>

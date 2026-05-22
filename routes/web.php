@@ -57,6 +57,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/image', [ProfileController::class, 'updateImage'])->name('profile.image.update');
+    
+    Route::get('/profile/reset-password', [ProfileController::class, 'showResetPasswordRequest'])->name('profile.reset-password.request');
+    Route::post('/profile/reset-password/send', [ProfileController::class, 'sendResetOtp'])->name('profile.reset-password.send');
+    Route::get('/profile/reset-password/verify', [ProfileController::class, 'showVerifyOtp'])->name('profile.reset-password.verify');
+    Route::post('/profile/reset-password/verify', [ProfileController::class, 'verifyOtp'])->name('profile.reset-password.verify-submit');
+    Route::get('/profile/reset-password/new', [ProfileController::class, 'showNewPasswordForm'])->name('profile.reset-password.new');
+    Route::post('/profile/reset-password/new', [ProfileController::class, 'updatePassword'])->name('profile.reset-password.update');
+
     Route::get('/kos/{id}', [KosController::class, 'showDetail'])->name('detail');
 
 

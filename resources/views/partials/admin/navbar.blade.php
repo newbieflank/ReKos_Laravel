@@ -14,22 +14,12 @@
 
     <div class="d-flex align-items-center gap-3 gap-md-4">
 
-        <button class="btn btn-link text-secondary position-relative p-0 border-0">
-            <i class="fa-regular fa-bell fs-5"></i>
-            <span
-                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white"
-                style="font-size: 0.65rem;">
-                6
-            </span>
-        </button>
 
-        <div class="vr d-none d-md-block" style="height: 24px;"></div>
 
         <div class="dropdown">
             <button class="btn p-0 border-0 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=0d6efd&color=fff" alt="User"
-                    class="rounded-circle" width="32" height="32">
-                <span class="text-dark small fw-medium d-none d-md-block">Administrator</span>
+                <span class="text-dark fw-medium d-none d-md-block">{{ auth()->user()->name ?? 'Administrator' }}</span>
+                <i class="fa-solid fa-chevron-down ms-1" style="font-size: 0.8rem; color: #6c757d;"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
                 <li>

@@ -15,8 +15,8 @@
 
         <div class="dropdown">
             <button class="btn p-0 border-0 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
-                <i class="fa-solid fa-circle-user text-primary" style="font-size: 32px;"></i>
-                <span class="text-dark small fw-medium d-none d-md-block">{{ Auth::user()->name ?? 'Bapak/Ibu Kost' }}</span>
+                <span class="text-dark fw-medium d-none d-md-block">{{ Auth::user()->name ?? 'Bapak/Ibu Kost' }}</span>
+                <i class="fa-solid fa-chevron-down ms-1" style="font-size: 0.8rem; color: #6c757d;"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
                 <li><a class="dropdown-item py-2" href="{{ route('profile.edit') }}"><i class="fa-solid fa-user me-2"></i> Profil</a></li>

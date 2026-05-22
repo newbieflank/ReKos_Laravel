@@ -16,6 +16,7 @@ class RoleRequest extends Model
      */
     protected $fillable = [
         'user_id',
+        'ktp_image',
         'status',
     ];
 
