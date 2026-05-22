@@ -101,10 +101,24 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /var/www/html/rekos-laravel
-            docker compose pull
-            docker compose up -d
-            docker exec rekos_app bash -c "if [ ! -f .env ]; then cp .env.example .env && php artisan key:generate; fi"
-            docker exec rekos_app php artisan migrate --force
-            docker exec rekos_app bash -c "if [ ! -d public/storage ]; then php artisan storage:link; fi"
-            docker exec rekos_app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-            docker exec rekos_app php artisan optimize:clear
+            
+            # 1. Update kluster Swarm dengan image terbaru dari DockerHub
+            docker stack deploy --with-registry-auth -c docker-compose.yml rekos_cluster
+            
+            # 2. Beri waktu sejenak agar container baru selesai melakukan booting
+            sleep 15
+            
+            # 3. Cari satu ID container Laravel yang sedang bertugas di Manager Node
+            CONTAINER_ID=$(docker ps -q -f name=rekos_cluster_app | head -n 1)
+            
+            # 4. Eksekusi perintah artisan ke dalam container yang ditemukan
+            if [ -n "$CONTAINER_ID" ]; then
+              docker exec $CONTAINER_ID bash -c "if [ ! -f .env ]; then cp .env.example .env && php artisan key:generate; fi"
+              docker exec $CONTAINER_ID php artisan migrate --force
+              docker exec $CONTAINER_ID bash -c "if [ ! -d public/storage ]; then php artisan storage:link; fi"
+              docker exec $CONTAINER_ID chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+              docker exec $CONTAINER_ID php artisan optimize:clear
+              echo "Deployment dan optimasi berhasil dieksekusi di container $CONTAINER_ID."
+            else
+              echo "Warning: Container Laravel tidak ditemukan berjalan di node Manager ini untuk menjalankan artisan."
+            fi
