@@ -112,6 +112,7 @@ jobs:
             if [ -n "$CONTAINER_ID" ]; then
               docker exec $CONTAINER_ID php artisan migrate --force
               docker exec $CONTAINER_ID php artisan optimize:clear
+              docker exec $CONTAINER_ID php artisan storage:link
               echo "Deployment dan optimasi berhasil dieksekusi di container $CONTAINER_ID."
             else
               echo "Warning: Container Laravel tidak ditemukan berjalan di node Manager ini untuk menjalankan artisan."
