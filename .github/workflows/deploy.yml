@@ -27,17 +27,14 @@ jobs:
           # Gunakan .env.dusk.local sebagai template (sudah berisi konfigurasi SQLite)
           cp .env.dusk.local .env
 
-          # Timpa path SQLite ke path absolut di GitHub Actions runner
           sed -i "s|DB_DATABASE=.*|DB_DATABASE=$(pwd)/database/dusk.sqlite|g" .env
 
-          # Suntikkan API keys dari GitHub Secrets agar test yang membutuhkan API tidak error
           echo "MIDTRANS_SERVER_KEY=${{ secrets.MIDTRANS_SERVER_KEY }}" >> .env
           echo "MIDTRANS_CLIENT_KEY=${{ secrets.MIDTRANS_CLIENT_KEY }}" >> .env
           echo "MIDTRANS_MERCHANT_ID=${{ secrets.MIDTRANS_MERCHANT_ID }}" >> .env
           echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
           echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
 
-          # Generate APP_KEY untuk environment testing
           php artisan key:generate
           
       - name: Create SQLite Database
@@ -111,12 +108,9 @@ jobs:
             # 3. Cari satu ID container Laravel yang sedang bertugas di Manager Node
             CONTAINER_ID=$(docker ps -q -f name=rekos_cluster_app | head -n 1)
             
-            # 4. Eksekusi perintah artisan ke dalam container yang ditemukan
+            # 4. Eksekusi perintah artisan (HANYA MIGRATE & OPTIMIZE)
             if [ -n "$CONTAINER_ID" ]; then
-              docker exec $CONTAINER_ID bash -c "if [ ! -f .env ]; then cp .env.example .env && php artisan key:generate; fi"
               docker exec $CONTAINER_ID php artisan migrate --force
-              docker exec $CONTAINER_ID bash -c "if [ ! -d public/storage ]; then php artisan storage:link; fi"
-              docker exec $CONTAINER_ID chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
               docker exec $CONTAINER_ID php artisan optimize:clear
               echo "Deployment dan optimasi berhasil dieksekusi di container $CONTAINER_ID."
             else
