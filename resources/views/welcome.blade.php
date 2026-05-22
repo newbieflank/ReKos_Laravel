@@ -139,8 +139,8 @@
                     Cari Kost Terbaik di Bondowoso, Temukan Hunian Nyaman untukmu.
                 </h1>
                 <p class="text-muted mb-4 fs-5">
-                    Platform pencarian tempat tinggal no 1 dan aman di Indonesia yang siap membantumu menemukan tempat
-                    beristirahat! COBA CI CD SCALALALALALALAL
+                    Platform pencarian tempat tinggal no 1 dan aman di Bondowoso yang siap membantumu menemukan tempat
+                    beristirahat!
                 </p>
 
                 <div class="d-flex gap-5">
