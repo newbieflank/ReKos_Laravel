@@ -55,7 +55,7 @@ class AdminApprovalTest extends DuskTestCase
                     ->visit('/')
                     ->click('#profileDropdown')
                     ->pause(500)
-                    ->clickLink('Ajukan Jadi Owner')
+                    ->clickLink('Ajukan Jadi Pemilik Kos')
                     ->pause(1000)
                     ->attach('#ktp_image', $dummyPath)
                     ->press('Kirim Pengajuan')
@@ -85,7 +85,7 @@ class AdminApprovalTest extends DuskTestCase
                     ->pause(1000)
                     ->click('#profileDropdown')
                     ->waitForText('Manajemen Kost', 5)
-                    ->assertDontSee('Ajukan Jadi Owner');
+                    ->assertDontSee('Ajukan Jadi Pemilik Kos');
         });
     }
 }
