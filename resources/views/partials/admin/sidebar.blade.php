@@ -1,5 +1,5 @@
-<aside class="bg-white shadow-sm d-flex flex-column border-end position-fixed top-0 start-0"
-    style="width: 260px; height: 100vh; z-index: 1030;">
+<aside id="sidebar" class="bg-white shadow-sm d-flex flex-column border-end position-fixed top-0 start-0"
+    style="width: 260px; height: 100vh; z-index: 1030; transition: transform 0.3s ease-in-out;">
 
     <div class="d-flex align-items-center justify-content-between px-4 flex-shrink-0"
         style="height: 64px; border-bottom: 1px solid #f3f4f6;">

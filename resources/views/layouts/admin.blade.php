@@ -67,13 +67,13 @@
             left: 260px;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 767.98px) {
             #sidebar {
-                margin-left: -260px;
+                transform: translateX(-100%);
             }
 
             #sidebar.show-mobile {
-                margin-left: 0;
+                transform: translateX(0);
                 box-shadow: 0 0 15px rgba(0, 0, 0, 0.2) !important;
             }
 
@@ -92,9 +92,7 @@
 
 <body>
 
-    <div id="sidebar">
-        @include('partials.admin.sidebar')
-    </div>
+    @include('partials.admin.sidebar')
 
     <div id="main-wrapper">
 
