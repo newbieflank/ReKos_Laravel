@@ -9,3 +9,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::post('/midtrans-callback', [PaymentController::class, 'callback']);
+
+Route::get('/test', function () {
+    return response()->json(['status' => 'success', 'message' => 'API is reachable!']);
+});
