@@ -160,10 +160,10 @@
         <div class="row g-2 mb-4 mb-md-5 gallery-wrapper position-relative">
             <div class="col-12 col-md-8 h-100">
                 @if ($fotoKamar)
-                    <img src="{{ $fotoKamar }}" class="w-100 h-100 object-fit-cover rounded" alt="Foto Kamar">
+                    <img src="{{ $fotoKamar }}" class="w-100 h-100 object-fit-cover rounded" alt="Foto Kamar" data-bs-toggle="modal" data-bs-target="#galleryModal" style="cursor: pointer;">
                 @else
                     <div
-                        class="w-100 h-100 bg-light rounded d-flex flex-column align-items-center justify-content-center text-muted border">
+                        class="w-100 h-100 bg-light rounded d-flex flex-column align-items-center justify-content-center text-muted border" data-bs-toggle="modal" data-bs-target="#galleryModal" style="cursor: pointer;">
                         <i class="fa-solid fa-bed fs-1 mb-2 text-secondary"></i>
                         <span>Belum ada foto kamar</span>
                     </div>
@@ -172,10 +172,10 @@
             <div class="col-12 col-md-4 d-none d-md-flex flex-column gap-2 h-100">
                 <div class="w-100 rounded" style="height: calc(50% - 4px);">
                     @if ($fotoBangunan)
-                        <img src="{{ $fotoBangunan }}" class="w-100 h-100 object-fit-cover rounded" alt="Foto Bangunan">
+                        <img src="{{ $fotoBangunan }}" class="w-100 h-100 object-fit-cover rounded" alt="Foto Bangunan" data-bs-toggle="modal" data-bs-target="#galleryModal" style="cursor: pointer;">
                     @else
                         <div
-                            class="w-100 h-100 bg-light rounded d-flex flex-column align-items-center justify-content-center text-muted border">
+                            class="w-100 h-100 bg-light rounded d-flex flex-column align-items-center justify-content-center text-muted border" data-bs-toggle="modal" data-bs-target="#galleryModal" style="cursor: pointer;">
                             <i class="fa-solid fa-building fs-1 mb-2 text-secondary"></i>
                             <span>Belum ada foto bangunan</span>
                         </div>
@@ -184,10 +184,10 @@
                 <div class="position-relative w-100 rounded" style="height: calc(50% - 4px);">
                     @if ($fotoTampakDepan)
                         <img src="{{ $fotoTampakDepan }}" class="w-100 h-100 object-fit-cover rounded"
-                            alt="Foto Tampak Depan">
+                            alt="Foto Tampak Depan" data-bs-toggle="modal" data-bs-target="#galleryModal" style="cursor: pointer;">
                     @else
                         <div
-                            class="w-100 h-100 bg-light rounded d-flex flex-column align-items-center justify-content-center text-muted border">
+                            class="w-100 h-100 bg-light rounded d-flex flex-column align-items-center justify-content-center text-muted border" data-bs-toggle="modal" data-bs-target="#galleryModal" style="cursor: pointer;">
                             <i class="fa-solid fa-image fs-1 mb-2 text-secondary"></i>
                             <span>Belum ada foto tampak depan</span>
                         </div>
@@ -481,189 +481,91 @@
     <!-- Gallery Modal -->
     <div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content bg-dark text-white border-0">
+                <div class="modal-header border-0 pb-0 position-absolute w-100" style="z-index: 1055;">
                     <h5 class="modal-title fw-bold title-text" id="galleryModalLabel">Galeri Foto Properti</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4 p-md-5">
+                <div class="modal-body p-0">
+                    <div id="galleryCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            @php
+                                $allImages = [];
+                                if ($fotoKamar) $allImages[] = ['src' => $fotoKamar, 'label' => 'Foto Kamar'];
+                                if ($fotoBangunan) $allImages[] = ['src' => $fotoBangunan, 'label' => 'Foto Bangunan'];
+                                if ($fotoTampakDepan) $allImages[] = ['src' => $fotoTampakDepan, 'label' => 'Foto Tampak Depan'];
+                                if ($fotoKamarMandi) $allImages[] = ['src' => $fotoKamarMandi, 'label' => 'Foto Kamar Mandi'];
 
-                    <div class="mb-5">
-                        <h5 class="fw-bold mb-3 heading-text"><i class="fa-solid fa-building text-primary me-2"></i>
-                            Foto Bangunan</h5>
-                        <div class="row g-3">
-                            @if ($fotoBangunan)
-                                <div class="col-12 col-md-6">
-                                    <img src="{{ $fotoBangunan }}" class="w-100 rounded object-fit-cover shadow-sm"
-                                        style="height: 300px;" alt="Foto Bangunan">
-                                </div>
-                            @endif
-                            @if ($fotoTampakDepan)
-                                <div class="col-12 col-md-6">
-                                    <img src="{{ $fotoTampakDepan }}"
-                                        class="w-100 rounded object-fit-cover shadow-sm" style="height: 300px;"
-                                        alt="Foto Tampak Depan">
-                                </div>
-                            @endif
-                            @if (!$fotoBangunan && !$fotoTampakDepan)
-                                <div class="col-12 text-muted fst-italic">Belum ada foto bangunan diunggah.</div>
-                            @endif
-                        </div>
-                    </div>
+                                if ($fotoFasilitasKost) {
+                                    if (is_array($fotoFasilitasKost)) {
+                                        foreach ($fotoFasilitasKost as $img) $allImages[] = ['src' => asset($img), 'label' => 'Fasilitas Kos'];
+                                    } else {
+                                        $allImages[] = ['src' => asset($fotoFasilitasKost), 'label' => 'Fasilitas Kos'];
+                                    }
+                                }
+                                if ($fotoFasilitasKamar) {
+                                    if (is_array($fotoFasilitasKamar)) {
+                                        foreach ($fotoFasilitasKamar as $img) $allImages[] = ['src' => asset($img), 'label' => 'Fasilitas Kamar'];
+                                    } else {
+                                        $allImages[] = ['src' => asset($fotoFasilitasKamar), 'label' => 'Fasilitas Kamar'];
+                                    }
+                                }
+                                if ($fotoLainnyaKost) {
+                                    if (is_array($fotoLainnyaKost)) {
+                                        foreach ($fotoLainnyaKost as $img) $allImages[] = ['src' => asset($img), 'label' => 'Lainnya Kos'];
+                                    } else {
+                                        $allImages[] = ['src' => asset($fotoLainnyaKost), 'label' => 'Lainnya Kos'];
+                                    }
+                                }
+                                if ($fotoLainnyaKamar) {
+                                    if (is_array($fotoLainnyaKamar)) {
+                                        foreach ($fotoLainnyaKamar as $img) $allImages[] = ['src' => asset($img), 'label' => 'Lainnya Kamar'];
+                                    } else {
+                                        $allImages[] = ['src' => asset($fotoLainnyaKamar), 'label' => 'Lainnya Kamar'];
+                                    }
+                                }
+                                
+                                $uniqueImages = [];
+                                $addedUrls = [];
+                                foreach($allImages as $img) {
+                                    if(!in_array($img['src'], $addedUrls)) {
+                                        $addedUrls[] = $img['src'];
+                                        $uniqueImages[] = $img;
+                                    }
+                                }
+                            @endphp
 
-                    <div class="mb-5">
-                        <h5 class="fw-bold mb-3 heading-text"><i class="fa-solid fa-bed text-primary me-2"></i> Foto
-                            Kamar</h5>
-                        <div class="row g-3">
-                            @if ($fotoKamar)
-                                <div class="col-12 col-md-6">
-                                    <img src="{{ $fotoKamar }}" class="w-100 rounded object-fit-cover shadow-sm"
-                                        style="height: 300px;" alt="Foto Kamar">
-                                </div>
-                            @else
-                                <div class="col-12 text-muted fst-italic">Belum ada foto kamar diunggah.</div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="mb-5">
-                        <h5 class="fw-bold mb-3 heading-text"><i class="fa-solid fa-bath text-primary me-2"></i> Foto
-                            Kamar Mandi</h5>
-                        <div class="row g-3">
-                            @if ($fotoKamarMandi)
-                                <div class="col-12 col-md-6">
-                                    <img src="{{ $fotoKamarMandi }}" class="w-100 rounded object-fit-cover shadow-sm"
-                                        style="height: 300px;" alt="Foto Kamar Mandi">
-                                </div>
-                            @else
-                                <div class="col-12 text-muted fst-italic">Belum ada foto kamar mandi diunggah.</div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="mb-5">
-                        <h5 class="fw-bold mb-3 heading-text"><i class="fa-solid fa-couch text-primary me-2"></i> Foto
-                            Fasilitas Umum (Kos)</h5>
-                        <div class="row g-3">
-                            @if ($fotoFasilitasKost)
-                                @if (is_array($fotoFasilitasKost))
-                                    @foreach ($fotoFasilitasKost as $img)
-                                        <div class="col-12 col-md-6">
-                                            <div class="position-relative h-100">
-                                                <img src="{{ asset($img) }}"
-                                                    class="w-100 rounded object-fit-cover shadow-sm"
-                                                    style="height: 300px;" alt="Fasilitas Kost">
-                                            </div>
+                            @if(count($uniqueImages) > 0)
+                                @foreach($uniqueImages as $index => $image)
+                                    <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                        <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
+                                            <img src="{{ $image['src'] }}" class="d-block w-100" style="max-height: 100%; object-fit: contain;" alt="{{ $image['label'] }}">
                                         </div>
-                                    @endforeach
-                                @else
-                                    <div class="col-12 col-md-6">
-                                        <div class="position-relative h-100">
-                                            <img src="{{ asset($fotoFasilitasKost) }}"
-                                                class="w-100 rounded object-fit-cover shadow-sm"
-                                                style="height: 300px;" alt="Fasilitas Kost">
+                                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded px-3 py-1 mb-3">
+                                            <h5 class="mb-0">{{ $image['label'] }}</h5>
                                         </div>
                                     </div>
-                                @endif
+                                @endforeach
                             @else
-                                <div class="col-12 text-muted fst-italic">Belum ada foto fasilitas umum diunggah.</div>
+                                <div class="carousel-item active">
+                                    <div class="d-flex justify-content-center align-items-center text-white" style="height: 80vh;">
+                                        <h5>Belum ada foto</h5>
+                                    </div>
+                                </div>
                             @endif
                         </div>
+                        @if(count($uniqueImages) > 1)
+                        <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                        @endif
                     </div>
-
-                    <div class="mb-5">
-                        <h5 class="fw-bold mb-3 heading-text"><i class="fa-solid fa-bed text-primary me-2"></i> Foto
-                            Fasilitas Dalam Kamar</h5>
-                        <div class="row g-3">
-                            @if ($fotoFasilitasKamar)
-                                @if (is_array($fotoFasilitasKamar))
-                                    @foreach ($fotoFasilitasKamar as $img)
-                                        <div class="col-12 col-md-6">
-                                            <div class="position-relative h-100">
-                                                <img src="{{ asset($img) }}"
-                                                    class="w-100 rounded object-fit-cover shadow-sm"
-                                                    style="height: 300px;" alt="Fasilitas Kamar">
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @else
-                                    <div class="col-12 col-md-6">
-                                        <div class="position-relative h-100">
-                                            <img src="{{ asset($fotoFasilitasKamar) }}"
-                                                class="w-100 rounded object-fit-cover shadow-sm"
-                                                style="height: 300px;" alt="Fasilitas Kamar">
-                                        </div>
-                                    </div>
-                                @endif
-                            @else
-                                <div class="col-12 text-muted fst-italic">Belum ada foto fasilitas dalam kamar
-                                    diunggah.</div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <h5 class="fw-bold mb-3 heading-text"><i class="fa-solid fa-images text-primary me-2"></i>
-                            Foto Lainnya</h5>
-                        <div class="row g-3">
-                            @if ($fotoLainnyaKost)
-                                @if (is_array($fotoLainnyaKost))
-                                    @foreach ($fotoLainnyaKost as $img)
-                                        <div class="col-12 col-md-6">
-                                            <div class="position-relative h-100">
-                                                <img src="{{ asset($img) }}"
-                                                    class="w-100 rounded object-fit-cover shadow-sm"
-                                                    style="height: 300px;" alt="Lainnya Kost">
-                                                <span
-                                                    class="position-absolute bottom-0 start-0 m-2 badge bg-dark bg-opacity-75">Kost</span>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @else
-                                    <div class="col-12 col-md-6">
-                                        <div class="position-relative h-100">
-                                            <img src="{{ asset($fotoLainnyaKost) }}"
-                                                class="w-100 rounded object-fit-cover shadow-sm"
-                                                style="height: 300px;" alt="Lainnya Kost">
-                                            <span
-                                                class="position-absolute bottom-0 start-0 m-2 badge bg-dark bg-opacity-75">Kost</span>
-                                        </div>
-                                    </div>
-                                @endif
-                            @endif
-
-                            @if ($fotoLainnyaKamar)
-                                @if (is_array($fotoLainnyaKamar))
-                                    @foreach ($fotoLainnyaKamar as $img)
-                                        <div class="col-12 col-md-6">
-                                            <div class="position-relative h-100">
-                                                <img src="{{ asset($img) }}"
-                                                    class="w-100 rounded object-fit-cover shadow-sm"
-                                                    style="height: 300px;" alt="Lainnya Kamar">
-                                                <span
-                                                    class="position-absolute bottom-0 start-0 m-2 badge bg-dark bg-opacity-75">Kamar</span>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @else
-                                    <div class="col-12 col-md-6">
-                                        <div class="position-relative h-100">
-                                            <img src="{{ asset($fotoLainnyaKamar) }}"
-                                                class="w-100 rounded object-fit-cover shadow-sm"
-                                                style="height: 300px;" alt="Lainnya Kamar">
-                                            <span
-                                                class="position-absolute bottom-0 start-0 m-2 badge bg-dark bg-opacity-75">Kamar</span>
-                                        </div>
-                                    </div>
-                                @endif
-                            @endif
-                            @if (!$fotoLainnyaKost && !$fotoLainnyaKamar)
-                                <div class="col-12 text-muted fst-italic">Belum ada foto lainnya diunggah.</div>
-                            @endif
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
