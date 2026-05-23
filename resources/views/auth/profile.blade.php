@@ -163,6 +163,7 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Flatpickr (Tanggal)
@@ -178,6 +179,16 @@
                     bsAlert.close();
                 }, 4000);
             }
+
+            @if(session('error'))
+            Swal.fire({
+                title: 'Perhatian!',
+                text: '{{ session("error") }}',
+                icon: 'warning',
+                confirmButtonText: 'Mengerti',
+                confirmButtonColor: '#0d6efd'
+            });
+            @endif
         });
     </script>
 @endpush

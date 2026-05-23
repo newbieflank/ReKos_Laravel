@@ -9,18 +9,37 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
+            @php
+                $isProfileIncomplete = false;
+                if (auth()->check()) {
+                    $user = auth()->user();
+                    $userDetail = $user->userDetail;
+                    if (!$userDetail || 
+                        empty(trim((string)$userDetail->phone)) || 
+                        empty(trim((string)$userDetail->gender)) || 
+                        $userDetail->gender === 'unknown' || 
+                        empty(trim((string)$userDetail->birth_date))) {
+                        $isProfileIncomplete = true;
+                    }
+                }
+            @endphp
+
             <ul class="navbar-nav mx-auto fw-medium">
                 <li class="nav-item px-2">
-                    <a class="nav-link" href="{{ route('home') }}#hero">Home</a>
+                    <a class="nav-link" href="{{ $isProfileIncomplete ? 'javascript:void(0)' : route('home') . '#hero' }}"
+                        @if($isProfileIncomplete) onclick="alertProfileIncompleteNav()" @endif>Home</a>
                 </li>
                 <li class="nav-item px-2">
-                    <a class="nav-link" href="{{ route('home') }}#rekomendasi">Kost-an</a>
+                    <a class="nav-link" href="{{ $isProfileIncomplete ? 'javascript:void(0)' : route('home') . '#rekomendasi' }}"
+                        @if($isProfileIncomplete) onclick="alertProfileIncompleteNav()" @endif>Kost-an</a>
                 </li>
                 <li class="nav-item px-2">
-                    <a class="nav-link" href="{{ route('home') }}#rating">Rating</a>
+                    <a class="nav-link" href="{{ $isProfileIncomplete ? 'javascript:void(0)' : route('home') . '#rating' }}"
+                        @if($isProfileIncomplete) onclick="alertProfileIncompleteNav()" @endif>Rating</a>
                 </li>
                 <li class="nav-item px-2">
-                    <a class="nav-link" href="{{ route('home') }}#contact">Contact</a>
+                    <a class="nav-link" href="{{ $isProfileIncomplete ? 'javascript:void(0)' : route('home') . '#contact' }}"
+                        @if($isProfileIncomplete) onclick="alertProfileIncompleteNav()" @endif>Contact</a>
                 </li>
             </ul>
 
@@ -121,24 +140,37 @@
     </div>
 </div>
 
-<script>
-    document.querySelectorAll('a.nav-link[href*="#"]').forEach(function(link) {
-        link.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            const hashIndex = href.indexOf('#');
-            if (hashIndex === -1) return;
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function alertProfileIncompleteNav() {
+            Swal.fire({
+                title: 'Profil Belum Lengkap!',
+                text: 'Harap lengkapi profil Anda terlebih dahulu untuk menelusuri halaman lain.',
+                icon: 'warning',
+                confirmButtonText: 'Mengerti',
+                confirmButtonColor: '#0d6efd'
+            });
+        }
 
-            const hash = href.substring(hashIndex + 1);
-            const target = document.getElementById(hash);
+        document.querySelectorAll('a.nav-link[href*="#"]').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href === 'javascript:void(0)') return;
+                
+                const hashIndex = href.indexOf('#');
+                if (hashIndex === -1) return;
 
-            if (target) {
-                e.preventDefault();
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-                history.replaceState(null, '', window.location.pathname);
-            }
+                const hash = href.substring(hashIndex + 1);
+                const target = document.getElementById(hash);
+
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    history.replaceState(null, '', window.location.pathname);
+                }
+            });
         });
-    });
-</script>
+    </script>
