@@ -219,18 +219,10 @@ class PaymentController extends Controller
 
         if ($transaction == 'settlement' || $transaction == 'capture') {
             $payment->update(['status' => 'successful']);
-
-            if ($payment->tenant && $payment->tenant->room) {
-                $payment->tenant->room->update(['available' => 0]);
-            }
         } elseif ($transaction == 'pending') {
             $payment->update(['status' => 'waiting']);
         } elseif (in_array($transaction, ['deny', 'expire', 'cancel'])) {
             $payment->update(['status' => 'failed']);
-
-            if ($payment->tenant && $payment->tenant->room) {
-                $payment->tenant->room->update(['available' => 1]);
-            }
         }
 
         return response()->json(['message' => 'Notification handled successfully'], 200);
