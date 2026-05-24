@@ -18,7 +18,11 @@ class AppReviewController extends Controller
         ]);
 
         $badWords = [];
-        if (Storage::exists('badwords.json')) {
+        $badWordsPath = storage_path('app/badwords.json');
+        
+        if (file_exists($badWordsPath)) {
+            $badWords = json_decode(file_get_contents($badWordsPath), true) ?? [];
+        } elseif (Storage::exists('badwords.json')) {
             $badWords = json_decode(Storage::get('badwords.json'), true) ?? [];
         }
         

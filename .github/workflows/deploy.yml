@@ -46,7 +46,9 @@ jobs:
         run: php artisan dusk:chrome-driver --detect
 
       - name: Start Web Server
-        run: php artisan serve &
+        run: |
+          php artisan serve &
+          sleep 3 
         
       - name: Run Dusk Tests
         run: php artisan dusk
@@ -100,19 +102,11 @@ jobs:
           envs: DB_PASSWORD 
           script: |
             cd /var/www/html/rekos-laravel
-            
             export DB_PASSWORD=$DB_PASSWORD
-            
-            # 1. Update kluster Swarm dengan image terbaru dari DockerHub
-            docker stack deploy --with-registry-auth -c docker-compose.yml rekos_cluster
-            
-            # 2. Beri waktu sejenak agar container baru selesai melakukan booting
-            sleep 15
-            
-            # 3. Cari satu ID container Laravel yang sedang bertugas di Manager Node
+            docker pull sonuafriza/rekos-laravel:latest
+            docker stack deploy --with-registry-auth --resolve-image=always -c docker-compose.yml rekos_cluster
+            sleep 20
             CONTAINER_ID=$(docker ps -q -f name=rekos_cluster_app | head -n 1)
-            
-            # 4. Eksekusi perintah artisan (HANYA MIGRATE & OPTIMIZE)
             if [ -n "$CONTAINER_ID" ]; then
               docker exec $CONTAINER_ID php artisan migrate --force
               docker exec $CONTAINER_ID php artisan optimize:clear
