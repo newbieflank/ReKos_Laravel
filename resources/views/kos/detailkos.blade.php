@@ -218,6 +218,7 @@
                     <a href="#" class="tab-link" onclick="changeTab(event, 'lokasi', this)">Lokasi</a>
                     <a href="#" class="tab-link" onclick="changeTab(event, 'kebijakan', this)">Kebijakan</a>
                     <a href="#" class="tab-link" onclick="changeTab(event, 'tentang', this)">Tentang</a>
+                    <a href="#" class="tab-link" onclick="changeTab(event, 'ulasan', this)">Ulasan</a>
                 </div>
 
                 <h2 class="fw-bold title-text mb-1">{{ $firstRoom ? $firstRoom->room_name : 'Kamar' }}</h2>
@@ -466,6 +467,47 @@
             <div class="text-muted body-text lh-lg">
                 <p>{{ $kos->description ?? 'Belum ada deskripsi' }}</p>
             </div>
+        </div>
+
+        <div id="ulasan" class="pb-4 mb-4 scroll-section">
+            <h5 class="fw-bold mb-3 heading-text">Ulasan Penyewa</h5>
+            @if ($kos->reviews && $kos->reviews->count() > 0)
+                <div class="d-flex flex-column gap-3">
+                    @foreach ($kos->reviews as $review)
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="background: linear-gradient(145deg, #ffffff, #f8f9fa); border: 1px solid #e9ecef !important;">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="bg-primary bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold shadow-sm" style="width: 45px; height: 45px; font-size: 1.2rem;">
+                                        {{ strtoupper(substr($review->user->name ?? 'A', 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold text-dark">{{ $review->user->name ?? 'Anonim' }}</h6>
+                                        <div class="text-warning small mt-1 d-flex align-items-center">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                @if ($i <= $review->rating)
+                                                    <i class="fa-solid fa-star"></i>
+                                                @else
+                                                    <i class="fa-regular fa-star text-secondary opacity-25"></i>
+                                                @endif
+                                            @endfor
+                                            <span class="text-muted ms-2" style="font-size: 0.8rem;"><i class="fa-regular fa-clock me-1"></i>{{ \Carbon\Carbon::parse($review->created_at)->diffForHumans() }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-secondary mb-0 body-text fst-italic lh-lg">"{!! nl2br(e($review->review)) !!}"</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-muted body-text bg-light p-5 rounded-4 text-center border" style="border-style: dashed !important;">
+                    <div class="bg-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm mb-3" style="width: 60px; height: 60px;">
+                        <i class="fa-regular fa-comment-dots fs-3 text-primary"></i>
+                    </div>
+                    <p class="mb-0 fw-medium">Belum ada ulasan untuk kost ini.</p>
+                    <small class="opacity-75">Jadilah yang pertama menyewa dan memberikan ulasan!</small>
+                </div>
+            @endif
         </div>
 
         {{--
