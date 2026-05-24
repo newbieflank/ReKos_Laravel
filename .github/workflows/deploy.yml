@@ -104,9 +104,6 @@ jobs:
             cd /var/www/html/rekos-laravel
             export DB_PASSWORD=$DB_PASSWORD
             
-            echo "Membersihkan cache Docker lama..."
-            docker system prune -af --volumes || true
-            
             docker pull sonuafriza/rekos-laravel:latest
             
             echo "Deploying ke Docker Swarm..."
