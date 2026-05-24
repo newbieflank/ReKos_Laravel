@@ -20,7 +20,17 @@ class PaymentController extends Controller
     {
         $kos = Room::with('boardingHouse')->findOrFail($id);
 
-        return view('payments.informasi', compact('kos'));
+        $bookedDates = Tenant::where('room_id', $kos->id)
+            ->select('start_date', 'end_date')
+            ->get()
+            ->map(function ($tenant) {
+                return [
+                    'start' => $tenant->start_date,
+                    'end' => $tenant->end_date
+                ];
+            });
+
+        return view('payments.informasi', compact('kos', 'bookedDates'));
     }
 
     public function save1(Request $request)
@@ -42,11 +52,12 @@ class PaymentController extends Controller
     public function payment(Request $request)
     {
         $bookingData = session('booking_data');
-        $kos = Room::with('boardingHouse')->findOrFail($bookingData['room_id']);
 
         if (!$bookingData) {
             return redirect()->route('home')->with('error', 'Sesi habis, silakan isi data kembali.');
         }
+
+        $kos = Room::with('boardingHouse')->findOrFail($bookingData['room_id']);
 
         return view('payments.pembayaran', compact('bookingData', 'kos'));
     }

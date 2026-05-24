@@ -11,11 +11,11 @@ class TenantObserver
      */
     public function created(Tenant $tenant): void
     {
-        $room = $tenant->room;
-        if ($room) {
-            $room->available = 0;
-            $room->save();
-        }
+        // $room = $tenant->room;
+        // if ($room) {
+        //     $room->available = 0;
+        //     $room->save();
+        // }
     }
 
     /**
@@ -31,11 +31,11 @@ class TenantObserver
      */
     public function deleted(Tenant $tenant): void
     {
-        $room = $tenant->room;
-        if ($room) {
-            $room->available = 1;
-            $room->save();
-        }
+        // $room = $tenant->room;
+        // if ($room) {
+        //     $room->available = 1;
+        //     $room->save();
+        // }
     }
 
     /**

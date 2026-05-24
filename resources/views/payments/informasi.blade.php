@@ -360,21 +360,46 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #1a1a2e;
             cursor: pointer;
+            background: #fff;
+            transition: border-color 0.2s;
+            min-width: 210px;
+            /* Menjaga lebar box agar tetap konsisten dan proporsional */
         }
 
-        /* Input asli disembunyikan tapi tetap bisa diklik di seluruh area */
-        .date-input input[type="date"] {
+        .date-input:hover {
+            border-color: #1E3A8A;
+        }
+
+        .date-input svg,
+        .date-input i {
+            color: #888;
+            position: relative;
+            z-index: 2;
+        }
+
+        .date-input span {
+            position: relative;
+            z-index: 2;
+        }
+
+        .date-input input[data-input] {
             position: absolute;
-            opacity: 0;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            opacity: 0;
             cursor: pointer;
+            z-index: 5;
+            background: transparent;
+            border: none;
+            outline: none;
         }
     </style>
 
@@ -478,19 +503,19 @@
                         <div class="date-row">
                             <div class="date-group">
                                 <label>Tanggal Masuk</label>
-                                <div class="date-input">
+                                <div class="date-input" id="checkInWrapper">
                                     <span id="textCheckIn">12 Okt 2023</span>
                                     <i class="bi bi-calendar3"></i>
-                                    <input type="date" id="checkInDate" name="start_date">
+                                    <input type="text" id="checkInDate" name="start_date" data-input>
                                 </div>
                             </div>
 
                             <div class="date-group">
                                 <label>Tanggal Keluar</label>
-                                <div class="date-input">
+                                <div class="date-input" id="checkOutWrapper">
                                     <span id="textCheckOut">13 Okt 2023</span>
                                     <i class="bi bi-calendar3"></i>
-                                    <input type="date" id="checkOutDate" name="end_date">
+                                    <input type="text" id="checkOutDate" name="end_date" data-input>
                                 </div>
                             </div>
                         </div>
@@ -528,24 +553,50 @@
     </div>
 
     <script>
-        // Ambil harga langsung dari database, fallback ke 0 jika tidak ada
         const hargaHarian = {{ $kos->daily_price ?? 0 }};
         const hargaMingguan = {{ $kos->weekly_price ?? 0 }};
         const hargaBulanan = {{ $kos->monthly_price ?? 0 }};
         const biayaLayanan = 5000;
+
+        // Ambil data rentang tanggal terbooking dari Laravel PHP
+        const bookedRanges = {!! json_encode($bookedDates ?? []) !!};
 
         const checkInInput = document.getElementById('checkInDate');
         const checkOutInput = document.getElementById('checkOutDate');
         const textCheckIn = document.getElementById('textCheckIn');
         const textCheckOut = document.getElementById('textCheckOut');
 
+        let checkInPicker, checkOutPicker;
+
         function formatDateDisplay(dateString) {
+            if (!dateString) return "Pilih Tanggal";
             const options = {
                 day: 'numeric',
                 month: 'short',
                 year: 'numeric'
             };
             return new Date(dateString).toLocaleDateString('id-ID', options);
+        }
+
+        // FUNGSI UTAMA: Cek apakah rentang tanggal bentrok dengan bookingan yang ada
+        function isRangeConflict(startDateStr, endDateStr) {
+            const start = new Date(startDateStr);
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(endDateStr);
+            end.setHours(0, 0, 0, 0);
+
+            for (let range of bookedRanges) {
+                const bStart = new Date(range.start);
+                bStart.setHours(0, 0, 0, 0);
+                const bEnd = new Date(range.end);
+                bEnd.setHours(0, 0, 0, 0);
+
+                // Formula tabrakan: (StartA <= EndB) && (EndA >= StartB)
+                if (start <= bEnd && end >= bStart) {
+                    return true; // Bentrok!
+                }
+            }
+            return false;
         }
 
         function updateSummary() {
@@ -564,17 +615,14 @@
             let sewaHarga = 0;
             let label = "";
 
-            // Logika Perhitungan Berdasarkan Tab Aktif
             if (activeTab == "1") {
                 sewaHarga = diffDays * hargaHarian;
                 label = `Harga Sewa (${diffDays} Hari)`;
             } else if (activeTab == "7") {
-                // Jika user pilih mingguan, kita hitung kelipatan minggunya
                 const weeks = Math.ceil(diffDays / 7);
                 sewaHarga = weeks * hargaMingguan;
                 label = `Harga Sewa (${weeks} Minggu)`;
             } else if (activeTab == "30") {
-                // Jika user pilih bulanan, kita hitung kelipatan bulannya
                 const months = Math.ceil(diffDays / 30);
                 sewaHarga = months * hargaBulanan;
                 label = `Harga Sewa (${months} Bulan)`;
@@ -582,7 +630,6 @@
 
             const totalFinal = sewaHarga + biayaLayanan;
 
-            // Update UI
             const inputHarga = document.getElementById('inputTotalPrice');
             if (inputHarga) inputHarga.value = totalFinal;
 
@@ -592,8 +639,7 @@
         }
 
         function setTab(element) {
-            if (event) event.preventDefault();
-
+            if (window.event) window.event.preventDefault();
             if (element.classList.contains('disabled')) return;
 
             document.querySelectorAll('.duration-tab').forEach(tab => tab.classList.remove('active'));
@@ -605,17 +651,36 @@
                 "7": "mingguan",
                 "30": "bulanan"
             };
-
             document.getElementById('durationType').value = typeMapping[days];
 
+            if (checkInPicker) {
+                checkInPicker.redraw();
+
+                if (checkInInput.value) {
+                    const currentStart = new Date(checkInInput.value);
+                    const calculatedEnd = new Date(currentStart);
+                    calculatedEnd.setDate(currentStart.getDate() + days);
+                    const currentEndStr = calculatedEnd.toISOString().split('T')[0];
+
+                    if (isRangeConflict(checkInInput.value, currentEndStr)) {
+                        checkInPicker.clear();
+                        checkOutInput.value = "";
+                        textCheckIn.innerText = "Pilih Tanggal";
+                        textCheckOut.innerText = "Pilih Tanggal";
+                        updateSummary();
+                        return;
+                    }
+                }
+            }
 
             const startDate = new Date(checkInInput.value);
             if (!isNaN(startDate.getTime())) {
                 const endDate = new Date(startDate);
                 endDate.setDate(startDate.getDate() + days);
-
                 const valEndDate = endDate.toISOString().split('T')[0];
+
                 checkOutInput.value = valEndDate;
+                if (checkOutPicker) checkOutPicker.setDate(valEndDate);
                 textCheckOut.innerText = formatDateDisplay(valEndDate);
             }
 
@@ -623,60 +688,52 @@
         }
 
         window.onload = function() {
-            const today = new Date();
-            const valToday = today.toISOString().split('T')[0];
-            checkInInput.value = valToday;
-            textCheckIn.innerText = formatDateDisplay(valToday);
+            const today = new Date().toISOString().split('T')[0];
+
+            checkInPicker = flatpickr(document.getElementById('checkInWrapper'), {
+                wrap: true,
+                minDate: "today",
+                dateFormat: "Y-m-d",
+                disable: [
+                    function(date) {
+                        const dateStr = date.toISOString().split('T')[0];
+                        let isBooked = bookedRanges.some(range => dateStr >= range.start && dateStr <= range
+                            .end);
+                        if (isBooked) return true;
+
+                        const activeTabElement = document.querySelector('.duration-tab.active');
+                        if (activeTabElement) {
+                            const days = parseInt(activeTabElement.getAttribute('data-days'));
+                            const endDate = new Date(date);
+                            endDate.setDate(date.getDate() + days);
+                            const endDateStr = endDate.toISOString().split('T')[0];
+
+                            return isRangeConflict(dateStr, endDateStr);
+                        }
+                        return false;
+                    }
+                ],
+                onChange: function(selectedDates, dateStr) {
+                    textCheckIn.innerText = formatDateDisplay(dateStr);
+                    const activeTab = document.querySelector('.duration-tab.active');
+                    if (activeTab) setTab(activeTab);
+                }
+            });
+
+            checkOutPicker = flatpickr(document.getElementById('checkOutWrapper'), {
+                wrap: true,
+                minDate: "today",
+                dateFormat: "Y-m-d",
+                clickOpens: false
+            });
+
+            checkInPicker.setDate(today, false);
+            textCheckIn.innerText = formatDateDisplay(today);
 
             const firstTab = document.querySelector('.duration-tab:not(.disabled)');
             if (firstTab) {
                 setTab(firstTab);
-            } else {
-                updateSummary();
             }
         };
-
-        checkInInput.addEventListener('change', function() {
-            textCheckIn.innerText = formatDateDisplay(this.value);
-            const activeTab = document.querySelector('.duration-tab.active');
-            if (activeTab) setTab(activeTab);
-        });
-
-        checkOutInput.addEventListener('change', function() {
-            const start = new Date(checkInInput.value);
-            let end = new Date(this.value);
-            const activeTab = document.querySelector('.duration-tab.active').getAttribute('data-days');
-            const interval = parseInt(activeTab);
-
-            if (end <= start) {
-                alert("Tanggal keluar harus setelah tanggal masuk");
-                end = new Date(start);
-                end.setDate(start.getDate() + interval);
-            } else {
-                const diffTime = end - start;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                if (interval > 1) {
-                    const multiplier = Math.ceil(diffDays / interval);
-                    const fixedDays = multiplier * interval;
-
-                    end = new Date(start);
-                    end.setDate(start.getDate() + fixedDays);
-
-                    // Beri tahu user (opsional)
-                    if (diffDays % interval !== 0) {
-                        alert(
-                            `Untuk durasi ${document.querySelector('.duration-tab.active').innerText}, tanggal disesuaikan ke kelipatan ${interval} hari terdekat.`
-                        );
-                    }
-                }
-            }
-
-            const finalDate = end.toISOString().split('T')[0];
-            this.value = finalDate;
-            textCheckOut.innerText = formatDateDisplay(finalDate);
-
-            updateSummary();
-        });
     </script>
 @endsection
