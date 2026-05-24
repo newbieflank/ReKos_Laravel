@@ -12,7 +12,7 @@ class KosController extends Controller
         $roomId = $request->query('room_id');
         $kos = BoardingHouse::with(['rooms' => function ($query) use ($roomId) {
             $query->where('id', $roomId);
-        }, 'reviews'])
+        }, 'reviews.user'])
             ->whereHas('rooms', function ($query) use ($roomId) {
                 $query->where('id', $roomId);
             })
