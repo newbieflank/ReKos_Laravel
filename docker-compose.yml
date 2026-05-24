@@ -28,9 +28,6 @@ services:
       - db
     deploy:
       replicas: 2
-      resources:
-        limits:
-          memory: 1024M
       restart_policy:
         condition: on-failure
 
@@ -52,9 +49,6 @@ services:
       - app
     deploy:
       replicas: 1
-      resources:
-        limits:
-          memory: 512M
       restart_policy:
         condition: any
 
@@ -69,9 +63,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-      resources:
-        limits:
-          memory: 512M
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
