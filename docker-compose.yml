@@ -20,7 +20,7 @@ services:
       start_period: 60s
     volumes:
       - /var/www/html/rekos-laravel/storage/app/public:/var/www/html/storage/app/public
-      - /var/www/html/rekos-laravel/.env:/var/www/html/.env
+      - /var/www/html/rekos-laravel/.env:/var/www/html/.env:ro
     depends_on:
       - db
     deploy:
