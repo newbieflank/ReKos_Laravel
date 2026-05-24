@@ -189,14 +189,19 @@ class PaymentController extends Controller
     public function callback(Request $request)
     {
         $serverKey = config('services.midtrans.server_key');
-        $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
+
+        $grossAmount = (int) $request->gross_amount;
+
+        $hashed = hash("sha512", $request->order_id . $request->status_code . $grossAmount . $serverKey);
 
         if ($hashed !== $request->signature_key) {
-            return response()->json(['message' => 'Invalid signature'], 403);
+            return response()->json([
+                'message' => 'Invalid signature',
+                'debug_server_key_exists' => !empty($serverKey),
+            ], 403);
         }
 
         $transaction = $request->transaction_status;
-        $type = $request->payment_type;
         $orderId = $request->order_id;
 
         $payment = Payment::where('order_id', $orderId)->first();
@@ -208,15 +213,19 @@ class PaymentController extends Controller
         if ($transaction == 'settlement' || $transaction == 'capture') {
             $payment->update(['status' => 'successful']);
 
-            $payment->tenant->room()->update(['available' => 0]);
+            if ($payment->tenant && $payment->tenant->room) {
+                $payment->tenant->room->update(['available' => 0]);
+            }
         } elseif ($transaction == 'pending') {
             $payment->update(['status' => 'waiting']);
         } elseif (in_array($transaction, ['deny', 'expire', 'cancel'])) {
             $payment->update(['status' => 'failed']);
 
-            $payment->tenant->room()->update(['available' => 1]);
+            if ($payment->tenant && $payment->tenant->room) {
+                $payment->tenant->room->update(['available' => 1]);
+            }
         }
 
-        return response()->json(['message' => 'Notification handled successfully']);
+        return response()->json(['message' => 'Notification handled successfully'], 200);
     }
 }
