@@ -19,19 +19,20 @@ class UpdateRoomStatus extends Command
 
         $roomsToOccupy = Tenant::whereDate('start_date', $today)
             ->pluck('room_id');
+        $roomsToRelease = Tenant::whereDate('end_date', $lateLimitDate)
+            ->pluck('room_id');
 
         if ($roomsToOccupy->isNotEmpty()) {
             Room::whereIn('id', $roomsToOccupy)
+                ->where('available', 1)
                 ->update(['available' => 0]);
 
             $this->info('Status kamar berhasil di-ubah menjadi TIDAK TERSEDIA (0) untuk tenant baru hari ini.');
         }
 
-        $roomsToRelease = Tenant::whereDate('end_date', $lateLimitDate)
-            ->pluck('room_id');
-
         if ($roomsToRelease->isNotEmpty()) {
             Room::whereIn('id', $roomsToRelease)
+                ->where('available', 0)
                 ->update(['available' => 1]);
 
             $this->info('Status kamar berhasil di-ubah menjadi TERSEDIA (1) setelah batas telat 7 hari.');
