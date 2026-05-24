@@ -15,27 +15,28 @@ class UpdateRoomStatus extends Command
     public function handle()
     {
         $today = Carbon::today()->toDateString();
-        $lateLimitDate = Carbon::today()->subDays(7)->toDateString();
-
-        $roomsToOccupy = Tenant::whereDate('start_date', $today)
-            ->pluck('room_id');
-        $roomsToRelease = Tenant::whereDate('end_date', $lateLimitDate)
-            ->pluck('room_id');
-
+        $roomsToOccupy = Tenant::whereDate('start_date', '<=', $today)
+            ->whereDate('end_date', '>', $today)
+            ->pluck('room_id')
+            ->unique();
+        $roomsToRelease = Tenant::whereDate('end_date', '<=', $today)
+            ->pluck('room_id')
+            ->unique();
         if ($roomsToOccupy->isNotEmpty()) {
             Room::whereIn('id', $roomsToOccupy)
                 ->where('available', 1)
                 ->update(['available' => 0]);
 
-            $this->info('Status kamar berhasil di-ubah menjadi TIDAK TERSEDIA (0) untuk tenant baru hari ini.');
+            $this->info('Status kamar berhasil di-ubah menjadi TIDAK TERSEDIA (0) untuk tenant aktif.');
         }
+        $actualRoomsToRelease = $roomsToRelease->diff($roomsToOccupy);
 
-        if ($roomsToRelease->isNotEmpty()) {
-            Room::whereIn('id', $roomsToRelease)
+        if ($actualRoomsToRelease->isNotEmpty()) {
+            Room::whereIn('id', $actualRoomsToRelease)
                 ->where('available', 0)
                 ->update(['available' => 1]);
 
-            $this->info('Status kamar berhasil di-ubah menjadi TERSEDIA (1) setelah batas telat 7 hari.');
+            $this->info('Status kamar berhasil di-ubah menjadi TERSEDIA (1) karena masa sewa habis.');
         }
 
         $this->info('Proses update status kamar berdasarkan data tenant selesai.');
