@@ -17,9 +17,9 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
       interval: 60s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+      timeout: 30s        
+      retries: 5         
+      start_period: 90s   
     volumes:
       - /var/www/html/rekos-laravel/storage/app/public:/var/www/html/storage/app/public
       - /var/www/html/rekos-laravel/.env:/var/www/html/.env:ro
@@ -28,8 +28,13 @@ services:
       - db
     deploy:
       replicas: 2
+      resources:
+        limits:
+          cpus: '1.0'    
+          memory: 1024M   
       restart_policy:
-        condition: on-failure
+        condition: any    
+        delay: 10s
 
   queue:
     image: sonuafriza/rekos-laravel:latest
@@ -49,6 +54,10 @@ services:
       - app
     deploy:
       replicas: 1
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
       restart_policy:
         condition: any
 
@@ -63,6 +72,10 @@ services:
       placement:
         constraints:
           - node.role == manager
+      resources:
+        limits:
+          cpus: '2.0'     
+          memory: 1024M
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -77,6 +90,10 @@ services:
       placement:
         constraints:
           - node.role == manager
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.0
@@ -90,6 +107,10 @@ services:
       - "8081:8080" 
     deploy:
       mode: global
+      resources:
+        limits:
+          cpus: '0.30'    
+          memory: 256M
       restart_policy:
         condition: on-failure
 
