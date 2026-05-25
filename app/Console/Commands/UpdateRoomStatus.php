@@ -15,30 +15,33 @@ class UpdateRoomStatus extends Command
     public function handle()
     {
         $today = Carbon::today()->toDateString();
+
         $roomsToOccupy = Tenant::whereDate('start_date', '<=', $today)
             ->whereDate('end_date', '>', $today)
             ->pluck('room_id')
-            ->unique();
-        $roomsToRelease = Tenant::whereDate('end_date', '<=', $today)
-            ->pluck('room_id')
-            ->unique();
-        if ($roomsToOccupy->isNotEmpty()) {
+            ->unique()
+            ->toArray();
+
+        if (!empty($roomsToOccupy)) {
             Room::whereIn('id', $roomsToOccupy)
                 ->where('available', 1)
                 ->update(['available' => 0]);
 
-            $this->info('Status kamar berhasil di-ubah menjadi TIDAK TERSEDIA (0) untuk tenant aktif.');
-        }
-        $actualRoomsToRelease = $roomsToRelease->diff($roomsToOccupy);
-
-        if ($actualRoomsToRelease->isNotEmpty()) {
-            Room::whereIn('id', $actualRoomsToRelease)
-                ->where('available', 0)
-                ->update(['available' => 1]);
-
-            $this->info('Status kamar berhasil di-ubah menjadi TERSEDIA (1) karena masa sewa habis.');
+            $this->info('Status kamar di-ubah menjadi TIDAK TERSEDIA (0) untuk tenant aktif. ID Kamar: ');
         }
 
-        $this->info('Proses update status kamar berdasarkan data tenant selesai.');
+        $queryRelease = Room::where('available', 0);
+        if (!empty($roomsToOccupy)) {
+            $queryRelease->whereNotIn('id', $roomsToOccupy);
+        }
+
+        $roomsReleasedCount = $queryRelease->update(['available' => 1]);
+        if ($roomsReleasedCount > 0) {
+            $this->info("Berhasil merilis $roomsReleasedCount kamar menjadi TERSEDIA (1) karena berada di luar masa sewa.");
+        } else {
+            $this->info('Tidak ada kamar di luar masa sewa yang perlu dirilis hari ini.');
+        }
+
+        $this->info('Proses update status kamar selesai.');
     }
 }
