@@ -46,7 +46,9 @@ jobs:
         run: php artisan dusk:chrome-driver --detect
 
       - name: Start Web Server
-        run: php artisan serve &
+        run: |
+          php artisan serve &
+          sleep 3 
         
       - name: Run Dusk Tests
         run: php artisan dusk
@@ -100,24 +102,24 @@ jobs:
           envs: DB_PASSWORD 
           script: |
             cd /var/www/html/rekos-laravel
-            
             export DB_PASSWORD=$DB_PASSWORD
             
-            # 1. Update kluster Swarm dengan image terbaru dari DockerHub
-            docker stack deploy --with-registry-auth -c docker-compose.yml rekos_cluster
+            docker pull sonuafriza/rekos-laravel:latest
             
-            # 2. Beri waktu sejenak agar container baru selesai melakukan booting
+            echo "Deploying ke Docker Swarm..."
+            docker stack deploy --with-registry-auth --resolve-image=always -c docker-compose.yml rekos_cluster
+            
+            # Tunggu sebentar agar database siap dan network tersedia
             sleep 15
             
-            # 3. Cari satu ID container Laravel yang sedang bertugas di Manager Node
-            CONTAINER_ID=$(docker ps -q -f name=rekos_cluster_app | head -n 1)
-            
-            # 4. Eksekusi perintah artisan (HANYA MIGRATE & OPTIMIZE)
-            if [ -n "$CONTAINER_ID" ]; then
-              docker exec $CONTAINER_ID php artisan migrate --force
-              docker exec $CONTAINER_ID php artisan optimize:clear
-              docker exec $CONTAINER_ID php artisan queue:restart
-              echo "Deployment dan optimasi berhasil dieksekusi di container $CONTAINER_ID."
-            else
-              echo "Warning: Container Laravel tidak ditemukan berjalan di node Manager ini untuk menjalankan artisan."
-            fi
+            echo "Menjalankan migrasi database..."
+            docker run --rm --network rekos_cluster_default \
+              -e DB_CONNECTION=mysql \
+              -e DB_HOST=db \
+              -e DB_PORT=3306 \
+              -e DB_DATABASE=rekos_db \
+              -e DB_USERNAME=root \
+              -e DB_PASSWORD=$DB_PASSWORD \
+              sonuafriza/rekos-laravel:latest php artisan migrate --force
+              
+            echo "Deployment dan optimasi berhasil! Kontainer baru otomatis bersih dari cache."
