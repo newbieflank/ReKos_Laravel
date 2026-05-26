@@ -136,7 +136,7 @@
         <div class="row align-items-center p-4 p-md-5 mx-1">
             <div class="col-lg-6 mb-4 mb-lg-0">
                 <h1 class="fw-bold display-5 mb-3" style="color: #1A202C;">
-                    Cari Kost Terbaik di Bondowoso, Temukan Hunian Nyaman untukmu.
+                    Cari Kost Terbaik di Jember, Temukan Hunian Nyaman untukmu.
                 </h1>
                 <p class="text-muted mb-4 fs-5">
                     Platform pencarian tempat tinggal no 1 dan aman di Bondowoso yang siap membantumu menemukan tempat
